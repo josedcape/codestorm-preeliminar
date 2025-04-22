@@ -1,0 +1,17 @@
+s.project_type AS projects_project_type, projects.tech_stack AS projects_tech_stack, projects.status AS projects_status, projects.progress AS projects_progress, projects.phase AS projects_phase, projects.current_step AS projects_current_step, projects.requirements AS projects_requirements, projects.generated_files AS projects_generated_files, projects.pending_actions AS projects_pending_actions, projects.plan AS projects_plan, projects.current_task_index AS projects_current_task_index, projects.current_agent AS projects_current_agent, projects.structure AS projects_structure, projects.total_files AS projects_total_files, projects.model AS projects_model, projects.error_count AS projects_error_count, projects.ai_config AS projects_ai_config, projects.active_agents AS projects_active_agents, projects.development_speed AS projects_development_speed, projects.created_at AS projects_created_at, projects.updated_at AS projects_updated_at 
+FROM projects 
+WHERE projects.project_id = %(project_id_1)s 
+ LIMIT %(param_1)s]
+[parameters: {'project_id_1': 'e46f0324-5eff-4047-bbb3-b49992813bcb', 'param_1': 1}]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+ERROR:constructor_routes:Error al obtener proyecto: (psycopg2.errors.UndefinedColumn) column projects.plan does not exist
+LINE 1: ...ects.pending_actions AS projects_pending_actions, projects.p...
+                                                             ^
+
+[SQL: SELECT projects.id AS projects_id, projects.user_id AS projects_user_id, projects.project_id AS projects_project_id, projects.name AS projects_name, projects.description AS projects_description, projects.project_type AS projects_project_type, projects.tech_stack AS projects_tech_stack, projects.status AS projects_status, projects.progress AS projects_progress, projects.phase AS projects_phase, projects.current_step AS projects_current_step, projects.requirements AS projects_requirements, projects.generated_files AS projects_generated_files, projects.pending_actions AS projects_pending_actions, projects.plan AS projects_plan, projects.current_task_index AS projects_current_task_index, projects.current_agent AS projects_current_agent, projects.structure AS projects_structure, projects.total_files AS projects_total_files, projects.model AS projects_model, projects.error_count AS projects_error_count, projects.ai_config AS projects_ai_config, projects.active_agents AS projects_active_agents, projects.development_speed AS projects_development_speed, projects.created_at AS projects_created_at, projects.updated_at AS projects_updated_at 
+FROM projects 
+WHERE projects.project_id = %(project_id_1)s 
+ LIMIT %(param_1)s]
+[parameters: {'project_id_1': 'e46f0324-5eff-4047-bbb3-b49992813bcb', 'param_1': 1}]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+ERROR:constructor_routes:Error al obtener proyecto: (psycopg2.err

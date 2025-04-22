@@ -1,0 +1,73 @@
+      .navbar-futuristic {
+            background: linear-gradient(90deg, #091428 0%, #0A2149 100%);
+            box-shadow: 0 2px 15px rgba(0, 100, 255, 0.2);
+            border-bottom: 1px solid #1E88E5;
+        }
+        
+        .logo-container {
+            display: flex;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+        
+        .logo-img {
+            width: 120px;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 3px solid #1E88E5;
+            box-shadow: 0 0 15px rgba(0, 150, 255, 0.5);
+        }
+        
+        .logo-text {
+            margin-left: 1rem;
+        }
+        
+        .hero-section {
+            background: linear-gradient(135deg, rgba(10, 33, 73, 0.9) 0%, rgba(13, 71, 161, 0.8) 100%);
+            border-radius: 10px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .feature-card {
+            background: rgba(9, 20, 40, 0.7);
+            border: 1px solid rgba(30, 136, 229, 0.2);
+            border-radius: 8px;
+            padding: 1.5rem;
+            height: 100%;
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 100, 255, 0.3);
+            border-color: rgba(30, 136, 229, 0.5);
+        }
+        
+        .feature-icon {
+            font-size: 2rem;
+            color: #1E88E5;
+            margin-bottom: 1rem;
+        }
+        
+        @media (max-width: 768px) {
+            .logo-container {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .logo-text {
+                margin-left: 0;
+                margin-top: 1rem;
+            }
+            
+            .logo-img {
+                width: 100px;
+                height: 100px;
+            }
+        }
+    </style>

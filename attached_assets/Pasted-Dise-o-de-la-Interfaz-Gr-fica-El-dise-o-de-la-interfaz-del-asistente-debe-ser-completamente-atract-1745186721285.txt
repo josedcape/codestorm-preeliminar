@@ -1,0 +1,36 @@
+Diseño de la Interfaz Gráfica:
+
+El diseño de la interfaz del asistente debe ser completamente atractivo y moderno, siguiendo un estilo futurista que refleje el avance tecnológico y la innovación del programa.
+
+Fondo y Color:
+
+El fondo debe ser azul oscuro, lo que brindará una sensación de seriedad y modernidad, además de permitir que los elementos de la interfaz se destaquen visualmente.
+
+Título:
+
+El título debe ser prominente, ubicado en la parte superior de la interfaz, y con un diseño en letras doradas. Las letras deben tener un estilo moderno y elegante, con un toque minimalista que resalte en el fondo oscuro.
+
+Animaciones:
+
+Se deben agregar animaciones sutiles pero impactantes para crear una experiencia dinámica. Por ejemplo, cuando el asistente esté procesando una tarea, puede mostrar una animación de carga futurista (como un círculo giratorio o una línea de progresión). Además, los iconos y botones pueden tener animaciones suaves al pasar el mouse o hacer clic.
+
+Iconos:
+
+Los iconos deben ser representativos del tema tratado, como iconos relacionados con la terminal, programación, voz, carga de archivos, y modelos de lenguaje. Se pueden usar iconos planos y modernos con un diseño minimalista. Los iconos deben tener un toque futurista, tal vez en tonos plateados o dorados, para hacerlos resaltar contra el fondo oscuro.
+
+Contenedores y Bordes:
+
+Los contenedores que agruparán diferentes funcionalidades (por ejemplo, el área de entrada de comandos, las opciones de modelos de lenguaje y la carga de archivos) deben tener bordes plateados para dar un acabado elegante y profesional.
+
+Los bordes deben tener un efecto sutil, tal vez con un brillo suave para resaltar la interfaz sin ser demasiado intrusivo.
+
+Estilo Futurista:
+
+El estilo debe estar orientado a la estética futurista, con líneas limpias, transiciones suaves y un diseño de interface que refleje la tecnología avanzada del asistente.
+
+El uso de sombras suaves y gradientes de color puede añadir un toque moderno, sin perder la claridad visual.
+
+Interactividad y Funcionalidad:
+
+La interfaz debe ser completamente interactiva, permitiendo que los usuarios puedan acceder rápidamente a las funcionalidades del asistente. Esto incluye el uso de botones de acción que lleven a diferentes secciones como la configuración de modelos, carga de archivos y comandos.
+

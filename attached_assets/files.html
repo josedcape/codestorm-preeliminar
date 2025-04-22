@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Explorador de Archivos - Codestorm Assistant</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <!-- Custom CSS -->
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            background-color: #121212;
+            color: #e9ecef;
+        }
+
+        .main-content {
+            flex: 1;
+        }
+
+        .file-explorer {
+            border: 1px solid #2c3034;
+            border-radius: 6px;
+            overflow: hidden;
+            background-color: #1a1a1a;
+        }
+
+        .file-explorer-header {
+            background-color: #212529;
+            border-bottom: 1px solid #2c3034;
+            padding: 10px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .file-path {
+            font-weight: 500;
+            color: #adb5bd;
+        }
+
+        .file-list {
+            padding: 0;
+            margin: 0;
+            list-style: none;
+        }
+
+        .file-item {
+            padding: 8px 15px;
+            border-bottom: 1px solid #2c3034;
+            display: flex;
+            align-items: center;
+            transition: background-color 0.2s;
+            cursor: pointer;
+        }
+
+        .file-item:hover {
+            background-color: #2c3034;
+        }
+
+        .file-item:last-child {
+            border-bottom: none;
+        }
+
+        .file-item-icon {
+            margin-right: 10px;
+            font-size: 1.2rem;
+        }
+
+        .directory .file-item-icon {
+            color: #ffc107;
+        }
+
+        .file .file-item-icon {
+            color: #6c757d;
+        }
+
+        .file-item-details {
+            display: flex;
+            margin-left: auto;
+            color: #6c757d;
+            font-size: 0.85rem;
+        }
+
+        .file-size {
+            margin-right: 15px;
+            min-width: 70px;
+            text-align: right;
+        }
+
+        .file-date {
+            min-width: 150px;
+        }
+
+        .file-actions {
+            gap: 8px;
+            display: flex;
+        }
+
+        .file-explorer-toolbar {
+            padding: 10px 15px;
+            background-color: #1e1e1e;
+            border-bottom: 1px solid #2c3034;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .btn-action {
+            padding: 5px 10px;
+            font-size: 0.9em;
+        }
+
+        .file-context-menu {
+            background-color: #2c3034;
+            border-radius: 4px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            padding: 5px 0;
+            min-width: 150px;
+            z-index: 100;
+        }
+
+        .context-menu-item {
+            padding: 8px 15px;
+            cursor: pointer;
+        }
+
+        .context-menu-item:hover {
+            background-color: #3c4044;
+        }
+
+        .context-menu-item.danger {
+            color: #dc3545;
+        }
+
+        .context-menu-item.danger:hover {
+            background-color: rgba(220, 53, 69, 0.2);
+        }
+
+        .context-menu-item i {
+            margin-right: 8px;
+        }
+
+        .file-create-form {
+            padding: 15px;
+            background-color: #212529;
+            border-radius: 6px;
+            border: 1px solid #2c3034;
+            margin-bottom: 15px;
+        }
+
+        .file-empty-message {
+            padding: 20px;
+            text-align: center;
+            color: #6c757d;
+        }
+
+        .navbar-brand {
+            font-weight: bold;
+            color: #ffffff !important;
+        }
+
+        .navbar-brand span {
+            color: #ffc107;
+        }
+        
+        .nav-link {
+            border-radius: 0.25rem;
+            transition: background-color 0.2s;
+        }
+        
+        .nav-link:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        .nav-link.active {
+            background-color: rgba(255, 255, 255, 0.2);
+            font-weight: 500;
+        }
+        
+        /* Estilos adicionales para la animación de carga */
+        .spin {
+            animation: spin 1s linear infinite;
+            display: inline-block;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Estilo para los botones de descarga */
+        .download-btn {
+            padding: 0.2rem 0.4rem;
+            font-size: 0.75rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Barra de navegación -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="bi bi-code-square"></i> Code<span>Storm</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Inicio</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/chat">Asistente</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/files">Archivos</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/code_corrector">Corrector</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container my-4 main-content">
+        <div class="row mb-4">
+            <div class="col-12">
+                <h1 class="fs-2 fw-bold mb-4">Explorador de Archivos</h1>
+                <p class="text-muted">Gestiona tus archivos y directorios de trabajo.</p>
+                
+                <!-- Formulario para crear archivos/carpetas -->
+                <div id="create-file-form" class="file-create-form d-none mb-4">
+                    <div class="mb-3">
+                        <label for="file-name" class="form-label">Nombre del archivo/carpeta</label>
+                        <input type="text" class="form-control" id="file-name" placeholder="ejemplo.js">
+                    </div>
+                    <div class="mb-3" id="file-content-container">
+                        <label for="file-content" class="form-label">Contenido (opcional)</label>
+                        <textarea class="form-control" id="file-content" rows="5" placeholder="// Tu código aquí"></textarea>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button id="save-file-btn" class="btn btn-primary">Guardar</button>
+                        <button id="cancel-file-btn" class="btn btn-outline-secondary">Cancelar</button>
+                    </div>
+                </div>
+                
+                <!-- Explorador de archivos -->
+                <div class="file-explorer">
+                    <!-- Barra de herramientas -->
+                    <div class="file-explorer-toolbar">
+                        <div class="breadcrumb mb-0">
+                            <ol class="breadcrumb mb-0" id="path-breadcrumb">
+                                <li class="breadcrumb-item active">/</li>
+                            </ol>
+                        </div>
+                        <div class="file-actions">
+                            <button id="new-file-btn" class="btn btn-sm btn-primary">
+                                <i class="bi bi-file-earmark-plus"></i> Nuevo Archivo
+                            </button>
+                            <button id="new-folder-btn" class="btn btn-sm btn-secondary">
+                                <i class="bi bi-folder-plus"></i> Nueva Carpeta
+                            </button>
+                            <label for="upload-file" class="btn btn-sm btn-info mb-0">
+                                <i class="bi bi-upload"></i> Subir Archivo
+                            </label>
+                            <input type="file" id="upload-file" class="d-none" multiple>
+                            <button id="clone-repo-btn" class="btn btn-sm btn-success">
+                                <i class="bi bi-git"></i> Clonar Repositorio
+                            </button>
+                            <div class="dropdown d-inline-block">
+                                <button class="btn btn-sm btn-info dropdown-toggle" type="button" id="downloadOptionsBtn" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="bi bi-download"></i> Descargar
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="downloadOptionsBtn">
+                                    <li><a class="dropdown-item" href="#" id="download-current-dir-btn"><i class="bi bi-file-earmark-zip"></i> Descargar este directorio</a></li>
+                                    <li><a class="dropdown-item" href="#" id="download-all-btn"><i class="bi bi-file-earmark-zip"></i> Descargar todo el workspace</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Encabezado del explorador -->
+                    <div class="file-explorer-header">
+                        <span class="fw-bold">Nombre</span>
+                        <div class="d-flex">
+                            <span class="file-size fw-bold">Tamaño</span>
+                            <span class="file-date fw-bold">Modificado</span>
+                        </div>
+                    </div>
+                    <!-- Contenido del explorador (lista de archivos) -->
+                    <div id="file-explorer-content" class="file-explorer-content">
+                        <div class="text-center py-5">
+                            <div class="spinner-border text-light" role="status">
+                                <span class="visually-hidden">Cargando...</span>
+                            </div>
+                            <p class="mt-3">Cargando archivos...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-light py-3 mt-auto">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <p class="mb-0">CodeStorm Assistant &copy; 2025</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <a href="#" class="text-light me-3"><i class="bi bi-github"></i></a>
+                    <a href="#" class="text-light me-3"><i class="bi bi-discord"></i></a>
+                    <a href="#" class="text-light"><i class="bi bi-twitter"></i></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.socket.io/4.6.1/socket.io.min.js"></script>
+    <script src="{{ url_for('static', filename='js/websocket.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/file-actions.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/download-manager.js') }}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Referencias a elementos del DOM
+            const fileExplorerContent = document.getElementById('file-explorer-content');
+            const pathBreadcrumb = document.getElementById('path-breadcrumb');
+            const newFileBtn = document.getElementById('new-file-btn');
+            const newFolderBtn = document.getElementById('new-folder-btn');
+            const createFileForm = document.getElementById('create-file-form');
+            const fileNameInput = document.getElementById('file-name');
+            const fileContentContainer = document.getElementById('file-content-container');
+            const fileContentInput = document.getElementById('file-content');
+            const saveFileBtn = document.getElementById('save-file-btn');
+            const cancelFileBtn = document.getElementById('cancel-file-btn');
+            const uploadFileInput = document.getElementById('upload-file');
+            
+            // Variable para almacenar el directorio actual
+            let currentDirectory = '/';
+            let creatingFolder = false;
+            
+            // Inicializar WebSocket
+            initializeWebSocket();
+            
+            // Configurar botones de descarga
+            const downloadCurrentDirBtn = document.getElementById('download-current-dir-btn');
+            const downloadAllBtn = document.getElementById('download-all-btn');
+            
+            // Evento para descargar el directorio actual
+            if (downloadCurrentDirBtn) {
+                downloadCurrentDirBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    window.location.href = `/api/download_directory/${currentDirectory}`;
+                });
+            }
+            
+            // Evento para descargar todo el workspace
+            if (downloadAllBtn) {
+                downloadAllBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    window.location.href = '/api/download_directory/';
+                });
+            }
+            
+            // Escuchar eventos de cambio en archivos
+            document.addEventListener('file_change', function(e) {
+                console.log('Cambio detectado:', e.detail);
+                // Recargar directorio si hay cambios
+                loadDirectory(currentDirectory);
+            });
+            
+            // Cargar archivos iniciales
+            loadDirectory('/');
+            
+            // Botón para crear nuevo archivo
+            newFileBtn.addEventListener('click', function() {
+                showCreateForm(false);
+            });
+            
+            // Botón para crear nueva carpeta
+            newFolderBtn.addEventListener('click', function() {
+                showCreateForm(true);
+            });
+            
+            // Botón para guardar archivo/carpeta
+            saveFileBtn.addEventListener('click', function() {
+                const fileName = fileNameInput.value.trim();
+                
+                if (!fileName) {
+                    alert('Por favor, ingresa un nombre para el archivo o carpeta.');
+                    return;
+                }
+                
+                if (creatingFolder) {
+                    // Crear carpeta
+                    const folderPath = currentDirectory === '/' 
+                        ? `${currentDirectory}${fileName}` 
+                        : `${currentDirectory}/${fileName}`;
+                        
+                    window.fileActions.createFolder(folderPath)
+                        .then(() => {
+                            hideCreateForm();
+                            loadDirectory(currentDirectory);
+                        })
+                        .catch(error => {
+                            alert(`Error al crear carpeta: ${error.message}`);
+                        });
+                } else {
+                    // Crear archivo
+                    const content = fileContentInput.value;
+                    const filePath = currentDirectory === '/' 
+                        ? `${currentDirectory}${fileName}` 
+                        : `${currentDirectory}/${fileName}`;
+                        
+                    window.fileActions.createFile(filePath, content)
+                        .then(() => {
+                            hideCreateForm();
+                            loadDirectory(currentDirectory);
+                        })
+                        .catch(error => {
+                            alert(`Error al crear archivo: ${error.message}`);
+                        });
+                }
+            });
+            
+            // Botón para cancelar creación
+            cancelFileBtn.addEventListener('click', function() {
+                hideCreateForm();
+            });
+            
+            // Input para subir archivos
+            uploadFileInput.addEventListener('change', function(e) {
+                const files = e.target.files;
+                
+                if (files.length === 0) return;
+                
+                const uploads = Array.from(files).map(file => {
+                    return new Promise((resolve, reject) => {
+                        const reader = new FileReader();
+                        
+                        reader.onload = function(event) {
+                            const content = event.target.result;
+                            const filePath = currentDirectory === '/' 
+                                ? `${currentDirectory}${file.name}` 
+                                : `${currentDirectory}/${file.name}`;
+                                
+                            window.fileActions.createFile(filePath, content)
+                                .then(resolve)
+                                .catch(reject);
+                        };
+                        
+                        reader.onerror = reject;
+                        
+                        // Leer como texto para archivos que no son binarios
+                        // En una aplicación real deberías manejar binarios también
+                        reader.readAsText(file);
+                    });
+                });
+                
+                Promise.all(uploads)
+                    .then(() => {
+                        loadDirectory(currentDirectory);
+                        uploadFileInput.value = '';
+                    })
+                    .catch(error => {
+                        alert(`Error al subir archivos: ${error.message}`);
+                        uploadFileInput.value = '';
+                    });
+            });
+            
+            // Función para mostrar el formulario de creación
+            function showCreateForm(isFolder) {
+                creatingFolder = isFolder;
+                createFileForm.classList.remove('d-none');
+                fileNameInput.value = '';
+                fileContentInput.value = '';
+                
+                if (isFolder) {
+                    fileContentContainer.classList.add('d-none');
+                } else {
+                    fileContentContainer.classList.remove('d-none');
+                }
+                
+                fileNameInput.focus();
+            }
+            
+            // Función para ocultar el formulario de creación
+            function hideCreateForm() {
+                createFileForm.classList.add('d-none');
+            }
+            
+            // Función para cargar un directorio
+            function loadDirectory(path) {
+                path = path || '/';
+                
+                // Normalizar path
+                if (path === '.') path = '/';
+                if (path.startsWith('./')) path = path.substring(2);
+                
+                currentDirectory = path;
+                
+                // Mostrar cargando
+                fileExplorerContent.innerHTML = `
+                    <div class="text-center py-5">
+                        <div class="spinner-border text-light" role="status">
+                            <span class="visually-hidden">Cargando...</span>
+                        </div>
+                        <p class="mt-3">Cargando archivos...</p>
+                    </div>
+                `;
+                
+                // Cargar archivos desde el servidor
+                fetch('/api/list_files', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ directory: path })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        fileExplorerContent.innerHTML = `
+                            <div class="file-empty-message">
+                                <i class="bi bi-exclamation-circle text-warning fs-1"></i>
+                                <p class="mt-3">${data.error}</p>
+                            </div>
+                        `;
+                        return;
+                    }
+                    
+                    // Actualizar breadcrumb
+                    updateBreadcrumb(path);
+                    
+                    // Mostrar archivos
+                    displayFiles(data.files || []);
+                    
+                    // Disparar evento de cambio de directorio para actualizar otras partes
+                    document.dispatchEvent(new CustomEvent('directoryChanged', { 
+                        detail: { path: currentDirectory } 
+                    }));
+                    
+                    // Disparar evento cuando los archivos se han cargado
+                    document.dispatchEvent(new CustomEvent('filesLoaded'));
+                })
+                .catch(error => {
+                    console.error('Error loading files:', error);
+                    fileExplorerContent.innerHTML = `
+                        <div class="file-empty-message">
+                            <i class="bi bi-exclamation-circle text-danger fs-1"></i>
+                            <p class="mt-3">Error al cargar archivos: ${error.message}</p>
+                        </div>
+                    `;
+                });
+            }
+            
+            // Función para mostrar archivos
+            function displayFiles(files) {
+                if (files.length === 0) {
+                    fileExplorerContent.innerHTML = `
+                        <div class="file-empty-message">
+                            <i class="bi bi-folder2-open text-warning fs-1"></i>
+                            <p class="mt-3">No hay archivos en este directorio</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                // Ordenar archivos: primero directorios, luego archivos, ordenados alfabéticamente
+                files.sort((a, b) => {
+                    if (a.type === 'directory' && b.type !== 'directory') return -1;
+                    if (a.type !== 'directory' && b.type === 'directory') return 1;
+                    return a.name.localeCompare(b.name);
+                });
+                
+                // Crear lista de archivos
+                const fileList = document.createElement('ul');
+                fileList.className = 'file-list';
+                
+                // Agregar elemento para navegar al directorio padre, excepto en la raíz
+                if (currentDirectory !== '/') {
+                    const parentItem = document.createElement('li');
+                    parentItem.className = 'file-item directory';
+                    parentItem.innerHTML = `
+                        <i class="bi bi-arrow-90deg-up file-item-icon"></i>
+                        <span>..</span>
+                    `;
+                    
+                    parentItem.addEventListener('click', function() {
+                        // Navegar al directorio padre
+                        const parentDir = currentDirectory.substring(0, currentDirectory.lastIndexOf('/'));
+                        loadDirectory(parentDir || '/');
+                    });
+                    
+                    fileList.appendChild(parentItem);
+                }
+                
+                // Agregar cada archivo/directorio a la lista
+                files.forEach(file => {
+                    const fileItem = document.createElement('li');
+                    fileItem.className = `file-item ${file.type}`;
+                    
+                    // Seleccionar ícono según tipo
+                    let icon = 'bi-file-earmark';
+                    if (file.type === 'directory') {
+                        icon = 'bi-folder';
+                    } else {
+                        // Identificar tipo de archivo por extensión
+                        const ext = file.name.split('.').pop()?.toLowerCase();
+                        if (['js', 'jsx', 'ts', 'tsx'].includes(ext)) icon = 'bi-filetype-js';
+                        else if (['py'].includes(ext)) icon = 'bi-filetype-py';
+                        else if (['html', 'htm'].includes(ext)) icon = 'bi-filetype-html';
+                        else if (['css', 'scss', 'sass'].includes(ext)) icon = 'bi-filetype-css';
+                        else if (['json'].includes(ext)) icon = 'bi-filetype-json';
+                        else if (['md', 'markdown'].includes(ext)) icon = 'bi-filetype-md';
+                        else if (['jpg', 'jpeg', 'png', 'gif', 'svg'].includes(ext)) icon = 'bi-file-earmark-image';
+                    }
+                    
+                    // Formatear fecha
+                    const modifiedDate = file.modified_at 
+                        ? new Date(file.modified_at).toLocaleString() 
+                        : '';
+                    
+                    // Formatear tamaño
+                    const formattedSize = file.type === 'file' 
+                        ? formatFileSize(file.size || 0) 
+                        : '';
+                    
+                    fileItem.innerHTML = `
+                        <i class="bi ${icon} file-item-icon"></i>
+                        <span>${file.name}</span>
+                        <div class="file-item-details">
+                            <span class="file-size">${formattedSize}</span>
+                            <span class="file-date">${modifiedDate}</span>
+                        </div>
+                    `;
+                    
+                    // Agregar manejador de clic
+                    fileItem.addEventListener('click', function() {
+                        if (file.type === 'directory') {
+                            // Navegar al directorio
+                            const dirPath = currentDirectory === '/' 
+                                ? `${currentDirectory}${file.name}` 
+                                : `${currentDirectory}/${file.name}`;
+                            loadDirectory(dirPath);
+                        } else {
+                            // Abrir archivo en editor
+                            const filePath = currentDirectory === '/' 
+                                ? `${currentDirectory}${file.name}` 
+                                : `${currentDirectory}/${file.name}`;
+                            window.location.href = `/edit/${filePath}`;
+                        }
+                    });
+                    
+                    fileList.appendChild(fileItem);
+                });
+                
+                fileExplorerContent.innerHTML = '';
+                fileExplorerContent.appendChild(fileList);
+                
+                // Añadir menú contextual a los elementos de archivo
+                addFileContextMenu();
+            }
+            
+            // Añadir menú contextual a los elementos de archivo
+            function addFileContextMenu() {
+                const fileItems = document.querySelectorAll('.file-item');
+                
+                fileItems.forEach(item => {
+                    item.addEventListener('contextmenu', function(e) {
+                        e.preventDefault();
+                        
+                        const fileName = item.querySelector('span').textContent;
+                        // No permitir operaciones en el directorio padre
+                        if (fileName === '..') return;
+                        
+                        const isDirectory = item.classList.contains('directory');
+                        const filePath = currentDirectory === '/' 
+                            ? fileName 
+                            : `${currentDirectory}/${fileName}`;
+                        
+                        // Crear menú contextual
+                        const menu = document.createElement('div');
+                        menu.className = 'file-context-menu position-absolute';
+                        menu.style.left = `${e.pageX}px`;
+                        menu.style.top = `${e.pageY}px`;
+                        
+                        // Elementos del menú contextual
+                        if (!isDirectory) {
+                            const editItem = document.createElement('div');
+                            editItem.className = 'context-menu-item';
+                            editItem.innerHTML = '<i class="bi bi-pencil"></i> Editar';
+                            editItem.addEventListener('click', () => {
+                                window.location.href = `/edit/${filePath}`;
+                            });
+                            menu.appendChild(editItem);
+                            
+                            const downloadItem = document.createElement('div');
+                            downloadItem.className = 'context-menu-item';
+                            downloadItem.innerHTML = '<i class="bi bi-download"></i> Descargar';
+                            downloadItem.addEventListener('click', () => {
+                                window.location.href = `/api/download_file/${filePath}`;
+                            });
+                            menu.appendChild(downloadItem);
+                        } else {
+                            const downloadZipItem = document.createElement('div');
+                            downloadZipItem.className = 'context-menu-item';
+                            downloadZipItem.innerHTML = '<i class="bi bi-file-earmark-zip"></i> Descargar como ZIP';
+                            downloadZipItem.addEventListener('click', () => {
+                                window.location.href = `/api/download_directory/${filePath}`;
+                            });
+                            menu.appendChild(downloadZipItem);
+                        }
+                        
+                        const deleteItem = document.createElement('div');
+                        deleteItem.className = 'context-menu-item danger';
+                        deleteItem.innerHTML = '<i class="bi bi-trash"></i> Eliminar';
+                        deleteItem.addEventListener('click', () => {
+                            window.fileActions.deleteFileOrFolder(filePath);
+                        });
+                        menu.appendChild(deleteItem);
+                        
+                        // Añadir menú al documento
+                        document.body.appendChild(menu);
+                        
+                        // Eliminar menú al hacer clic fuera
+                        const closeMenu = (e) => {
+                            if (!menu.contains(e.target)) {
+                                menu.remove();
+                                document.removeEventListener('click', closeMenu);
+                            }
+                        };
+                        
+                        setTimeout(() => {
+                            document.addEventListener('click', closeMenu);
+                        }, 0);
+                    });
+                });
+            }
+            
+            // Actualizar navegación de migas de pan
+            function updateBreadcrumb(path) {
+                // Limpiar migas de pan existentes
+                pathBreadcrumb.innerHTML = '';
+                
+                // Añadir raíz
+                const rootLi = document.createElement('li');
+                rootLi.className = 'breadcrumb-item';
+                
+                if (path === '/') {
+                    rootLi.classList.add('active');
+                    rootLi.textContent = '/';
+                } else {
+                    const rootLink = document.createElement('a');
+                    rootLink.href = '#';
+                    rootLink.textContent = '/';
+                    rootLink.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        loadDirectory('.');
+                    });
+                    rootLi.appendChild(rootLink);
+                }
+                
+                pathBreadcrumb.appendChild(rootLi);
+                
+                // Si estamos en la raíz, no hay más migas de pan para agregar
+                if (path === '/') return;
+                
+                // Dividir el camino en partes
+                const parts = path.split('/').filter(part => part);
+                let currentPath = '';
+                
+                // Añadir cada parte como miga de pan
+                parts.forEach((part, index) => {
+                    currentPath += '/' + part;
+                    
+                    const partLi = document.createElement('li');
+                    partLi.className = 'breadcrumb-item';
+                    
+                    if (index === parts.length - 1) {
+                        // Último elemento (directorio actual)
+                        partLi.classList.add('active');
+                        partLi.textContent = part;
+                    } else {
+                        // Directorio intermedio
+                        const partLink = document.createElement('a');
+                        partLink.href = '#';
+                        partLink.textContent = part;
+                        
+                        // Almacenar ruta para usar en el evento de clic
+                        const pathForClick = currentPath;
+                        
+                        partLink.addEventListener('click', (e) => {
+                            e.preventDefault();
+                            loadDirectory(pathForClick);
+                        });
+                        
+                        partLi.appendChild(partLink);
+                    }
+                    
+                    pathBreadcrumb.appendChild(partLi);
+                });
+            }
+            
+            // Formatear tamaño de archivo
+            function formatFileSize(bytes) {
+                if (bytes === 0) return '0 B';
+                
+                const k = 1024;
+                const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
+                const i = Math.floor(Math.log(bytes) / Math.log(k));
+                
+                return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+            }
+            
+            // Inicializar WebSocket
+            function initializeWebSocket() {
+                if (typeof initSocketConnection === 'function') {
+                    initSocketConnection((data) => {
+                        // Callback para cuando hay cambios notificados por WebSocket
+                        document.dispatchEvent(new CustomEvent('file_change', { detail: data }));
+                    });
+                }
+            }
+            
+            // Exponer funciones para uso desde otros scripts
+            window.fileExplorer = {
+                loadDirectory,
+                getCurrentDirectory: () => currentDirectory
+            };
+        });
+    </script>
+</body>
+</html>

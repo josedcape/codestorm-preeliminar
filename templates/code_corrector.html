@@ -1,0 +1,570 @@
+{% extends "base.html" %}
+
+{% block title %}CODESTORM - Corrector de Código{% endblock %}
+
+{% block extra_css %}
+<!-- Prism.js para resaltado de sintaxis -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+<style>
+    /* Estilos específicos para corrector de código */
+    .code-correction-container {
+        border-radius: 8px;
+        overflow: hidden;
+        height: calc(100vh - 200px);
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .code-editor-pane, .correction-result-pane {
+        background-color: var(--bg-tertiary);
+        border: 1px solid var(--accent-primary);
+        border-radius: 8px;
+        overflow: hidden;
+        height: 100%;
+    }
+    
+    /* Mejoras para dispositivos móviles */
+    @media (max-width: 767.98px) {
+        .code-correction-container {
+            height: auto;
+        }
+        
+        .code-editor-pane, .correction-result-pane {
+            height: auto;
+            min-height: 400px;
+            margin-bottom: 1.5rem;
+        }
+        
+        .code-editor-body, .correction-result-body {
+            height: auto;
+            min-height: 350px;
+        }
+        
+        .code-textarea {
+            height: 250px;
+        }
+        
+        .instructions-textarea {
+            height: 100px;
+        }
+    }
+    
+    .code-editor-header, .correction-result-header {
+        background-color: var(--bg-secondary);
+        border-bottom: 1px solid var(--accent-primary);
+        color: var(--text-primary);
+        padding: 0.75rem 1rem;
+        font-weight: 500;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .code-editor-body, .correction-result-body {
+        padding: 1rem;
+        overflow-y: auto;
+        height: calc(100% - 50px);
+    }
+    
+    .code-textarea {
+        width: 100%;
+        height: 300px;
+        background-color: var(--bg-tertiary);
+        color: var(--text-primary);
+        border: 1px solid var(--accent-primary);
+        border-radius: 4px;
+        font-family: 'JetBrains Mono', monospace;
+        padding: 0.75rem;
+        resize: vertical;
+    }
+    
+    .instructions-textarea {
+        width: 100%;
+        height: 120px;
+        background-color: var(--bg-tertiary);
+        color: var(--text-primary);
+        border: 1px solid var(--accent-primary);
+        border-radius: 4px;
+        padding: 0.75rem;
+        resize: vertical;
+        margin-bottom: 1rem;
+    }
+    
+    .language-selector {
+        background-color: var(--bg-tertiary);
+        color: var(--text-primary);
+        border: 1px solid var(--accent-primary);
+        border-radius: 4px;
+        padding: 0.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .changes-container {
+        border-left: 2px solid var(--accent-primary);
+        padding-left: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .change-description {
+        font-weight: 500;
+        color: var(--text-primary);
+    }
+    
+    .change-lines {
+        font-size: 0.85rem;
+        color: var(--text-secondary);
+    }
+    
+    .view-toggle-buttons {
+        display: flex;
+        gap: 0.5rem;
+    }
+    
+    /* Mejoras adicionales para móviles */
+    @media (max-width: 575.98px) {
+        .view-toggle-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+        
+        .d-flex.justify-content-end {
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        
+        #copy-button, #apply-button, #send-to-assistant-button {
+            margin-bottom: 0.5rem;
+            padding: 0.375rem 0.75rem;
+            font-size: 0.875rem;
+            flex: 1 1 auto;
+            min-width: 120px;
+        }
+    }
+    
+    .view-toggle-btn {
+        background-color: var(--bg-tertiary);
+        color: var(--text-secondary);
+        border: 1px solid var(--accent-primary);
+        border-radius: 4px;
+        padding: 0.25rem 0.75rem;
+        font-size: 0.85rem;
+        cursor: pointer;
+        transition: all var(--transition-fast);
+    }
+    
+    .view-toggle-btn:hover, .view-toggle-btn.active {
+        background-color: var(--accent-primary);
+        color: var(--bg-primary);
+    }
+    
+    .diff-line {
+        display: block;
+        margin: 0;
+        padding: 0 5px;
+        font-family: 'JetBrains Mono', monospace;
+    }
+    
+    .diff-line-add {
+        background-color: rgba(40, 167, 69, 0.2);
+    }
+    
+    .diff-line-remove {
+        background-color: rgba(220, 53, 69, 0.2);
+    }
+    
+    .diff-line-context {
+        color: var(--text-secondary);
+    }
+    
+    .loading-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(10, 25, 47, 0.8);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+        visibility: hidden;
+        opacity: 0;
+        transition: opacity 0.3s, visibility 0s 0.3s;
+    }
+    
+    .loading-overlay.active {
+        visibility: visible;
+        opacity: 1;
+        transition: opacity 0.3s;
+    }
+    
+    .loading-spinner {
+        width: 50px;
+        height: 50px;
+        border: 5px solid var(--accent-primary);
+        border-top-color: var(--accent-secondary);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="content-container">
+    <!-- Título y descripción -->
+    <div class="mb-4">
+        <h2 class="mb-2"><i class="fa-solid fa-code me-2"></i>Corrector de Código</h2>
+        <p class="text-muted">Mejora y optimiza tu código con asistencia inteligente de IA. Proporciona instrucciones específicas para obtener correcciones precisas.</p>
+    </div>
+    
+    <div class="row">
+        <!-- Panel editor de código -->
+        <div class="col-lg-6">
+            <div class="code-editor-pane">
+                <div class="code-editor-header">
+                    <span>Código a corregir</span>
+                    <div class="dropdown">
+                        <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="languageDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fa-solid fa-code me-1"></i> Lenguaje
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="languageDropdown">
+                            <li><a class="dropdown-item" href="#" data-language="python">Python</a></li>
+                            <li><a class="dropdown-item" href="#" data-language="javascript">JavaScript</a></li>
+                            <li><a class="dropdown-item" href="#" data-language="html">HTML</a></li>
+                            <li><a class="dropdown-item" href="#" data-language="css">CSS</a></li>
+                            <li><a class="dropdown-item" href="#" data-language="java">Java</a></li>
+                            <li><a class="dropdown-item" href="#" data-language="cpp">C++</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="code-editor-body">
+                    <div class="mb-3">
+                        <label for="instructions" class="form-label">Instrucciones para la corrección:</label>
+                        <textarea id="instructions" class="instructions-textarea" placeholder="Describe qué correcciones necesitas en el código. Por ejemplo: 'Corrige el manejo de errores y optimiza el rendimiento'"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="code-input" class="form-label">Código a corregir:</label>
+                        <textarea id="code-input" class="code-textarea" placeholder="Ingresa aquí tu código para revisión..."></textarea>
+                    </div>
+                    <div class="d-flex justify-content-end">
+                        <button id="clear-button" class="btn btn-outline-secondary me-2">
+                            <i class="fa-solid fa-eraser me-1"></i> Limpiar
+                        </button>
+                        <button id="correct-button" class="btn btn-primary">
+                            <i class="fa-solid fa-wand-magic-sparkles me-1"></i> Corregir código
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Panel de resultados -->
+        <div class="col-lg-6 mt-4 mt-lg-0">
+            <div class="correction-result-pane">
+                <div class="correction-result-header">
+                    <span>Resultado de la corrección</span>
+                    <div class="view-toggle-buttons">
+                        <button class="view-toggle-btn active" data-view="code">
+                            <i class="fa-solid fa-code me-1"></i> Ver código
+                        </button>
+                        <button class="view-toggle-btn" data-view="changes">
+                            <i class="fa-solid fa-list-check me-1"></i> Ver cambios
+                        </button>
+                    </div>
+                </div>
+                <div class="correction-result-body position-relative">
+                    <!-- Overlay de carga -->
+                    <div class="loading-overlay" id="loading-overlay">
+                        <div class="text-center">
+                            <div class="loading-spinner mb-3"></div>
+                            <p class="text-light">Procesando código...</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Vista de código corregido -->
+                    <div id="code-view" class="view-content">
+                        <div id="initial-message" class="text-center py-5">
+                            <i class="fa-solid fa-code text-muted mb-3" style="font-size: 3rem;"></i>
+                            <h4 class="text-muted">Esperando código para corregir</h4>
+                            <p class="text-muted">Ingresa tu código y las instrucciones de corrección para comenzar.</p>
+                        </div>
+                        
+                        <div id="corrected-code-container" style="display: none;">
+                            <pre class="language-python"><code id="corrected-code"></code></pre>
+                            <div class="d-flex justify-content-end mt-3">
+                                <button id="copy-button" class="btn btn-sm btn-outline-secondary me-2">
+                                    <i class="fa-regular fa-copy me-1"></i> Copiar
+                                </button>
+                                <button id="apply-button" class="btn btn-sm btn-primary me-2">
+                                    <i class="fa-solid fa-check me-1"></i> Aplicar cambios
+                                </button>
+                                <button id="send-to-assistant-button" class="btn btn-sm btn-accent">
+                                    <i class="fa-solid fa-robot me-1"></i> Enviar al asistente
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Vista de cambios realizados -->
+                    <div id="changes-view" class="view-content" style="display: none;">
+                        <h5 class="mb-3">Cambios realizados:</h5>
+                        <div id="changes-list">
+                            <!-- Los cambios se insertarán aquí dinámicamente -->
+                        </div>
+                        
+                        <h5 class="mt-4 mb-3">Explicación:</h5>
+                        <div id="explanation-content" class="p-3 border border-1 rounded">
+                            <!-- La explicación se insertará aquí dinámicamente -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-css.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-markup.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        let currentLanguage = 'python';
+        
+        // Elementos del DOM
+        const codeInput = document.getElementById('code-input');
+        const instructionsInput = document.getElementById('instructions');
+        const correctButton = document.getElementById('correct-button');
+        const clearButton = document.getElementById('clear-button');
+        const copyButton = document.getElementById('copy-button');
+        const applyButton = document.getElementById('apply-button');
+        const languageDropdown = document.getElementById('languageDropdown');
+        const loadingOverlay = document.getElementById('loading-overlay');
+        const initialMessage = document.getElementById('initial-message');
+        const correctedCodeContainer = document.getElementById('corrected-code-container');
+        const correctedCode = document.getElementById('corrected-code');
+        const changesView = document.getElementById('changes-view');
+        const codeView = document.getElementById('code-view');
+        const changesList = document.getElementById('changes-list');
+        const explanationContent = document.getElementById('explanation-content');
+        
+        // Cambiar entre vistas (código/cambios)
+        document.querySelectorAll('.view-toggle-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const view = this.getAttribute('data-view');
+                
+                // Actualizar botones
+                document.querySelectorAll('.view-toggle-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                this.classList.add('active');
+                
+                // Mostrar la vista correspondiente
+                if (view === 'code') {
+                    codeView.style.display = 'block';
+                    changesView.style.display = 'none';
+                } else {
+                    codeView.style.display = 'none';
+                    changesView.style.display = 'block';
+                }
+            });
+        });
+        
+        // Selección de lenguaje
+        document.querySelectorAll('[data-language]').forEach(item => {
+            item.addEventListener('click', function(e) {
+                e.preventDefault();
+                currentLanguage = this.getAttribute('data-language');
+                languageDropdown.textContent = currentLanguage;
+                
+                // Actualizar el resaltado de sintaxis
+                correctedCode.className = `language-${currentLanguage}`;
+                Prism.highlightElement(correctedCode);
+            });
+        });
+        
+        // Botón para corregir código
+        correctButton.addEventListener('click', function() {
+            const code = codeInput.value.trim();
+            const instructions = instructionsInput.value.trim();
+            
+            if (!code) {
+                alert('Por favor ingresa código para corregir.');
+                return;
+            }
+            
+            if (!instructions) {
+                alert('Por favor ingresa instrucciones para la corrección.');
+                return;
+            }
+            
+            // Mostrar overlay de carga
+            loadingOverlay.classList.add('active');
+            
+            // Simulación de envío al servidor (en producción esto sería una llamada API real)
+            setTimeout(() => {
+                // Simulamos un resultado
+                const result = simulateCodeCorrection(code, instructions, currentLanguage);
+                
+                // Actualizar vista de código
+                correctedCode.textContent = result.correctedCode;
+                correctedCode.className = `language-${currentLanguage}`;
+                Prism.highlightElement(correctedCode);
+                
+                // Actualizar vista de cambios
+                renderChanges(result.changes);
+                explanationContent.textContent = result.explanation;
+                
+                // Mostrar resultado
+                initialMessage.style.display = 'none';
+                correctedCodeContainer.style.display = 'block';
+                
+                // Ocultar overlay de carga
+                loadingOverlay.classList.remove('active');
+            }, 2000);
+        });
+        
+        // Botón para limpiar
+        clearButton.addEventListener('click', function() {
+            codeInput.value = '';
+            instructionsInput.value = '';
+        });
+        
+        // Botón para copiar código corregido
+        copyButton.addEventListener('click', function() {
+            navigator.clipboard.writeText(correctedCode.textContent)
+                .then(() => {
+                    // Cambiar temporalmente el texto del botón para indicar éxito
+                    const originalText = this.innerHTML;
+                    this.innerHTML = '<i class="fa-solid fa-check me-1"></i> Copiado!';
+                    setTimeout(() => {
+                        this.innerHTML = originalText;
+                    }, 2000);
+                })
+                .catch(err => {
+                    console.error('Error al copiar:', err);
+                    alert('No se pudo copiar el código.');
+                });
+        });
+        
+        // Botón para aplicar cambios
+        applyButton.addEventListener('click', function() {
+            codeInput.value = correctedCode.textContent;
+            alert('Cambios aplicados al editor.');
+        });
+        
+        // Botón para enviar al asistente
+        const sendToAssistantButton = document.getElementById('send-to-assistant-button');
+        if (sendToAssistantButton) {
+            sendToAssistantButton.addEventListener('click', function() {
+                const code = correctedCode.textContent;
+                const instructions = instructionsInput.value.trim();
+                
+                if (!code) {
+                    alert('No hay código para enviar al asistente.');
+                    return;
+                }
+                
+                // Crear un mensaje para el asistente
+                const message = `Por favor, ayúdame con este código en ${currentLanguage}:\n\n\`\`\`${currentLanguage}\n${code}\n\`\`\`\n\nInstrucciones adicionales: ${instructions || 'Revisar y optimizar el código.'}`;
+                
+                // Redirigir a la página de chat con el mensaje como parámetro
+                const encodedMessage = encodeURIComponent(message);
+                window.location.href = `/chat?message=${encodedMessage}`;
+            });
+        }
+        
+        // Función para renderizar los cambios en la vista de cambios
+        function renderChanges(changes) {
+            // Limpiar lista actual
+            changesList.innerHTML = '';
+            
+            // Renderizar cada cambio
+            if (changes && changes.length > 0) {
+                changes.forEach((change, index) => {
+                    const changeElement = document.createElement('div');
+                    changeElement.className = 'changes-container';
+                    changeElement.innerHTML = `
+                        <p class="change-description">${index + 1}. ${change.description}</p>
+                        ${change.lineNumbers ? `<p class="change-lines">Líneas: ${change.lineNumbers.join(', ')}</p>` : ''}
+                    `;
+                    changesList.appendChild(changeElement);
+                });
+            } else {
+                changesList.innerHTML = '<p class="text-muted fst-italic">No se especificaron cambios detallados.</p>';
+            }
+        }
+        
+        // Función para simular la corrección de código (en producción, esto sería reemplazado por una llamada API real)
+        function simulateCodeCorrection(code, instructions, language) {
+            // Ejemplo simple de respuesta simulada
+            return {
+                correctedCode: improveCode(code, language),
+                changes: [
+                    {
+                        description: "Corregido manejo de errores con bloques try-except",
+                        lineNumbers: [5, 6, 7]
+                    },
+                    {
+                        description: "Optimizado rendimiento eliminando operaciones redundantes",
+                        lineNumbers: [12, 13]
+                    },
+                    {
+                        description: "Mejorada la legibilidad con mejores nombres de variables",
+                        lineNumbers: [1, 8, 15]
+                    }
+                ],
+                explanation: "El código ha sido refactorizado para mejorar la robustez y el rendimiento. Se implementaron patrones de manejo de errores adecuados, se eliminaron operaciones redundantes y se mejoraron los nombres de variables para incrementar la legibilidad."
+            };
+        }
+        
+        // Función simple para "mejorar" el código (solo para demostración)
+        function improveCode(code, language) {
+            // En producción, esto sería el resultado real de la IA
+            if (language === 'python') {
+                // Simulamos mejoras para Python
+                return `# Código optimizado y corregido
+import os
+from typing import List, Dict, Optional
+
+def process_data(file_path: str) -> Optional[Dict]:
+    """Procesa datos desde un archivo de manera segura.
+    
+    Args:
+        file_path: Ruta al archivo a procesar
+        
+    Returns:
+        Diccionario con los datos procesados o None si hay error
+    """
+    try:
+        if not os.path.exists(file_path):
+            print(f"El archivo {file_path} no existe")
+            return None
+            
+        # Procesamiento de datos mejorado
+        result = {}
+        with open(file_path, 'r') as file:
+            for line in file:
+                key, value = line.strip().split(':', 1)
+                result[key.strip()] = value.strip()
+                
+        return result
+    except Exception as e:
+        print(f"Error procesando {file_path}: {e}")
+        return None`;
+            } else {
+                // Por defecto, devolvemos una versión "mejorada" genérica
+                return code + `\n\n// Código optimizado y con mejor manejo de errores\n// Se implementaron buenas prácticas según las instrucciones`;
+            }
+        }
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="es" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CODESTORM - Chat con Agentes Especializados</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css" rel="stylesheet">
+    
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    
+    <!-- Google Fonts - Carga optimizada -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+    
+    <!-- Highlight.js para resaltado de sintaxis - Versión combinada minificada -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" defer></script>
+    
+    <!-- CSS Personalizado -->
+    <link href="{{ url_for('static', filename='css/styles.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/chat.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/futuristic.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/performance.css') }}" rel="stylesheet">
+    
+    <!-- Precargar recursos clave para mejorar el rendimiento -->
+    <link rel="preload" href="{{ url_for('static', filename='js/chat/agents.js') }}" as="script">
+    <link rel="preload" href="{{ url_for('static', filename='js/chat/chat.js') }}" as="script">
+</head>
+<body class="smooth-scroll">
+    <div class="main-container">
+    <nav class="navbar navbar-expand-lg navbar-futuristic sticky-optimized">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/">
+                <i class="bi bi-braces"></i>
+                Codestorm Assistant
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/"><i class="bi bi-house"></i> Inicio</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/chat"><i class="bi bi-chat-dots"></i> Asistente IA</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/files"><i class="bi bi-folder2-open"></i> Explorador</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/code_corrector"><i class="bi bi-bug"></i> Corrector de Código</a>
+                    </li>
+                </ul>
+                <div class="ms-auto d-flex align-items-center">
+                    <span id="workspace-info" class="badge bg-primary me-3">Workspace: default</span>
+                    <div class="d-flex align-items-center">
+                        <span class="status-indicator status-disconnected" id="status-indicator" title="Comprobando estado del servidor..."></span>
+                        <span class="small ms-2">Estado del Servidor</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid mt-4">
+        <div class="row">
+            <!-- Panel de Configuración de Agentes -->
+            <div class="col-lg-3 col-md-4">
+                <div class="card card-futuristic h-100 mb-4">
+                    <div class="card-header card-header-futuristic">
+                        <span><i class="bi bi-cpu me-2"></i>Configuración de Agentes</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label for="model-select" class="form-label">Seleccionar Modelo de IA:</label>
+                            <select id="model-select" class="form-select select-futuristic select-optimized">
+                                <option value="openai" selected>OpenAI (GPT-4o)</option>
+                                <option value="anthropic">Anthropic (Claude)</option>
+                                <option value="gemini">Google (Gemini)</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="agent-selector" class="form-label">Seleccionar Agente:</label>
+                            <select id="agent-selector" class="form-select select-futuristic select-optimized"></select>
+                        </div>
+                        <div class="agent-info mb-3">
+                            <div class="agent-avatar">
+                                <i class="bi bi-code-slash"></i>
+                            </div>
+                            <div class="agent-details">
+                                <h5 class="mb-1">Agente de Desarrollo</h5>
+                                <p id="agent-description" class="mb-1">Experto en optimización y edición de código en tiempo real</p>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <h6>Capacidades:</h6>
+                            <ul id="agent-capabilities" class="agent-capabilities">
+                                <li>Corrección y refactorización de código</li>
+                                <li>Optimización de rendimiento</li>
+                                <li>Integración de frameworks y librerías</li>
+                                <li>Automatización de tareas</li>
+                                <li>Generación de código limpio</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Contenido principal -->
+            <div class="col-lg-9 col-md-8">
+                <div class="row">
+                    <!-- Panel de Chat -->
+                    <div class="col-12 mb-4">
+                        <div class="card card-futuristic h-100">
+                            <div class="card-header card-header-futuristic d-flex justify-content-between align-items-center">
+                                <span><i class="bi bi-chat-dots me-2"></i>Chat con Agente Especializado</span>
+                            </div>
+                            <div class="card-body p-0 d-flex flex-column" style="height: calc(100vh - 350px);">
+                                <div id="chat-container" class="chat-container-futuristic">
+                                    <div id="chat-messages" class="chat-messages-futuristic">
+                                        <!-- Los mensajes se mostrarán aquí -->
+                                        <div class="chat-message system-message">
+                                            <div class="message-content">
+                                                <p>¡Bienvenido al chat especializado de CODESTORM! Estás hablando con el <strong>Agente de Desarrollo</strong>, un experto en optimización y edición de código en tiempo real.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <form id="chat-form" class="chat-form-futuristic">
+                                        <textarea id="chat-input" class="chat-input-futuristic" placeholder="Escribe tu mensaje aquí... Por ejemplo: 'Crea una página de ventas para productos tecnológicos'" rows="1"></textarea>
+                                        <button type="submit" class="send-button-futuristic">
+                                            <i class="bi bi-send"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Previsualización -->
+                    <div class="col-12" id="preview-section" style="display: none;">
+                        <div class="card card-futuristic">
+                            <div class="card-header card-header-futuristic d-flex justify-content-between align-items-center">
+                                <span><i class="bi bi-window me-2"></i>Previsualización</span>
+                                <div>
+                                    <button id="toggle-preview" class="btn btn-sm btn-futuristic">
+                                        <i class="bi bi-x-lg"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="card-body p-0">
+                                <div class="device-toggle-buttons py-2">
+                                    <button class="device-toggle-btn active" data-device="desktop">
+                                        <i class="bi bi-laptop"></i> Escritorio
+                                    </button>
+                                    <button class="device-toggle-btn" data-device="tablet">
+                                        <i class="bi bi-tablet"></i> Tablet
+                                    </button>
+                                    <button class="device-toggle-btn" data-device="mobile">
+                                        <i class="bi bi-phone"></i> Móvil
+                                    </button>
+                                </div>
+                                
+                                <div class="preview-container" id="preview-container">
+                                    <div class="preview-header">
+                                        <div class="preview-controls">
+                                            <div class="control-btn control-close"></div>
+                                            <div class="control-btn control-minimize"></div>
+                                            <div class="control-btn control-expand"></div>
+                                        </div>
+                                        <div class="preview-url">
+                                            <span>preview.html</span>
+                                        </div>
+                                    </div>
+                                    <iframe id="preview-iframe" class="preview-iframe" title="Previsualización"></iframe>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer mt-4 py-3" style="background: linear-gradient(90deg, var(--darker-blue) 0%, var(--dark-blue) 100%);">
+        <div class="container text-center">
+            <span class="text-light">CODESTORM-Assistant © 2025 | Herramienta de Desarrollo Impulsada por IA</span>
+        </div>
+    </footer>
+
+    <!-- Notificaciones -->
+    <div id="notifications" class="position-fixed top-0 end-0 p-3" style="z-index: 5000;"></div>
+
+    <!-- JavaScript -->
+    <script src="https://cdn.socket.io/4.6.1/socket.io.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Namespace global de la aplicación -->
+    <script>
+        // Inicializar el objeto global app
+        window.app = window.app || {};
+        
+        // Definir agentes especializados
+        window.SPECIALIZED_AGENTS = {
+            developer: {
+                id: 'developer',
+                name: 'Agente de Desarrollo',
+                icon: 'bi-code-slash',
+                description: 'Experto en optimización y edición de código en tiempo real',
+                capabilities: [
+                    'Corrección y refactorización de código',
+                    'Optimización de rendimiento',
+                    'Integración de frameworks y librerías',
+                    'Automatización de tareas',
+                    'Generación de código limpio'
+                ],
+                prompt: 'Eres un desarrollador experto especializado en optimización y edición de código. Tu objetivo es ayudar a los usuarios a mejorar su código, resolver problemas técnicos y sugerir mejores prácticas.'
+            },
+            architect: {
+                id: 'architect',
+                name: 'Arquitecto de Software',
+                icon: 'bi-diagram-3',
+                description: 'Especialista en diseño de arquitecturas de software escalables',
+                capabilities: [
+                    'Diseño de sistemas',
+                    'Patrones arquitectónicos',
+                    'Microservicios',
+                    'Seguridad y escalabilidad',
+                    'Diagramas y documentación'
+                ],
+                prompt: 'Eres un arquitecto de software experto especializado en diseñar sistemas escalables y eficientes. Tu objetivo es ayudar a los usuarios a diseñar la estructura de sus aplicaciones, eligiendo las tecnologías adecuadas y siguiendo las mejores prácticas.'
+            },
+            designer: {
+                id: 'designer',
+                name: 'Diseñador UX/UI',
+                icon: 'bi-palette',
+                description: 'Creador de interfaces atractivas centradas en el usuario',
+                capabilities: [
+                    'Diseño visual y estético',
+                    'Experiencia de usuario',
+                    'Accesibilidad web',
+                    'Prototipos interactivos',
+                    'Animaciones y transiciones'
+                ],
+                prompt: 'Eres un diseñador UX/UI experto especializado en crear interfaces atractivas y funcionales. Tu objetivo es ayudar a los usuarios a mejorar la experiencia de usuario de sus aplicaciones, con enfoque en diseño intuitivo, accesibilidad y estética moderna.'
+            }
+        };
+    </script>
+    <script src="{{ url_for('static', filename='js/websocket.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/natural-command-processor.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/multi-agent-system.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/chat/agents.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/chat/chat.js') }}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log("DOM completamente cargado");
+            
+            // Inicializar sistemas
+            if (window.naturalCommandProcessor) {
+                console.log("Procesador de comandos naturales inicializado");
+            }
+            
+            if (window.multiAgentSystem) {
+                console.log("Inicializando sistema multi-agente");
+                window.multiAgentSystem.initialize();
+            }
+            
+            // Inicializar chat
+            if (typeof initializeChat === 'function') {
+                window.app.chat = window.app.chat || {};
+                window.app.chat.initialize = initializeChat;
+                window.app.chat.setActiveAgent = setActiveAgent;
+                
+                window.app.chat.initialize();
+                setActiveAgent('developer'); // Establecer agente por defecto
+            } else {
+                console.error("Error: La función initializeChat no está definida");
+            }
+            
+            // Mostrar/ocultar previsualización
+            const previewSection = document.getElementById('preview-section');
+            const previewContainer = document.getElementById('preview-container');
+            const previewIframe = document.getElementById('preview-iframe');
+            const togglePreviewBtn = document.getElementById('toggle-preview');
+            const deviceButtons = document.querySelectorAll('.device-toggle-btn');
+            
+            // Mostrar/ocultar previsualización
+            togglePreviewBtn.addEventListener('click', function() {
+                previewSection.style.display = 'none';
+            });
+            
+            // Cambiar tamaño según dispositivo
+            deviceButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    // Quitar clase activa de todos los botones
+                    deviceButtons.forEach(btn => btn.classList.remove('active'));
+                    // Agregar clase activa al botón seleccionado
+                    this.classList.add('active');
+                    
+                    const device = this.getAttribute('data-device');
+                    
+                    switch(device) {
+                        case 'desktop':
+                            previewContainer.style.width = '100%';
+                            break;
+                        case 'tablet':
+                            previewContainer.style.width = '768px';
+                            break;
+                        case 'mobile':
+                            previewContainer.style.width = '375px';
+                            break;
+                    }
+                });
+            });
+            
+            // Función para mostrar previsualización
+            window.showPreview = function(htmlContent) {
+                // Mostrar sección de previsualización
+                previewSection.style.display = 'block';
+                
+                // Cargar contenido en el iframe
+                const iframe = previewIframe;
+                const iframeDocument = iframe.contentDocument || iframe.contentWindow.document;
+                
+                iframeDocument.open();
+                iframeDocument.write(htmlContent);
+                iframeDocument.close();
+                
+                // Hacer scroll a la previsualización
+                previewSection.scrollIntoView({ behavior: 'smooth' });
+            };
+            
+            // Extender la función de chat para reconocer comandos de creación
+            window.app.chat.handleCreationRequest = function(message) {
+                const lowerMsg = message.toLowerCase();
+                if (lowerMsg.includes('crea una página') || lowerMsg.includes('crear página') || 
+                    lowerMsg.includes('genera una página') || lowerMsg.includes('generar página')) {
+                    
+                    // Preguntar por detalles específicos si el mensaje es general
+                    if (!lowerMsg.includes('para') || message.length < 30) {
+                        const questions = [
+                            "¿Para qué tipo de producto o servicio necesitas la página?",
+                            "¿Puedes proporcionar detalles específicos sobre el contenido que deseas incluir?",
+                            "¿Tienes preferencias de diseño o estilo específicas?",
+                            "¿Necesitas funcionalidades específicas como formularios de contacto o galerías?"
+                        ];
+                        
+                        // Seleccionar una pregunta aleatoria
+                        const randomQuestion = questions[Math.floor(Math.random() * questions.length)];
+                        
+                        // Agregar mensaje del agente pidiendo más detalles
+                        window.app.chat.addAgentMessage(`Para crear la página que necesitas, necesito más detalles. ${randomQuestion}`, window.app.activeAgent);
+                        
+                        return true; // Indica que se manejó el mensaje
+                    }
+                }
+                
+                return false; // No se manejó el mensaje
+            };
+            
+            // Extender función sendMessage para interceptar comandos de creación
+            const originalSendMessage = window.app.chat.sendMessage;
+            window.app.chat.sendMessage = function(message) {
+                if (!window.app.chat.handleCreationRequest(message)) {
+                    originalSendMessage(message);
+                }
+            };
+        });
+    </script>
+</body>
+</html>

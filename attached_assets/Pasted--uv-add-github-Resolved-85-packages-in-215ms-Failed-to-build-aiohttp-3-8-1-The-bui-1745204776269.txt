@@ -1,0 +1,137 @@
+-> uv add github
+Resolved 85 packages in 215ms
+  × Failed to build `aiohttp==3.8.1`
+  ├─▶ The build backend returned an error
+  ╰─▶ Call to `setuptools.build_meta.build_wheel` failed (exit status: 1)
+
+      [stdout]
+      running bdist_wheel
+      running build
+      running build_py
+      copying aiohttp/__init__.py -> build/lib.linux-x86_64-cpython-311/aiohttp
+      copying aiohttp/abc.py -> build/lib.linux-x86_64-cpython-311/aiohttp
+      copying aiohttp/base_protocol.py -> build/lib.linux-x86_64-cpython-311/aiohttp
+      copying aiohttp/client.py -> build/lib.linux-x86_64-cpython-311/aiohttp
+      copying aiohttp/client_exceptions.py -> build/lib.linux-x86_64-cpython-311/aiohttp
+      copying aiohttp/client_proto.py -> build/lib.linux-x86_64-cpython-311/aiohttp
+      copying aiohttp/client_reqrep.py -> build/lib.linux-x86_64-cpython-311/aiohttp
+      copying aiohttp/client_ws.py -> build/lib.linux-x86_64-cpython-311/aiohttp
+      copying aiohttp/connector.py -> build/lib.linux-x86_64-cpython-311/aiohttp
+      copying aiohttp/cookiejar.py -> build/lib.linux-x86_64-cpython-311/aiohttp
+      copying aiohttp/formdata.py -> build/lib.linux-x86_64-cpython-311/aiohttp
+      copying aiohttp/hdrs.py -> build/lib.linux-x86_64-cpython-311/aiohttp
+      copying aiohttp/helpers.py -> build/lib.linux-x86_64-cpython-311/aiohttp
+      copying aiohttp/http.py -> build/lib.linux-x86_64-cpython-311/aiohttp
+      copying aiohttp/http_exceptions.py -> build/lib.linux-x86_64-cpython-311/aiohttp
+      copying aiohttp/http_parser.py -> build/lib.linux-x86_64-cpython-311/aiohttp
+      copying aiohttp/http_websocket.py -> build/lib.linux-x86_64-cpython-311/aiohttp
+      copying aiohttp/http_writer.py -> build/lib.linux-x86_64-cpython-311/aiohttp
+      copying aiohttp/locks.py -> build/lib.linux-x86_64-cpython-311/aiohttp
+      copying aiohttp/log.py -> build/lib.linux-x86_64-cpython-311/aiohttp
+      copying aiohttp/multipart.py -> build/lib.linux-x86_64-cpython-311/aiohttp
+      copying aiohttp/payload.py -> build/lib.linux-x86_64-cpython-311/aiohttp
+      copying aiohttp/payload_streamer.py -> build/lib.linux-x86_64-cpython-311/aiohttp
+      copying aiohttp/pytest_plugin.py -> build/lib.linux-x86_64-cpython-311/aiohttp
+      copying aiohttp/resolver.py -> build/lib.linux-x86_64-cpython-311/aiohttp
+      copying aiohttp/streams.py -> build/lib.linux-x86_64-cpython-311/aiohttp
+      copying aiohttp/tcp_helpers.py -> build/lib.linux-x86_64-cpython-311/aiohttp
+      copying aiohttp/test_utils.py -> build/lib.linux-x86_64-cpython-311/aiohttp
+      copying aiohttp/tracing.py -> build/lib.linux-x86_64-cpython-311/aiohttp
+      copying aiohttp/typedefs.py -> build/lib.linux-x86_64-cpython-311/aiohttp
+      copying aiohttp/web.py -> build/lib.linux-x86_64-cpython-311/aiohttp
+      copying aiohttp/web_app.py -> build/lib.linux-x86_64-cpython-311/aiohttp
+      copying aiohttp/web_exceptions.py -> build/lib.linux-x86_64-cpython-311/aiohttp
+      copying aiohttp/web_fileresponse.py -> build/lib.linux-x86_64-cpython-311/aiohttp
+      copying aiohttp/web_log.py -> build/lib.linux-x86_64-cpython-311/aiohttp
+      copying aiohttp/web_middlewares.py -> build/lib.linux-x86_64-cpython-311/aiohttp
+      copying aiohttp/web_protocol.py -> build/lib.linux-x86_64-cpython-311/aiohttp
+      copying aiohttp/web_request.py -> build/lib.linux-x86_64-cpython-311/aiohttp
+      copying aiohttp/web_response.py -> build/lib.linux-x86_64-cpython-311/aiohttp
+      copying aiohttp/web_routedef.py -> build/lib.linux-x86_64-cpython-311/aiohttp
+      copying aiohttp/web_runner.py -> build/lib.linux-x86_64-cpython-311/aiohttp
+      copying aiohttp/web_server.py -> build/lib.linux-x86_64-cpython-311/aiohttp
+      copying aiohttp/web_urldispatcher.py -> build/lib.linux-x86_64-cpython-311/aiohttp
+      copying aiohttp/web_ws.py -> build/lib.linux-x86_64-cpython-311/aiohttp
+      copying aiohttp/worker.py -> build/lib.linux-x86_64-cpython-311/aiohttp
+      running egg_info
+      writing aiohttp.egg-info/PKG-INFO
+      writing dependency_links to aiohttp.egg-info/dependency_links.txt
+      writing requirements to aiohttp.egg-info/requires.txt
+      writing top-level names to aiohttp.egg-info/top_level.txt
+      reading manifest file 'aiohttp.egg-info/SOURCES.txt'
+      reading manifest template 'MANIFEST.in'
+      adding license file 'LICENSE.txt'
+      writing manifest file 'aiohttp.egg-info/SOURCES.txt'
+      copying aiohttp/_cparser.pxd -> build/lib.linux-x86_64-cpython-311/aiohttp
+      copying aiohttp/_find_header.c -> build/lib.linux-x86_64-cpython-311/aiohttp
+      copying aiohttp/_find_header.h -> build/lib.linux-x86_64-cpython-311/aiohttp
+      copying aiohttp/_find_header.pxd -> build/lib.linux-x86_64-cpython-311/aiohttp
+      copying aiohttp/_headers.pxi -> build/lib.linux-x86_64-cpython-311/aiohttp
+      copying aiohttp/_helpers.c -> build/lib.linux-x86_64-cpython-311/aiohttp
+      copying aiohttp/_helpers.pyi -> build/lib.linux-x86_64-cpython-311/aiohttp
+      copying aiohttp/_helpers.pyx -> build/lib.linux-x86_64-cpython-311/aiohttp
+      copying aiohttp/_http_parser.c -> build/lib.linux-x86_64-cpython-311/aiohttp
+      copying aiohttp/_http_parser.pyx -> build/lib.linux-x86_64-cpython-311/aiohttp
+      copying aiohttp/_http_writer.c -> build/lib.linux-x86_64-cpython-311/aiohttp
+      copying aiohttp/_http_writer.pyx -> build/lib.linux-x86_64-cpython-311/aiohttp
+      copying aiohttp/_websocket.c -> build/lib.linux-x86_64-cpython-311/aiohttp
+      copying aiohttp/_websocket.pyx -> build/lib.linux-x86_64-cpython-311/aiohttp
+      copying aiohttp/py.typed -> build/lib.linux-x86_64-cpython-311/aiohttp
+      copying aiohttp/.hash/_cparser.pxd.hash -> build/lib.linux-x86_64-cpython-311/aiohttp/.hash
+      copying aiohttp/.hash/_find_header.pxd.hash -> build/lib.linux-x86_64-cpython-311/aiohttp/.hash
+      copying aiohttp/.hash/_helpers.pyi.hash -> build/lib.linux-x86_64-cpython-311/aiohttp/.hash
+      copying aiohttp/.hash/_helpers.pyx.hash -> build/lib.linux-x86_64-cpython-311/aiohttp/.hash
+      copying aiohttp/.hash/_http_parser.pyx.hash -> build/lib.linux-x86_64-cpython-311/aiohttp/.hash
+      copying aiohttp/.hash/_http_writer.pyx.hash -> build/lib.linux-x86_64-cpython-311/aiohttp/.hash
+      copying aiohttp/.hash/_websocket.pyx.hash -> build/lib.linux-x86_64-cpython-311/aiohttp/.hash
+      copying aiohttp/.hash/hdrs.py.hash -> build/lib.linux-x86_64-cpython-311/aiohttp/.hash
+      running build_ext
+      building 'aiohttp._websocket' extension
+      gcc -isystem /nix/store/191vca5vdxdlr32k2hpzd66mic98930f-openssl-3.0.13-dev/include
+      -isystem /nix/store/07s64wxjzk6z1glwxvl3yq81vdn42k40-postgresql-15.7/include
+      -fPIC -I/home/runner/workspace/.cache/uv/builds-v0/.tmphqlpMq/include
+      -I/nix/store/clx0mcir7qw8zk36zbr4jra789g3knf6-python3-3.11.10/include/python3.11 -c
+      aiohttp/_websocket.c -o build/temp.linux-x86_64-cpython-311/aiohttp/_websocket.o
+
+      [stderr]
+      *********************
+      * Accelerated build *
+      *********************
+      /home/runner/workspace/.cache/uv/builds-v0/.tmphqlpMq/lib/python3.11/site-packages/setuptools/dist.py:759:
+      SetuptoolsDeprecationWarning: License classifiers are deprecated.
+      !!
+
+              ********************************************************************************
+              Please consider removing the following classifiers in favor of a SPDX license
+      expression:
+
+              License :: OSI Approved :: Apache Software License
+
+              See https://packaging.python.org/en/latest/guides/writing-pyproject-toml/#license for
+      details.
+              ********************************************************************************
+
+      !!
+        self._finalize_license_expression()
+      warning: no files found matching 'aiohttp' anywhere in distribution
+      warning: no previously-included files matching '*.pyc' found anywhere in distribution
+      warning: no previously-included files matching '*.pyd' found anywhere in distribution
+      warning: no previously-included files matching '*.so' found anywhere in distribution
+      warning: no previously-included files matching '*.lib' found anywhere in distribution
+      warning: no previously-included files matching '*.dll' found anywhere in distribution
+      warning: no previously-included files matching '*.a' found anywhere in distribution
+      warning: no previously-included files matching '*.obj' found anywhere in distribution
+      warning: no previously-included files found matching 'aiohttp/*.html'
+      no previously-included directories found matching 'docs/_build'
+      aiohttp/_websocket.c:198:12: fatal error: longintrepr.h: No such file or directory
+        198 |   #include "longintrepr.h"
+            |            ^~~~~~~~~~~~~~~
+      compilation terminated.
+      error: command '/nix/store/2wdjznxkbxy5qpvrfrx14s23acq5syz5-replit-runtime-path/bin/gcc' failed
+      with exit code 1
+
+      hint: This error likely indicates that you need to install a library that provides
+      "longintrepr.h" for `aiohttp@3.8.1`
+  help: `aiohttp` (v3.8.1) was included because `repl-nix-workspace` (v0.1.0) depends on `github`
+        (v1.2.7) which depends on `aiohttp`
+exit status 1

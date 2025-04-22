@@ -1,0 +1,35 @@
+FROM project_sessions 
+WHERE project_sessions.project_id = %(project_id_1)s 
+ LIMIT %(param_1)s]
+[parameters: {'project_id_1': 'c70891ea-15b3-4049-a606-cda0c06576e4', 'param_1': 1}]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+ERROR:constructor_routes:Error al obtener proyecto: (psycopg2.errors.UndefinedColumn) column project_sessions.special_actions does not exist
+LINE 1: ...ions.last_active AS project_sessions_last_active, project_se...
+                                                             ^
+
+[SQL: SELECT project_sessions.id AS project_sessions_id, project_sessions.project_id AS project_sessions_project_id, project_sessions.user_id AS project_sessions_user_id, project_sessions.ai_model AS project_sessions_ai_model, project_sessions.message_history AS project_sessions_message_history, project_sessions.last_active AS project_sessions_last_active, project_sessions.special_actions AS project_sessions_special_actions 
+FROM project_sessions 
+WHERE project_sessions.project_id = %(project_id_1)s 
+ LIMIT %(param_1)s]
+[parameters: {'project_id_1': 'c70891ea-15b3-4049-a606-cda0c06576e4', 'param_1': 1}]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+ERROR:constructor_routes:Error al obtener proyecto: (psycopg2.errors.UndefinedColumn) column project_sessions.special_actions does not exist
+LINE 1: ...ions.last_active AS project_sessions_last_active, project_se...
+                                                             ^
+
+[SQL: SELECT project_sessions.id AS project_sessions_id, project_sessions.project_id AS project_sessions_project_id, project_sessions.user_id AS project_sessions_user_id, project_sessions.ai_model AS project_sessions_ai_model, project_sessions.message_history AS project_sessions_message_history, project_sessions.last_active AS project_sessions_last_active, project_sessions.special_actions AS project_sessions_special_actions 
+FROM project_sessions 
+WHERE project_sessions.project_id = %(project_id_1)s 
+ LIMIT %(param_1)s]
+[parameters: {'project_id_1': 'c70891ea-15b3-4049-a606-cda0c06576e4', 'param_1': 1}]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+ERROR:constructor_routes:Error al obtener proyecto: (psycopg2.errors.UndefinedColumn) column project_sessions.special_actions does not exist
+LINE 1: ...ions.last_active AS project_sessions_last_active, project_se...
+                                                             ^
+
+[SQL: SELECT project_sessions.id AS project_sessions_id, project_sessions.project_id AS project_sessions_project_id, project_sessions.user_id AS project_sessions_user_id, project_sessions.ai_model AS project_sessions_ai_model, project_sessions.message_history AS project_sessions_message_history, project_sessions.last_active AS project_sessions_last_active, project_sessions.special_actions AS project_sessions_special_actions 
+FROM project_sessions 
+WHERE project_sessions.project_id = %(project_id_1)s 
+ LIMIT %(param_1)s]
+[parameters: {'project_id_1': 'c70891ea-15b3-4049-a606-cda0c06576e4', 'param_1': 1}]
+(Background on this error at: https://sqlalche.me/e/20/f405)

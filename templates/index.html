@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="es" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Codestorm-Assistant</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css" rel="stylesheet">
+    
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    
+    <!-- Estilos compartidos de base -->
+    <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+    
+    <style>
+        /* Los estilos propios del index se mantienen, pero quitamos los de navbar
+           que ahora vienen de style.css */
+        
+        .logo-container {
+            display: flex;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+        
+        .logo-img {
+            width: 120px;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 3px solid #1E88E5;
+            box-shadow: 0 0 15px rgba(0, 150, 255, 0.5);
+        }
+        
+        .logo-text {
+            margin-left: 1rem;
+        }
+        
+        .hero-section {
+            background: linear-gradient(135deg, rgba(10, 33, 73, 0.9) 0%, rgba(13, 71, 161, 0.8) 100%);
+            border-radius: 10px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .feature-card {
+            background: rgba(9, 20, 40, 0.7);
+            border: 1px solid rgba(30, 136, 229, 0.2);
+            border-radius: 8px;
+            padding: 1.5rem;
+            height: 100%;
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 100, 255, 0.3);
+            border-color: rgba(30, 136, 229, 0.5);
+        }
+        
+        .feature-icon {
+            font-size: 2rem;
+            color: #1E88E5;
+            margin-bottom: 1rem;
+        }
+        
+        @media (max-width: 768px) {
+            .logo-container {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .logo-text {
+                margin-left: 0;
+                margin-top: 1rem;
+            }
+            
+            .logo-img {
+                width: 100px;
+                height: 100px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark futuristic-navbar">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/">
+                <i class="bi bi-braces me-2 text-gold"></i>
+                <span class="codestorm-logo">Codestorm Assistant</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/"><i class="bi bi-house me-1"></i> Inicio</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/chat"><i class="bi bi-chat-dots me-1"></i> Asistente IA</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/constructor"><i class="bi bi-box me-1"></i> Constructor</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/files"><i class="bi bi-folder2-open me-1"></i> Explorador</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/code_corrector"><i class="bi bi-bug me-1"></i> Corrector de Código</a>
+                    </li>
+                </ul>
+                <div class="ms-auto workspace-status">
+                    <span id="workspace-info" class="workspace-badge">
+                        <i class="bi bi-folder2"></i> Workspace: default
+                    </span>
+                    <div class="status-container">
+                        <span class="status-indicator status-disconnected" id="status-indicator"></span>
+                        <span>Estado del Servidor</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Hero Section -->
+    <div class="container mt-4">
+        <div class="hero-section">
+            <div class="logo-container">
+                <img src="{{ url_for('static', filename='images/logo.jpg') }}" alt="Codestorm Assistant Logo" class="logo-img">
+                <div class="logo-text">
+                    <h1 class="text-light">Codestorm Assistant</h1>
+                    <p class="lead text-light">Asistente de desarrollo potenciado por IA para mejorar tu experiencia de programación</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card mb-3">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <span>Instrucciones en Lenguaje Natural</span>
+                        <div>
+                            <button class="btn btn-sm btn-outline-secondary" id="previous-btn" title="Previous command">
+                                <i class="bi bi-chevron-up"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-secondary" id="next-btn" title="Next command">
+                                <i class="bi bi-chevron-down"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label for="model-select" class="form-label">Selecciona Modelo de IA:</label>
+                            <select id="model-select" class="form-select form-select-sm futuristic-select">
+                                <option value="openai" selected>OpenAI (GPT-4o)</option>
+                                <option value="anthropic">Anthropic (Claude)</option>
+                                <option value="gemini">Google (Gemini)</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="agent-select" class="form-label">Agente Especializado:</label>
+                            <select id="agent-select" class="form-select form-select-sm futuristic-select">
+                                <option value="general" selected>Asistente General</option>
+                                <option value="developer">Desarrollador de Código</option>
+                                <option value="architect">Arquitecto de Sistemas</option>
+                                <option value="advanced">Experto Avanzado</option>
+                            </select>
+                            <div class="form-text">Selecciona el tipo de asistente según la tarea que necesites realizar.</div>
+                        </div>
+                        <textarea id="instruction-input" class="form-control instruction-input chat-input" placeholder="Escribe tus instrucciones en lenguaje natural. Puedes:
+- Crear archivos (ej: 'crea un archivo index.html')
+- Crear carpetas (ej: 'crea una carpeta llamada src')
+- Ejecutar comandos (ej: 'ejecuta ls -la')
+- Construir aplicaciones (ej: 'crea una aplicación Flask llamada miproyecto')"></textarea>
+                        <div class="d-flex justify-content-end mt-2">
+                            <button id="clear-btn" class="btn btn-secondary me-3">
+                                <i class="bi bi-x"></i> Limpiar
+                            </button>
+                            <button id="execute-btn" class="btn btn-gold">
+                                <i class="bi bi-play"></i> Ejecutar
+                                <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- File Explorer Column -->
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <span>Explorador de Archivos</span>
+                        <button id="refresh-btn" class="btn btn-sm btn-outline-secondary">
+                            <i class="bi bi-arrow-clockwise"></i>
+                        </button>
+                    </div>
+                    <div id="file-explorer-header" class="p-0">
+                        <div class="p-2 bg-secondary bg-opacity-25">
+                            <small>Directorio Actual: <span id="directory-path">/</span></small>
+                        </div>
+                    </div>
+                    <div class="card-body p-0">
+                        <div id="file-explorer" class="file-explorer"></div>
+                    </div>
+                    <div class="card-footer d-flex justify-content-between">
+                        <button id="new-file-btn" class="btn btn-sm btn-primary">
+                            <i class="bi bi-file-earmark-plus"></i> Nuevo Archivo
+                        </button>
+                        <button id="new-folder-btn" class="btn btn-sm btn-gold">
+                            <i class="bi bi-folder-plus"></i> Nueva Carpeta
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Terminal Output Column -->
+            <div class="col-md-8 mb-4">
+                <div class="card h-100">
+                    <div class="card-header">Salida del Terminal</div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label class="form-label">Comando Generado:</label>
+                            <pre id="command-display" class="terminal-output p-2 mb-3"></pre>
+                            
+                            <label class="form-label">Resultado:</label>
+                            <pre id="output-display" class="terminal-output p-2"></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Features Section -->
+        <div class="row mt-4 mb-5">
+            <div class="col-md-3 mb-4">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="bi bi-chat-square-text"></i>
+                    </div>
+                    <h4>Instrucciones en Lenguaje Natural</h4>
+                    <p>Convierte tus instrucciones en lenguaje natural a comandos precisos del terminal o acciones sobre archivos.</p>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="bi bi-code-square"></i>
+                    </div>
+                    <h4>Asistentes Especializados</h4>
+                    <p>Accede a diferentes agentes especializados según tus necesidades de desarrollo.</p>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="bi bi-file-earmark-code"></i>
+                    </div>
+                    <h4>Gestión de Archivos Inteligente</h4>
+                    <p>Administra tus archivos y directorios de manera intuitiva con ayuda de inteligencia artificial.</p>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="bi bi-rocket-takeoff"></i>
+                    </div>
+                    <h4>Creación de Aplicaciones</h4>
+                    <p>Construye aplicaciones completas con un solo comando. Soporta Flask, Node.js, Express y más.</p>
+                    <div class="mt-3">
+                        <a href="/constructor" class="btn btn-sm btn-primary">Usar Constructor <i class="bi bi-box"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer mt-5 py-3 bg-dark">
+        <div class="container text-center">
+            <span class="text-muted">Codestorm-Assistant © 2025 | Herramienta de Desarrollo Impulsada por IA</span>
+        </div>
+    </footer>
+
+    <!-- Notification container -->
+    <div id="notifications" class="position-fixed top-0 end-0 p-3" style="z-index: 5000;"></div>
+
+    <!-- JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const instructionInput = document.getElementById('instruction-input');
+            const executeBtn = document.getElementById('execute-btn');
+            const clearBtn = document.getElementById('clear-btn');
+            const commandDisplay = document.getElementById('command-display');
+            const outputDisplay = document.getElementById('output-display');
+            const spinner = executeBtn.querySelector('.spinner-border');
+            const modelSelect = document.getElementById('model-select');
+            const fileExplorer = document.getElementById('file-explorer');
+            const directoryPath = document.getElementById('directory-path');
+            const refreshBtn = document.getElementById('refresh-btn');
+            
+            // Command history
+            let commandHistory = [];
+            let historyIndex = -1;
+            
+            // Load initial files
+            loadFiles('.');
+            
+            // Event listeners
+            executeBtn.addEventListener('click', executeInstruction);
+            clearBtn.addEventListener('click', clearInputs);
+            refreshBtn.addEventListener('click', () => loadFiles(directoryPath.textContent || '.'));
+            
+            instructionInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+                    e.preventDefault();
+                    executeInstruction();
+                }
+            });
+            
+            function executeInstruction() {
+                const instruction = instructionInput.value.trim();
+                const model = modelSelect.value;
+                
+                if (!instruction) return;
+                
+                // Add to history
+                if (commandHistory.length === 0 || commandHistory[commandHistory.length - 1] !== instruction) {
+                    commandHistory.push(instruction);
+                    historyIndex = commandHistory.length;
+                }
+                
+                // Show loading
+                spinner.classList.remove('d-none');
+                executeBtn.disabled = true;
+                
+                // Detectar si la instrucción parece ser un comando directo
+                const isDirectCommand = 
+                    instruction.startsWith('ejecuta ') || 
+                    instruction.startsWith('corre ') || 
+                    instruction.startsWith('run ') ||
+                    instruction.startsWith('python ') ||
+                    instruction.startsWith('node ') ||
+                    instruction.startsWith('npm ') ||
+                    instruction.startsWith('ls ') ||
+                    instruction.startsWith('mkdir ') ||
+                    instruction.startsWith('touch ') ||
+                    instruction.startsWith('cat ');
+                
+                // Si es un comando directo, ejecutarlo directamente usando /api/execute en lugar de /api/process
+                const agent = document.getElementById('agent-select').value;
+                
+                if (isDirectCommand) {
+                    // Extraer el comando real (quitar el prefijo "ejecuta", "corre", etc.)
+                    let command = instruction;
+                    if (instruction.startsWith('ejecuta ')) {
+                        command = instruction.substring(8);
+                    } else if (instruction.startsWith('corre ')) {
+                        command = instruction.substring(6);
+                    } else if (instruction.startsWith('run ')) {
+                        command = instruction.substring(4);
+                    }
+                    
+                    // Ejecutar el comando directamente
+                    console.log("Ejecutando comando directamente:", command);
+                    fetch('/api/execute', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            command: command,
+                            agent_id: agent
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            commandDisplay.textContent = data.command;
+                            outputDisplay.innerHTML = formatOutput(data.stdout, data.stderr, data.status);
+                            
+                            // Mostrar notificación de éxito
+                            if (data.status === 0) {
+                                showNotification('Comando ejecutado correctamente', 'success');
+                            } else {
+                                showNotification(`Comando terminó con código ${data.status}`, 'warning');
+                            }
+                        } else {
+                            outputDisplay.innerHTML = `<span class="text-danger">Error: ${data.error}</span>`;
+                            showNotification('Error al ejecutar el comando', 'danger');
+                        }
+                        
+                        // Reload file list
+                        loadFiles(directoryPath.textContent || '.');
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        outputDisplay.innerHTML = `<span class="text-danger">Error: ${error.message}</span>`;
+                        showNotification('Error de conexión', 'danger');
+                    })
+                    .finally(() => {
+                        // Hide loading
+                        spinner.classList.add('d-none');
+                        executeBtn.disabled = false;
+                    });
+                } else {
+                    // Procesar como instrucción en lenguaje natural
+                    fetch('/api/process', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            instruction: instruction,
+                            model: model,
+                            agent_id: agent
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.command) {
+                            commandDisplay.textContent = data.command;
+                            outputDisplay.innerHTML = formatOutput(data.result, data.error, data.status);
+                        } else {
+                            commandDisplay.textContent = '';
+                            outputDisplay.textContent = data.result || 'Instrucción procesada correctamente';
+                        }
+                        
+                        // Reload file list after processing
+                        loadFiles(directoryPath.textContent || '.');
+                        
+                        // Show success notification
+                        showNotification(data.result || 'Instrucción procesada correctamente', 'success');
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        outputDisplay.textContent = 'Error al procesar instrucción: ' + error.message;
+                        showNotification('Error al procesar instrucción: ' + error.message, 'danger');
+                    })
+                    .finally(() => {
+                        // Hide loading
+                        spinner.classList.add('d-none');
+                        executeBtn.disabled = false;
+                    });
+                }
+            }
+            
+            function clearInputs() {
+                instructionInput.value = '';
+                commandDisplay.textContent = '';
+                outputDisplay.textContent = '';
+                instructionInput.focus();
+            }
+            
+            function formatOutput(stdout, stderr, status) {
+                let output = '';
+                
+                if (stdout) {
+                    output += `<div class="mb-2"><strong>Salida:</strong><pre class="mb-0 text-success">${stdout}</pre></div>`;
+                }
+                
+                if (stderr) {
+                    output += `<div class="mb-2"><strong>Error:</strong><pre class="mb-0 text-danger">${stderr}</pre></div>`;
+                }
+                
+                if (status !== undefined) {
+                    const statusClass = status === 0 ? 'text-success' : 'text-danger';
+                    output += `<div><strong>Estado:</strong> <span class="${statusClass}">${status}</span></div>`;
+                }
+                
+                return output || 'No hay salida';
+            }
+            
+            function loadFiles(directory) {
+                fetch(`/api/files?directory=${encodeURIComponent(directory)}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            displayFiles(data.files, data.directory);
+                            directoryPath.textContent = data.directory === '.' ? '/' : data.directory;
+                        } else {
+                            showNotification(data.error || 'Error al cargar archivos', 'danger');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        showNotification('Error al cargar archivos', 'danger');
+                    });
+            }
+            
+            function displayFiles(files, directory) {
+                fileExplorer.innerHTML = '';
+                
+                // If not in root directory, add option to go up
+                if (directory !== '.') {
+                    const parentDir = directory.split('/').slice(0, -1).join('/') || '.';
+                    const upDirectory = document.createElement('div');
+                    upDirectory.className = 'p-2 border-bottom d-flex align-items-center';
+                    upDirectory.innerHTML = `
+                        <i class="bi bi-arrow-up-circle me-2 text-info"></i>
+                        <span>..</span>
+                    `;
+                    upDirectory.style.cursor = 'pointer';
+                    upDirectory.addEventListener('click', () => loadFiles(parentDir));
+                    fileExplorer.appendChild(upDirectory);
+                }
+                
+                // Sort: directories first, then files
+                const directories = files.filter(f => f.type === 'directory');
+                const regularFiles = files.filter(f => f.type === 'file');
+                
+                // Add directories
+                directories.forEach(dir => {
+                    const dirElement = document.createElement('div');
+                    dirElement.className = 'p-2 border-bottom d-flex align-items-center';
+                    dirElement.innerHTML = `
+                        <i class="bi bi-folder-fill me-2 text-warning"></i>
+                        <span>${dir.name}</span>
+                    `;
+                    dirElement.style.cursor = 'pointer';
+                    dirElement.addEventListener('click', () => loadFiles(dir.path));
+                    fileExplorer.appendChild(dirElement);
+                });
+                
+                // Add files
+                regularFiles.forEach(file => {
+                    const fileElement = document.createElement('div');
+                    fileElement.className = 'p-2 border-bottom d-flex align-items-center justify-content-between';
+                    
+                    // Determine icon based on extension
+                    let icon = 'bi-file-earmark';
+                    const ext = file.name.split('.').pop().toLowerCase();
+                    
+                    if (['html', 'htm'].includes(ext)) icon = 'bi-file-earmark-code';
+                    else if (['js', 'ts'].includes(ext)) icon = 'bi-filetype-js';
+                    else if (['css', 'scss'].includes(ext)) icon = 'bi-filetype-css';
+                    else if (['py'].includes(ext)) icon = 'bi-filetype-py';
+                    else if (['jpg', 'jpeg', 'png', 'gif'].includes(ext)) icon = 'bi-file-earmark-image';
+                    else if (['md'].includes(ext)) icon = 'bi-file-earmark-text';
+                    
+                    fileElement.innerHTML = `
+                        <div>
+                            <i class="bi ${icon} me-2 text-muted"></i>
+                            <span>${file.name}</span>
+                        </div>
+                        <div class="text-muted small">${formatFileSize(file.size)}</div>
+                    `;
+                    fileElement.style.cursor = 'pointer';
+                    fileElement.addEventListener('click', () => {
+                        window.location.href = `/edit_file?path=${encodeURIComponent(file.path)}`;
+                    });
+                    fileExplorer.appendChild(fileElement);
+                });
+                
+                // Show message if no files
+                if (files.length === 0) {
+                    fileExplorer.innerHTML = '<div class="p-3 text-center text-muted">No hay archivos en este directorio</div>';
+                }
+            }
+            
+            function formatFileSize(bytes) {
+                if (bytes === 0) return '0 Bytes';
+                
+                const k = 1024;
+                const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+                const i = Math.floor(Math.log(bytes) / Math.log(k));
+                
+                return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+            }
+            
+            function showNotification(message, type = 'info') {
+                const container = document.getElementById('notifications');
+                if (!container) return;
+                
+                const notification = document.createElement('div');
+                notification.className = `alert alert-${type} alert-dismissible fade show`;
+                notification.innerHTML = `
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                `;
+                
+                container.appendChild(notification);
+                
+                // Auto-remove after 5 seconds
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                    setTimeout(() => notification.remove(), 300);
+                }, 5000);
+            }
+            
+            // Command history navigation
+            document.getElementById('previous-btn').addEventListener('click', () => {
+                if (historyIndex > 0) {
+                    historyIndex--;
+                    instructionInput.value = commandHistory[historyIndex];
+                }
+            });
+            
+            document.getElementById('next-btn').addEventListener('click', () => {
+                if (historyIndex < commandHistory.length - 1) {
+                    historyIndex++;
+                    instructionInput.value = commandHistory[historyIndex];
+                } else if (historyIndex === commandHistory.length - 1) {
+                    historyIndex = commandHistory.length;
+                    instructionInput.value = '';
+                }
+            });
+            
+            // New file/folder buttons
+            document.getElementById('new-file-btn').addEventListener('click', () => {
+                const filename = prompt('Nombre del nuevo archivo:');
+                if (!filename) return;
+                
+                const currentDir = directoryPath.textContent === '/' ? '.' : directoryPath.textContent;
+                const filePath = currentDir === '.' ? filename : `${currentDir}/${filename}`;
+                
+                fetch('/api/files/create', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        file_path: filePath,
+                        content: ''
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showNotification(`Archivo ${filename} creado correctamente`, 'success');
+                        loadFiles(currentDir);
+                    } else {
+                        showNotification(data.error || 'Error al crear archivo', 'danger');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showNotification('Error al crear archivo', 'danger');
+                });
+            });
+            
+            document.getElementById('new-folder-btn').addEventListener('click', () => {
+                const foldername = prompt('Nombre de la nueva carpeta:');
+                if (!foldername) return;
+                
+                const currentDir = directoryPath.textContent === '/' ? '.' : directoryPath.textContent;
+                const folderPath = currentDir === '.' ? foldername : `${currentDir}/${foldername}`;
+                
+                fetch('/api/files/create', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        file_path: `${folderPath}/.gitkeep`,
+                        content: ''
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showNotification(`Carpeta ${foldername} creada correctamente`, 'success');
+                        loadFiles(currentDir);
+                    } else {
+                        showNotification(data.error || 'Error al crear carpeta', 'danger');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showNotification('Error al crear carpeta', 'danger');
+                });
+            });
+        });
+    </script>
+</body>
+</html>

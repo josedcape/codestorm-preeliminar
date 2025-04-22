@@ -1,0 +1,444 @@
+/* Estilos específicos para el Constructor de Tareas Autónomo */
+
+.constructor-container {
+    min-height: calc(100vh - 56px);
+    display: flex;
+    flex-direction: column;
+}
+
+.feature {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.75rem;
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    transition: background-color 0.2s;
+}
+
+.feature:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+.feature i {
+    margin-right: 0.75rem;
+    color: var(--bs-primary);
+}
+
+.welcome-icon {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 80px;
+    height: 80px;
+    margin: 0 auto;
+    border-radius: 50%;
+    background-color: rgba(13, 110, 253, 0.1);
+}
+
+.welcome-feather {
+    width: 40px;
+    height: 40px;
+    color: var(--bs-primary);
+}
+
+.welcome-features {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin: 1.5rem 0;
+}
+
+/* Panel de notificaciones */
+.notifications-panel {
+    margin-top: 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 0.5rem;
+    overflow: hidden;
+    max-height: 250px;
+    display: flex;
+    flex-direction: column;
+}
+
+.notifications-header {
+    padding: 0.75rem 1rem;
+    background-color: rgba(0, 0, 0, 0.2);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.notifications-body {
+    overflow-y: auto;
+    flex-grow: 1;
+    max-height: 210px;
+}
+
+.notification {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    animation: fadeIn 0.3s ease-out;
+    transition: opacity 0.3s, transform 0.3s;
+}
+
+.notification-closing {
+    opacity: 0;
+    transform: translateX(100%);
+}
+
+.notification-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.notification-icon {
+    margin-right: 0.5rem;
+}
+
+.notification-title {
+    font-weight: 600;
+    flex-grow: 1;
+}
+
+.notification-time {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.5);
+    margin-right: 0.5rem;
+}
+
+.notification-close {
+    background: none;
+    border: none;
+    padding: 0;
+    color: rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.notification-close:hover {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.notification-body p {
+    margin-bottom: 0;
+    font-size: 0.9rem;
+}
+
+/* Tipos de notificaciones */
+.notification-info .notification-icon {
+    color: var(--bs-info);
+}
+
+.notification-success .notification-icon {
+    color: var(--bs-success);
+}
+
+.notification-warning .notification-icon {
+    color: var(--bs-warning);
+}
+
+.notification-error .notification-icon {
+    color: var(--bs-danger);
+}
+
+/* Animación */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Estilos para mensajes */
+.chat-messages {
+    padding: 1rem;
+    height: 500px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.system-message {
+    padding: 0.5rem 1rem;
+    background-color: rgba(0, 0, 0, 0.2);
+    border-left: 3px solid var(--bs-primary);
+    border-radius: 0.25rem;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.chat-message {
+    display: flex;
+    flex-direction: column;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    max-width: 100%;
+    margin-bottom: 1rem;
+}
+
+.user-message {
+    background-color: rgba(13, 110, 253, 0.1);
+    align-self: flex-end;
+    border-bottom-right-radius: 0;
+}
+
+.assistant-message {
+    background-color: rgba(0, 0, 0, 0.2);
+    align-self: flex-start;
+    border-bottom-left-radius: 0;
+}
+
+.message-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.sender-name {
+    font-weight: 600;
+}
+
+.message-time {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.message-content {
+    white-space: pre-wrap;
+}
+
+.message-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 0.5rem;
+}
+
+.copy-btn {
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+    transition: color 0.2s;
+    padding: 0.25rem;
+}
+
+.copy-btn:hover {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+/* Checklist de tareas */
+.task-item {
+    display: flex;
+    align-items: flex-start;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    transition: background-color 0.2s;
+}
+
+.task-item:hover {
+    background-color: rgba(255, 255, 255, 0.03);
+}
+
+.task-item .task-checkbox {
+    margin-right: 0.75rem;
+    margin-top: 0.25rem;
+}
+
+.task-item .task-content {
+    flex-grow: 1;
+}
+
+.task-item .task-title {
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+    display: block;
+}
+
+.task-item .task-description {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.task-item .task-meta {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.5);
+    margin-top: 0.25rem;
+    display: flex;
+    align-items: center;
+}
+
+.task-item .task-meta i {
+    margin-right: 0.25rem;
+}
+
+.task-item .task-time {
+    margin-right: 0.75rem;
+}
+
+.task-item .task-agent {
+    background-color: rgba(255, 255, 255, 0.1);
+    padding: 0.15rem 0.5rem;
+    border-radius: 0.25rem;
+}
+
+.task-completed .task-title {
+    text-decoration: line-through;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.task-current {
+    background-color: rgba(13, 110, 253, 0.1);
+    border-left: 3px solid var(--bs-primary);
+}
+
+/* Configuración de agentes */
+.agent-selection {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.agent-selection .form-check {
+    padding: 0.5rem;
+    border-radius: 0.25rem;
+    transition: background-color 0.2s;
+}
+
+.agent-selection .form-check:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+/* Agente activo */
+.agent-selection .form-check.active-agent {
+    background-color: rgba(13, 110, 253, 0.2);
+    border-left: 3px solid var(--bs-primary);
+    box-shadow: 0 0 5px rgba(13, 110, 253, 0.3);
+    animation: pulse-agent 2s infinite;
+}
+
+/* Transición de agente - efecto temporal al cambiar */
+.agent-selection .form-check.agent-transition {
+    background-color: rgba(255, 215, 0, 0.3); /* Color dorado */
+    border-left: 3px solid var(--bs-warning);
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+    animation: agent-highlight 1s ease-in-out;
+    transform: scale(1.05);
+    transition: all 0.3s ease-in-out;
+}
+
+.agent-selection .form-check-input {
+    margin-top: 0.25rem;
+}
+
+/* Efectos de animación para el icono del agente actual */
+.icon-pulse {
+    animation: icon-pulse 1s ease-in-out;
+}
+
+.text-highlight {
+    animation: text-highlight 1s ease-in-out;
+    font-weight: bold;
+}
+
+/* Keyframes para las animaciones */
+@keyframes pulse-agent {
+    0% {
+        box-shadow: 0 0 0 0 rgba(13, 110, 253, 0.4);
+    }
+    70% {
+        box-shadow: 0 0 0 5px rgba(13, 110, 253, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(13, 110, 253, 0);
+    }
+}
+
+@keyframes agent-highlight {
+    0% {
+        transform: scale(1);
+        background-color: rgba(255, 215, 0, 0.1);
+    }
+    50% {
+        transform: scale(1.05);
+        background-color: rgba(255, 215, 0, 0.3);
+    }
+    100% {
+        transform: scale(1);
+        background-color: rgba(255, 215, 0, 0.1);
+    }
+}
+
+@keyframes icon-pulse {
+    0% {
+        transform: scale(1);
+        opacity: 0.7;
+    }
+    50% {
+        transform: scale(1.3);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 0.7;
+    }
+}
+
+@keyframes text-highlight {
+    0% {
+        color: inherit;
+    }
+    50% {
+        color: var(--bs-warning);
+    }
+    100% {
+        color: inherit;
+    }
+}
+
+/* Icono pequeño */
+.feather-sm {
+    width: 16px;
+    height: 16px;
+}
+
+/* Estilo para el indicador de agente actual */
+#currentAgentInfo {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+}
+
+#currentAgentIcon {
+    display: inline-flex;
+    color: var(--bs-primary);
+    margin-right: 0.5rem;
+}
+
+#currentAgentLabel {
+    font-weight: 500;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .welcome-features {
+        grid-template-columns: 1fr;
+    }
+    
+    .chat-messages {
+        height: 400px;
+    }
+    
+    .agent-selection {
+        gap: 0.25rem;
+    }
+}

@@ -1,0 +1,596 @@
+/* Codestorm-Assistant - Futuristic Theme
+   Optimizada para rendimiento */
+
+:root {
+    --primary-blue: #1e88e5;
+    --dark-blue: #0d47a1;
+    --darker-blue: #081B29;
+    --accent-gold: #FFD700;
+    --accent-gold-light: #ffeb99;
+    --accent-gold-dark: #e6b800;
+    --text-light: #e0f7fa;
+    --text-dark: #002638;
+    --sidebar-width: 260px;
+    --silver: #b0bec5;
+    --glow-color: rgba(255, 215, 0, 0.5);
+    --card-bg: rgba(13, 36, 60, 0.8);
+    --card-border: rgba(30, 136, 229, 0.5);
+    --card-header-bg: linear-gradient(90deg, var(--darker-blue) 0%, var(--dark-blue) 100%);
+}
+
+/* Optimizaciones para carga rápida - usando caching de CSS */
+body {
+    font-family: 'Sora', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background-color: #0a1929;
+    background-image: 
+        radial-gradient(circle at 20% 35%, rgba(13, 71, 161, 0.15) 0%, transparent 40%),
+        radial-gradient(circle at 75% 15%, rgba(3, 169, 244, 0.1) 0%, transparent 45%),
+        linear-gradient(135deg, #040c18 0%, #071b34 100%);
+    background-attachment: fixed;
+    min-height: 100vh;
+    color: var(--text-light);
+    display: flex;
+    flex-direction: column;
+    line-height: 1.5;
+    font-weight: 400;
+}
+
+/* Futuristic Navbar */
+.navbar-futuristic {
+    background: linear-gradient(90deg, var(--darker-blue) 0%, var(--dark-blue) 100%);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    border-bottom: 1px solid var(--primary-blue);
+}
+
+.navbar-brand {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--accent-gold) !important;
+    letter-spacing: 0.5px;
+}
+
+.navbar-brand i {
+    margin-right: 8px;
+    color: var(--accent-gold);
+}
+
+.nav-link {
+    color: var(--text-light) !important;
+    margin: 0 5px;
+    padding: 8px 15px !important;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+}
+
+.nav-link:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    transform: translateY(-2px);
+}
+
+.nav-link.active {
+    background-color: var(--primary-blue);
+    color: white !important;
+    box-shadow: 0 0 10px rgba(30, 136, 229, 0.5);
+}
+
+/* Card styles */
+.card-futuristic {
+    background-color: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 8px 24px rgba(0, 10, 20, 0.3);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    margin-bottom: 20px;
+}
+
+.card-futuristic:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 28px rgba(0, 10, 20, 0.4);
+}
+
+.card-header-futuristic {
+    background: var(--card-header-bg);
+    color: var(--text-light);
+    border-bottom: 1px solid var(--primary-blue);
+    padding: 16px 20px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+}
+
+.card-header-futuristic i {
+    margin-right: 10px;
+    color: var(--accent-gold);
+}
+
+/* Button styles */
+.btn-futuristic {
+    background-color: rgba(8, 27, 41, 0.7);
+    color: var(--accent-gold);
+    border: 1px solid var(--primary-blue);
+    border-radius: 20px;
+    padding: 8px 16px;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+}
+
+.btn-futuristic:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    transition: left 0.5s ease;
+    z-index: -1;
+}
+
+.btn-futuristic:hover {
+    color: white;
+    border-color: var(--accent-gold);
+    box-shadow: 0 0 15px var(--glow-color);
+    transform: translateY(-2px);
+}
+
+.btn-futuristic:hover:before {
+    left: 100%;
+}
+
+.btn-futuristic i {
+    margin-right: 5px;
+}
+
+/* Input fields */
+.select-futuristic, 
+.input-futuristic {
+    background-color: rgba(13, 36, 60, 0.9);
+    border: 1px solid var(--primary-blue);
+    color: var(--text-light);
+    border-radius: 6px;
+    padding: 10px 15px;
+    transition: all 0.3s ease;
+}
+
+.select-futuristic:focus, 
+.input-futuristic:focus {
+    border-color: var(--accent-gold);
+    box-shadow: 0 0 10px var(--glow-color);
+}
+
+/* Agent styling */
+.agent-info {
+    display: flex;
+    background-color: rgba(13, 36, 60, 0.5);
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid rgba(30, 136, 229, 0.3);
+}
+
+.agent-avatar {
+    width: 50px;
+    height: 50px;
+    background-color: var(--primary-blue);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 15px;
+    color: white;
+    font-size: 24px;
+    box-shadow: 0 0 15px rgba(30, 136, 229, 0.5);
+}
+
+.agent-avatar i {
+    margin: 0;
+}
+
+.agent-capabilities {
+    padding-left: 20px;
+    margin-top: 5px;
+    font-size: 0.85rem;
+    color: var(--silver);
+}
+
+.agent-capabilities li {
+    margin-bottom: 5px;
+}
+
+/* Chat styling */
+.chat-container-futuristic {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.chat-messages-futuristic {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--primary-blue) rgba(13, 36, 60, 0.5);
+}
+
+.chat-form-futuristic {
+    display: flex;
+    padding: 15px;
+    background-color: rgba(13, 36, 60, 0.7);
+    border-top: 1px solid var(--primary-blue);
+}
+
+.chat-input-futuristic {
+    flex: 1;
+    background-color: rgba(13, 36, 60, 0.9);
+    border: 1px solid var(--primary-blue);
+    color: var(--text-light);
+    border-radius: 20px;
+    padding: 12px 20px;
+    resize: none;
+    transition: all 0.3s ease;
+}
+
+.chat-input-futuristic:focus {
+    border-color: var(--accent-gold);
+    box-shadow: 0 0 15px var(--glow-color);
+    outline: none;
+}
+
+.send-button-futuristic {
+    background-color: var(--primary-blue);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 45px;
+    height: 45px;
+    margin-left: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.send-button-futuristic:hover {
+    background-color: var(--dark-blue);
+    transform: scale(1.1);
+    box-shadow: 0 0 15px rgba(30, 136, 229, 0.5);
+}
+
+/* Chat messages */
+.chat-message {
+    margin-bottom: 20px;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+.user-message {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.user-message .message-bubble {
+    background-color: var(--primary-blue);
+    border-radius: 18px 18px 0 18px;
+    padding: 12px 20px;
+    max-width: 80%;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.agent-message {
+    display: flex;
+}
+
+.agent-message .message-avatar {
+    width: 40px;
+    height: 40px;
+    background-color: var(--dark-blue);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 12px;
+    color: white;
+    font-size: 18px;
+}
+
+.agent-message .message-content {
+    background-color: rgba(13, 36, 60, 0.7);
+    border: 1px solid rgba(30, 136, 229, 0.3);
+    border-radius: 0 18px 18px 18px;
+    padding: 12px 20px;
+    max-width: 80%;
+}
+
+.system-message .message-content {
+    background-color: rgba(13, 36, 60, 0.5);
+    border: 1px solid rgba(255, 215, 0, 0.3);
+    border-radius: 10px;
+    padding: 12px 20px;
+    margin: 15px auto;
+    max-width: 90%;
+    text-align: center;
+    color: var(--accent-gold-light);
+}
+
+.message-time {
+    font-size: 0.75rem;
+    color: var(--silver);
+    margin-top: 5px;
+    text-align: right;
+}
+
+/* Code blocks */
+.message-content pre {
+    background-color: #1a2130;
+    border-radius: 6px;
+    padding: 12px;
+    margin: 10px 0;
+    position: relative;
+    border: 1px solid #2a3244;
+    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.2);
+}
+
+.message-content code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.9rem;
+    color: #e6e6e6;
+}
+
+.code-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 12px;
+    background-color: #232838;
+    border-radius: 6px 6px 0 0;
+    margin-top: 10px;
+    border: 1px solid #2a3244;
+    border-bottom: none;
+}
+
+.code-language {
+    font-size: 0.75rem;
+    color: #b0bec5;
+}
+
+.copy-button {
+    background-color: transparent;
+    border: none;
+    color: #b0bec5;
+    cursor: pointer;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    transition: color 0.2s ease;
+}
+
+.copy-button:hover {
+    color: #e6e6e6;
+}
+
+.copy-button i {
+    margin-right: 5px;
+}
+
+/* Preview section */
+.device-toggle-buttons {
+    display: flex;
+    justify-content: center;
+    background-color: rgba(13, 36, 60, 0.7);
+    border-bottom: 1px solid var(--primary-blue);
+}
+
+.device-toggle-btn {
+    background-color: transparent;
+    border: none;
+    color: var(--silver);
+    padding: 8px 15px;
+    margin: 0 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border-bottom: 2px solid transparent;
+}
+
+.device-toggle-btn.active {
+    color: var(--accent-gold);
+    border-bottom: 2px solid var(--accent-gold);
+}
+
+.preview-container {
+    width: 100%;
+    height: 500px;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.preview-header {
+    height: 30px;
+    background-color: #232838;
+    display: flex;
+    align-items: center;
+    padding: 0 10px;
+    border-bottom: 1px solid #2a3244;
+}
+
+.preview-controls {
+    display: flex;
+    align-items: center;
+}
+
+.control-btn {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    margin-right: 6px;
+}
+
+.control-close {
+    background-color: #ff5f56;
+}
+
+.control-minimize {
+    background-color: #ffbd2e;
+}
+
+.control-expand {
+    background-color: #27c93f;
+}
+
+.preview-url {
+    flex: 1;
+    text-align: center;
+    font-size: 0.8rem;
+    color: #b0bec5;
+}
+
+.preview-iframe {
+    width: 100%;
+    height: calc(100% - 30px);
+    border: none;
+    background-color: white;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulseGlow {
+    0% { box-shadow: 0 0 5px var(--glow-color); }
+    50% { box-shadow: 0 0 15px var(--glow-color); }
+    100% { box-shadow: 0 0 5px var(--glow-color); }
+}
+
+/* Media Queries for responsive design */
+@media (max-width: 768px) {
+    .card-futuristic {
+        margin-bottom: 15px;
+    }
+    
+    .agent-message .message-content,
+    .user-message .message-bubble {
+        max-width: 90%;
+    }
+    
+    .chat-messages-futuristic {
+        padding: 15px 10px;
+    }
+    
+    .preview-container {
+        height: 400px;
+    }
+}
+
+@media (max-width: 576px) {
+    .navbar-brand {
+        font-size: 1.2rem;
+    }
+    
+    .card-header-futuristic {
+        padding: 12px 15px;
+    }
+    
+    .agent-message .message-content,
+    .user-message .message-bubble {
+        max-width: 95%;
+    }
+    
+    .chat-input-futuristic {
+        padding: 10px 15px;
+    }
+    
+    .send-button-futuristic {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .preview-container {
+        height: 300px;
+    }
+}
+
+/* Loading indicators */
+.loading-indicator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 20px 0;
+}
+
+.loading-dots {
+    display: flex;
+    align-items: center;
+}
+
+.loading-dot {
+    width: 8px;
+    height: 8px;
+    margin: 0 4px;
+    border-radius: 50%;
+    background-color: var(--primary-blue);
+    animation: dotPulse 1.5s infinite ease-in-out;
+}
+
+.loading-dot:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.loading-dot:nth-child(3) {
+    animation-delay: 0.4s;
+}
+
+@keyframes dotPulse {
+    0%, 100% { transform: scale(0.8); opacity: 0.6; }
+    50% { transform: scale(1.2); opacity: 1; }
+}
+
+/* Status indicator for websocket connection */
+.status-indicator {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin-right: 6px;
+}
+
+.status-connected {
+    background-color: #27c93f;
+    box-shadow: 0 0 10px rgba(39, 201, 63, 0.7);
+}
+
+.status-disconnected {
+    background-color: #ff5f56;
+    box-shadow: 0 0 10px rgba(255, 95, 86, 0.7);
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(13, 36, 60, 0.5);
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: var(--primary-blue);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background-color: var(--dark-blue);
+}
+
+/* File explorer optimizations */
+.file-item:hover {
+    background-color: rgba(30, 136, 229, 0.2);
+}
+
+/* Optimize transitions */
+* {
+    will-change: transform, opacity;
+}

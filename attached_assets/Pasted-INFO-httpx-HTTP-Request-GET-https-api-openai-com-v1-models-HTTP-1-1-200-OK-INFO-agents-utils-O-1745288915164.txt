@@ -1,0 +1,40 @@
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/models "HTTP/1.1 200 OK"
+INFO:agents_utils:OpenAI API key configurada: sk-pr...qxL8A
+INFO:agents_utils:Anthropic API key configured successfully.
+INFO:agents_utils:Gemini API key configured successfully.
+INFO:main:Rutas de documentos registradas correctamente
+INFO:main:Rutas de GitHub registradas correctamente
+INFO:file_explorer_routes:Rutas de exploración de archivos registradas correctamente
+INFO:main:Rutas de exploración de archivos registradas correctamente
+INFO:constructor_routes:Rutas del Constructor de Tareas registradas correctamente
+INFO:main:Rutas del Constructor de Tareas registradas correctamente
+ERROR:sqlalchemy.pool.impl.QueuePool:Exception during reset or similar
+Traceback (most recent call last):
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 987, in _finalize_fairy
+    fairy._reset(
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 1433, in _reset
+    pool._dialect.do_rollback(self)
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/sqlalchemy/engine/default.py", line 703, in do_rollback
+    dbapi_connection.rollback()
+psycopg2.OperationalError: SSL connection has been closed unexpectedly
+
+ERROR:sqlalchemy.pool.impl.QueuePool:Exception during reset or similar
+Traceback (most recent call last):
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 987, in _finalize_fairy
+    fairy._reset(
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 1433, in _reset
+    pool._dialect.do_rollback(self)
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/sqlalchemy/engine/default.py", line 703, in do_rollback
+    dbapi_connection.rollback()
+psycopg2.OperationalError: SSL connection has been closed unexpectedly
+
+ERROR:sqlalchemy.pool.impl.QueuePool:Exception during reset or similar
+Traceback (most recent call last):
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 987, in _finalize_fairy
+    fairy._reset(
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 1433, in _reset
+    pool._dialect.do_rollback(self)
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/sqlalchemy/engine/default.py", line 703, in do_rollback
+    dbapi_connection.rollback()
+psycopg2.OperationalError: SSL connection has been closed unexpectedly
+

@@ -1,0 +1,969 @@
+{% extends "base.html" %}
+
+{% block title %}CODESTORM - Chat con Agente Especializado{% endblock %}
+
+{% block extra_css %}
+<!-- Google Fonts - Carga optimizada -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+
+<!-- Highlight.js para resaltado de sintaxis -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+
+<style>
+/* Estilos generales */
+.chat-interface {
+    height: calc(100vh - 200px);
+    display: flex;
+    flex-direction: column;
+    max-width: 100%;
+}
+
+.chat-header {
+    padding: 15px;
+    background: linear-gradient(90deg, #091428 0%, #0A2149 100%);
+    border-bottom: 1px solid rgba(255, 215, 0, 0.2);
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.3);
+}
+
+.chat-controls {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 10px 15px;
+    background-color: rgba(10, 33, 73, 0.5);
+    border-top: 1px solid rgba(255, 215, 0, 0.1);
+}
+
+.chat-messages-container {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+    background-color: rgba(9, 20, 40, 0.7);
+}
+
+.chat-input-area {
+    display: flex;
+    padding: 15px;
+    background-color: rgba(10, 33, 73, 0.5);
+    border-top: 1px solid rgba(255, 215, 0, 0.1);
+}
+
+.input-addons {
+    display: flex;
+    gap: 10px;
+    margin-right: 10px;
+}
+
+.chat-input-wrapper {
+    flex: 1;
+    position: relative;
+}
+
+.chat-input {
+    width: 100%;
+    border: 1px solid rgba(255, 215, 0, 0.2);
+    background-color: rgba(9, 20, 40, 0.8);
+    color: #fff;
+    padding: 12px 15px;
+    border-radius: 8px;
+    resize: none;
+    font-family: 'Inter', sans-serif;
+    height: 50px;
+    max-height: 150px;
+    overflow-y: auto;
+    transition: all 0.3s ease;
+}
+
+.chat-input:focus {
+    border-color: rgba(255, 215, 0, 0.5);
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.2);
+    outline: none;
+}
+
+.chat-buttons {
+    display: flex;
+    gap: 10px;
+    margin-left: 10px;
+}
+
+.action-button {
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    border: none;
+    background: linear-gradient(135deg, #0A2149 0%, #091428 100%);
+    color: #FFC107;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.action-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    background: linear-gradient(135deg, #0A2149 0%, #0c1e3a 100%);
+}
+
+.action-button:active {
+    transform: translateY(1px);
+}
+
+.action-button i {
+    font-size: 1.2rem;
+}
+
+.send-button {
+    background: linear-gradient(135deg, #0c1e3a 0%, #0A2149 100%);
+    border: 1px solid rgba(255, 215, 0, 0.3);
+}
+
+.send-button:hover {
+    background: linear-gradient(135deg, #0c2657 0%, #0c2657 100%);
+    border-color: rgba(255, 215, 0, 0.5);
+}
+
+.file-upload-button, .voice-button {
+    background-color: rgba(9, 20, 40, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Mensajes del chat */
+.chat-message {
+    margin-bottom: 20px;
+    max-width: 90%;
+    animation: fadeIn 0.3s ease-out;
+}
+
+.user-message {
+    margin-left: auto;
+    background: linear-gradient(135deg, #0A2149 0%, #091428 100%);
+    border-radius: 12px 12px 2px 12px;
+    padding: 15px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 215, 0, 0.2);
+}
+
+.agent-message {
+    margin-right: auto;
+    background: linear-gradient(135deg, #091428 0%, #0A2149 100%);
+    border-radius: 12px 12px 12px 2px;
+    padding: 15px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(100, 149, 237, 0.2);
+}
+
+.system-message {
+    margin: 10px auto;
+    background-color: rgba(10, 33, 73, 0.3);
+    border-radius: 8px;
+    padding: 10px 15px;
+    max-width: 90%;
+    border: 1px solid rgba(255, 215, 0, 0.1);
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.8);
+    text-align: center;
+}
+
+.message-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+
+.message-sender {
+    font-weight: 600;
+    color: #FFC107;
+}
+
+.message-time {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.message-content {
+    color: #fff;
+    line-height: 1.5;
+}
+
+.message-content p {
+    margin-bottom: 1rem;
+}
+
+.message-content p:last-child {
+    margin-bottom: 0;
+}
+
+/* Selector de Agentes y Modelos */
+.selector-section {
+    background: linear-gradient(180deg, rgba(9, 20, 40, 0.8) 0%, rgba(10, 33, 73, 0.8) 100%);
+    border-radius: 8px;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    margin-bottom: 5px;
+    border: 1px solid rgba(255, 215, 0, 0.15);
+}
+
+.selector-label {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.8);
+    margin-right: 10px;
+    white-space: nowrap;
+}
+
+.selector-dropdown {
+    flex: 1;
+    background-color: rgba(9, 20, 40, 0.9);
+    border: 1px solid rgba(255, 215, 0, 0.2);
+    border-radius: 5px;
+    color: #fff;
+    padding: 5px 10px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.selector-dropdown:focus {
+    border-color: rgba(255, 215, 0, 0.5);
+    outline: none;
+    box-shadow: 0 0 5px rgba(255, 215, 0, 0.2);
+}
+
+.agent-info-panel {
+    display: flex;
+    background: linear-gradient(135deg, rgba(9, 20, 40, 0.6) 0%, rgba(10, 33, 73, 0.6) 100%);
+    border-radius: 8px;
+    padding: 12px;
+    margin: 0 15px 15px;
+    border: 1px solid rgba(255, 215, 0, 0.15);
+    align-items: center;
+}
+
+.agent-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 25px;
+    background: linear-gradient(135deg, #0A2149 0%, #091428 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #FFC107;
+    font-size: 1.5rem;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 215, 0, 0.3);
+    margin-right: 15px;
+    flex-shrink: 0;
+}
+
+.agent-details {
+    flex: 1;
+}
+
+.agent-name {
+    font-weight: 600;
+    color: #FFC107;
+    margin-bottom: 5px;
+    font-size: 1.1rem;
+}
+
+.agent-description {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.9rem;
+    margin-bottom: 0;
+}
+
+/* Código */
+pre {
+    background-color: #282c34;
+    border-radius: 8px;
+    padding: 15px;
+    overflow-x: auto;
+    margin: 10px 0;
+    position: relative;
+}
+
+pre code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+.code-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #21252b;
+    padding: 8px 15px;
+    border-radius: 8px 8px 0 0;
+    border-bottom: 1px solid #181a1f;
+    font-family: 'Inter', sans-serif;
+    margin-top: 10px;
+}
+
+.code-language {
+    font-size: 0.8rem;
+    color: #abb2bf;
+    font-weight: 600;
+}
+
+.code-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.code-button {
+    background-color: transparent;
+    border: none;
+    color: #abb2bf;
+    cursor: pointer;
+    padding: 2px 5px;
+    font-size: 0.8rem;
+    transition: all 0.3s ease;
+}
+
+.code-button:hover {
+    color: #fff;
+}
+
+/* Botón de carga de archivos */
+.file-input {
+    display: none;
+}
+
+/* Indicador de carga */
+.loading-animation {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 15px;
+    gap: 8px;
+}
+
+.loading-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: rgba(255, 215, 0, 0.6);
+    animation: loadingAnimation 1.4s infinite ease-in-out both;
+}
+
+.loading-dot:nth-child(1) {
+    animation-delay: -0.32s;
+}
+
+.loading-dot:nth-child(2) {
+    animation-delay: -0.16s;
+}
+
+@keyframes loadingAnimation {
+    0%, 80%, 100% {
+        transform: scale(0);
+    }
+    40% {
+        transform: scale(1);
+    }
+}
+
+/* Animaciones */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+/* Estilos para código inline */
+.inline-code {
+    font-family: 'JetBrains Mono', monospace;
+    background-color: rgba(40, 44, 52, 0.5);
+    padding: 2px 5px;
+    border-radius: 4px;
+    font-size: 0.9em;
+    color: #e6e6e6;
+}
+
+/* Estilos para los enlaces */
+.chat-link {
+    color: #3498db;
+    text-decoration: none;
+    border-bottom: 1px dotted #3498db;
+    transition: all 0.2s ease;
+}
+
+.chat-link:hover {
+    color: #2980b9;
+    border-bottom: 1px solid #2980b9;
+}
+
+/* Responsivo */
+@media (max-width: 768px) {
+    .chat-controls {
+        flex-direction: column;
+        gap: 10px;
+        padding: 10px;
+    }
+    
+    .selector-section {
+        width: 100%;
+    }
+    
+    .agent-info-panel {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .agent-icon {
+        margin: 0 auto 10px;
+    }
+    
+    .chat-input-area {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .input-addons {
+        width: 100%;
+        justify-content: space-between;
+    }
+    
+    .chat-buttons {
+        width: 100%;
+        justify-content: space-between;
+        margin-left: 0;
+    }
+    
+    .chat-interface {
+        height: calc(100vh - 280px);
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="row">
+        <!-- Interfaz de Chat Rediseñada -->
+        <div class="col-12">
+            <div class="card card-futuristic">
+                <!-- Cabecera con título -->
+                <div class="card-header card-header-futuristic d-flex justify-content-between align-items-center">
+                    <span><i class="bi bi-cpu me-2"></i>Chat con Agente Especializado</span>
+                </div>
+                
+                <!-- Contenido del chat -->
+                <div class="card-body p-0">
+                    <!-- Panel de control superior -->
+                    <div class="chat-controls">
+                        <!-- Selector de Modelo -->
+                        <div class="selector-section">
+                            <span class="selector-label">Modelo de IA:</span>
+                            <select id="model-select" class="selector-dropdown">
+                                <option value="openai" selected>OpenAI (GPT-4o)</option>
+                                <option value="anthropic">Anthropic (Claude)</option>
+                                <option value="gemini">Google (Gemini)</option>
+                            </select>
+                        </div>
+                        
+                        <!-- Selector de Agente -->
+                        <div class="selector-section">
+                            <span class="selector-label">Agente:</span>
+                            <select id="agent-selector" class="selector-dropdown">
+                                <option value="developer" selected>Agente de Desarrollo</option>
+                                <option value="architect">Arquitecto de Software</option>
+                                <option value="advanced">Especialista Avanzado</option>
+                                <option value="general">Asistente General</option>
+                            </select>
+                        </div>
+                        
+                        <!-- Selector de Documentos -->
+                        <div class="selector-section">
+                            <span class="selector-label">Documento:</span>
+                            <select id="document-selector" class="selector-dropdown">
+                                <option value="" selected>Sin documento</option>
+                                <!-- Aquí se cargarán dinámicamente los documentos disponibles -->
+                            </select>
+                            <button class="btn btn-sm btn-primary ms-2" data-bs-toggle="modal" data-bs-target="#documentModal">
+                                <i class="bi bi-file-earmark-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Información del agente seleccionado -->
+                    <div class="agent-info-panel">
+                        <div class="agent-icon">
+                            <i class="bi bi-code-slash" id="agent-icon"></i>
+                        </div>
+                        <div class="agent-details">
+                            <h5 class="agent-name" id="agent-name">Agente de Desarrollo</h5>
+                            <p class="agent-description" id="agent-description">Experto en optimización y edición de código en tiempo real</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Contenedor de mensajes -->
+                    <div class="chat-interface">
+                        <div class="chat-messages-container" id="chat-messages">
+                            <!-- Mensaje de bienvenida del sistema -->
+                            <div class="chat-message system-message">
+                                <div class="message-content">
+                                    <p>¡Bienvenido al chat especializado de CODESTORM! Estás hablando con el <strong>Agente de Desarrollo</strong>, un experto en optimización y edición de código en tiempo real.</p>
+                                </div>
+                            </div>
+                            <!-- Aquí se añadirán dinámicamente los mensajes -->
+                        </div>
+                        
+                        <!-- Área de entrada de texto y botones -->
+                        <div class="chat-input-area">
+                            <div class="input-addons">
+                                <button type="button" class="action-button file-upload-button" id="file-button" title="Subir archivo">
+                                    <i class="bi bi-paperclip"></i>
+                                </button>
+                                <input type="file" id="file-input" class="file-input" multiple>
+                                
+                                <button type="button" class="action-button voice-button" id="voice-button" title="Reconocimiento de voz">
+                                    <i class="bi bi-mic"></i>
+                                </button>
+                            </div>
+                            
+                            <div class="chat-input-wrapper">
+                                <textarea id="chat-input" class="chat-input" placeholder="Escribe tu mensaje aquí... Por ejemplo: 'Crea una página de ventas para productos tecnológicos'" rows="1"></textarea>
+                            </div>
+                            
+                            <div class="chat-buttons">
+                                <button type="button" class="action-button send-button" id="send-button">
+                                    <i class="bi bi-send"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Previsualización (inicialmente oculta) -->
+        <div class="col-12 mt-4" id="preview-section" style="display: none;">
+            <div class="card card-futuristic">
+                <div class="card-header card-header-futuristic d-flex justify-content-between align-items-center">
+                    <span><i class="bi bi-window me-2"></i>Previsualización</span>
+                    <div>
+                        <button id="toggle-preview" class="btn btn-sm btn-futuristic">
+                            <i class="bi bi-x-lg"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <div class="device-toggle-buttons py-2">
+                        <button class="device-toggle-btn active" data-device="desktop">
+                            <i class="bi bi-laptop"></i> Escritorio
+                        </button>
+                        <button class="device-toggle-btn" data-device="tablet">
+                            <i class="bi bi-tablet"></i> Tablet
+                        </button>
+                        <button class="device-toggle-btn" data-device="mobile">
+                            <i class="bi bi-phone"></i> Móvil
+                        </button>
+                    </div>
+                    
+                    <div class="preview-container" id="preview-container">
+                        <div class="preview-header">
+                            <div class="preview-controls">
+                                <div class="control-btn control-close"></div>
+                                <div class="control-btn control-minimize"></div>
+                                <div class="control-btn control-expand"></div>
+                            </div>
+                            <div class="preview-url">
+                                <span>preview.html</span>
+                            </div>
+                        </div>
+                        <iframe id="preview-iframe" class="preview-iframe" title="Previsualización"></iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="{{ url_for('static', filename='js/chat/chat.js') }}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Configuración de agentes especializados
+        window.SPECIALIZED_AGENTS = {
+            developer: {
+                id: 'developer',
+                name: 'Agente de Desarrollo',
+                icon: 'bi-code-slash',
+                description: 'Experto en optimización y edición de código en tiempo real',
+                capabilities: [
+                    'Corrección y refactorización de código',
+                    'Optimización de rendimiento',
+                    'Integración de frameworks y librerías',
+                    'Automatización de tareas',
+                    'Generación de código limpio'
+                ]
+            },
+            architect: {
+                id: 'architect',
+                name: 'Arquitecto de Software',
+                icon: 'bi-diagram-3',
+                description: 'Diseñador de arquitecturas escalables y optimizadas',
+                capabilities: [
+                    'Definición de estructura del proyecto',
+                    'Selección de tecnologías y frameworks',
+                    'Asesoría en elección de bases de datos',
+                    'Implementación de microservicios',
+                    'Planificación de UI/UX y patrones de diseño'
+                ]
+            },
+            advanced: {
+                id: 'advanced',
+                name: 'Especialista Avanzado',
+                icon: 'bi-braces',
+                description: 'Experto en soluciones complejas e integraciones',
+                capabilities: [
+                    'Desarrollo de soluciones avanzadas',
+                    'Integración con APIs externas',
+                    'Optimización de rendimiento',
+                    'Seguridad y encriptación',
+                    'Despliegue y configuración de servidores'
+                ]
+            },
+            general: {
+                id: 'general',
+                name: 'Asistente General',
+                icon: 'bi-chat-dots',
+                description: 'Asistente versátil para consultas generales',
+                capabilities: [
+                    'Respuesta a preguntas generales',
+                    'Orientación básica de desarrollo',
+                    'Ayuda con conceptos de programación',
+                    'Consejos de buenas prácticas',
+                    'Resolución de problemas comunes'
+                ]
+            }
+        };
+        
+        // Inicializar chat
+        initializeChat();
+        
+        // Funcionalidad para ajustar la altura del textarea
+        const chatInput = document.getElementById('chat-input');
+        chatInput.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = (this.scrollHeight < 150 ? this.scrollHeight : 150) + 'px';
+        });
+        
+        // Funcionalidad para el botón de archivo
+        const fileButton = document.getElementById('file-button');
+        const fileInput = document.getElementById('file-input');
+        
+        fileButton.addEventListener('click', function() {
+            fileInput.click();
+        });
+        
+        fileInput.addEventListener('change', function() {
+            if (this.files.length > 0) {
+                const fileNames = Array.from(this.files).map(file => file.name).join(', ');
+                chatInput.value += `\nArchivos seleccionados: ${fileNames}`;
+                chatInput.dispatchEvent(new Event('input'));
+            }
+        });
+        
+        // Funcionalidad para el botón de voz (básica)
+        const voiceButton = document.getElementById('voice-button');
+        let recognition;
+        
+        if ('webkitSpeechRecognition' in window) {
+            recognition = new webkitSpeechRecognition();
+            recognition.continuous = false;
+            recognition.interimResults = true;
+            recognition.lang = 'es-ES';
+            
+            voiceButton.addEventListener('click', function() {
+                if (voiceButton.classList.contains('recording')) {
+                    recognition.stop();
+                    voiceButton.classList.remove('recording');
+                    voiceButton.style.backgroundColor = '';
+                } else {
+                    recognition.start();
+                    voiceButton.classList.add('recording');
+                    voiceButton.style.backgroundColor = 'rgba(255, 0, 0, 0.2)';
+                }
+            });
+            
+            recognition.onresult = function(event) {
+                const transcript = event.results[0][0].transcript;
+                chatInput.value += transcript;
+                chatInput.dispatchEvent(new Event('input'));
+            };
+            
+            recognition.onend = function() {
+                voiceButton.classList.remove('recording');
+                voiceButton.style.backgroundColor = '';
+            };
+        } else {
+            voiceButton.addEventListener('click', function() {
+                alert('El reconocimiento de voz no está soportado en este navegador.');
+            });
+        }
+        
+        // La funcionalidad de envío ya está implementada en chat.js
+        console.log("Inicialización adicional completada.");
+        
+        // Permitir enviar con Enter (excepto con Shift+Enter para nueva línea)
+        chatInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendButton.click();
+            }
+        });
+        
+        // Inicializar funcionalidad de documentos
+        initializeDocumentFeatures();
+    });
+    
+    // Función para inicializar características de documentos
+    function initializeDocumentFeatures() {
+        // Cargar documentos disponibles
+        loadAvailableDocuments();
+        
+        // Configurar eventos para cargar documentos
+        const uploadDocumentForm = document.getElementById('uploadDocumentForm');
+        if (uploadDocumentForm) {
+            uploadDocumentForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                uploadDocument();
+            });
+        }
+        
+        // Configurar selector de documentos
+        const documentSelector = document.getElementById('document-selector');
+        if (documentSelector) {
+            documentSelector.addEventListener('change', function() {
+                updateDocumentInfo(this.value);
+            });
+        }
+        
+        // Configurar botón de eliminar documento
+        const documentRemoveBtn = document.querySelector('.document-remove');
+        if (documentRemoveBtn) {
+            documentRemoveBtn.addEventListener('click', function() {
+                const selectedDoc = document.getElementById('document-selector').value;
+                if (selectedDoc) {
+                    deleteDocument(selectedDoc);
+                }
+            });
+        }
+    }
+    
+    // Cargar documentos disponibles
+    function loadAvailableDocuments() {
+        fetch('/api/documents/list')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const documentSelector = document.getElementById('document-selector');
+                    // Limpiar opciones existentes excepto la primera (Sin documento)
+                    while (documentSelector.options.length > 1) {
+                        documentSelector.remove(1);
+                    }
+                    
+                    // Añadir documentos disponibles
+                    data.documents.forEach(doc => {
+                        const option = document.createElement('option');
+                        option.value = doc.filename;
+                        option.textContent = doc.filename;
+                        documentSelector.appendChild(option);
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error al cargar documentos:', error);
+            });
+    }
+    
+    // Actualizar información del documento seleccionado
+    function updateDocumentInfo(filename) {
+        const documentDetails = document.querySelector('.document-details');
+        const documentStatus = document.querySelector('.document-status');
+        
+        if (!filename) {
+            documentDetails.style.display = 'none';
+            documentStatus.innerHTML = '<small>Selecciona un documento para usarlo como contexto en la conversación.</small>';
+            return;
+        }
+        
+        fetch(`/api/documents/info/${encodeURIComponent(filename)}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const doc = data.document;
+                    
+                    // Mostrar detalles del documento
+                    document.querySelector('.document-type').textContent = doc.type.toUpperCase().substring(1);
+                    document.querySelector('.document-size').textContent = formatFileSize(doc.size);
+                    documentDetails.style.display = 'flex';
+                    
+                    // Actualizar estado
+                    const wordCount = doc.word_count ? doc.word_count.toLocaleString() : '?';
+                    documentStatus.innerHTML = `
+                        <small>Documento cargado: <strong>${doc.filename}</strong> (${wordCount} palabras)</small>
+                        <div class="mt-1 text-success">
+                            <small><i class="bi bi-check-circle"></i> Listo para usar como contexto</small>
+                        </div>
+                    `;
+                }
+            })
+            .catch(error => {
+                console.error('Error al obtener información del documento:', error);
+                documentDetails.style.display = 'none';
+                documentStatus.innerHTML = '<small class="text-danger">Error al cargar información del documento.</small>';
+            });
+    }
+    
+    // Subir documento
+    function uploadDocument() {
+        const fileInput = document.getElementById('documentFile');
+        if (!fileInput.files || fileInput.files.length === 0) {
+            showUploadError('Selecciona un archivo para subir.');
+            return;
+        }
+        
+        const allowedTypes = ['.pdf', '.docx', '.doc', '.html', '.htm', '.md', '.txt', '.py', '.js', '.css', '.json', '.csv', '.xml', '.yml', '.yaml', '.pptx', '.epub'];
+        const file = fileInput.files[0];
+        const fileExt = '.' + file.name.split('.').pop().toLowerCase();
+        
+        if (!allowedTypes.includes(fileExt)) {
+            showUploadError(`Tipo de archivo no permitido. Formatos soportados: ${allowedTypes.join(', ')}`);
+            return;
+        }
+        
+        // Mostrar estado de carga
+        const uploadStatus = document.getElementById('uploadStatus');
+        uploadStatus.innerHTML = '<div class="spinner-border spinner-border-sm text-primary" role="status"></div> Subiendo documento...';
+        
+        const formData = new FormData();
+        formData.append('file', file);
+        
+        fetch('/api/documents/upload', {
+            method: 'POST',
+            body: formData
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Actualizar lista de documentos
+                    loadAvailableDocuments();
+                    
+                    // Mostrar mensaje de éxito
+                    uploadStatus.innerHTML = `<div class="text-success"><i class="bi bi-check-circle"></i> Documento subido correctamente.</div>`;
+                    
+                    // Seleccionar el documento recién subido
+                    setTimeout(() => {
+                        const documentSelector = document.getElementById('document-selector');
+                        documentSelector.value = data.document.filename;
+                        updateDocumentInfo(data.document.filename);
+                        
+                        // Cerrar modal después de 1 segundo
+                        setTimeout(() => {
+                            const documentModal = bootstrap.Modal.getInstance(document.getElementById('documentModal'));
+                            documentModal.hide();
+                            uploadStatus.innerHTML = '';
+                            fileInput.value = '';
+                        }, 1000);
+                    }, 500);
+                } else {
+                    showUploadError(data.error || 'Error al subir el documento.');
+                }
+            })
+            .catch(error => {
+                console.error('Error al subir documento:', error);
+                showUploadError('Error de conexión al subir el documento.');
+            });
+    }
+    
+    // Eliminar documento
+    function deleteDocument(filename) {
+        if (!confirm(`¿Estás seguro de que deseas eliminar el documento "${filename}"?`)) {
+            return;
+        }
+        
+        fetch(`/api/documents/delete/${encodeURIComponent(filename)}`, {
+            method: 'DELETE'
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Actualizar lista de documentos
+                    loadAvailableDocuments();
+                    
+                    // Limpiar selección
+                    document.getElementById('document-selector').value = '';
+                    updateDocumentInfo('');
+                    
+                    // Mostrar mensaje
+                    addSystemMessage(`El documento "${filename}" ha sido eliminado.`);
+                } else {
+                    console.error('Error al eliminar documento:', data.error);
+                    addSystemMessage(`Error al eliminar el documento: ${data.error}`);
+                }
+            })
+            .catch(error => {
+                console.error('Error al eliminar documento:', error);
+                addSystemMessage('Error de conexión al eliminar el documento.');
+            });
+    }
+    
+    // Mostrar error en el formulario de subida
+    function showUploadError(message) {
+        const uploadStatus = document.getElementById('uploadStatus');
+        uploadStatus.innerHTML = `<div class="text-danger"><i class="bi bi-exclamation-circle"></i> ${message}</div>`;
+    }
+    
+    // Formatear tamaño de archivo
+    function formatFileSize(bytes) {
+        if (bytes < 1024) return bytes + ' B';
+        else if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+        else if (bytes < 1073741824) return (bytes / 1048576).toFixed(1) + ' MB';
+        else return (bytes / 1073741824).toFixed(1) + ' GB';
+    }
+</script>
+
+<!-- Modal para subir documentos -->
+<div class="modal fade" id="documentModal" tabindex="-1" aria-labelledby="documentModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content bg-dark text-light border-secondary">
+            <div class="modal-header border-secondary">
+                <h5 class="modal-title" id="documentModalLabel">Subir Documento</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="uploadDocumentForm">
+                    <div class="mb-3">
+                        <label for="documentFile" class="form-label">Selecciona un documento:</label>
+                        <input type="file" class="form-control bg-dark text-light border-secondary" id="documentFile" required>
+                        <div class="form-text text-light-50">
+                            Formatos soportados: PDF, DOCX, HTML, MD, TXT, PY, JS, etc.
+                        </div>
+                    </div>
+                    <div id="uploadStatus" class="mb-3"></div>
+                    <div class="d-flex justify-content-end">
+                        <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Subir</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

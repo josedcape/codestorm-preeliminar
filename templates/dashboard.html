@@ -1,0 +1,515 @@
+{% extends 'base.html' %}
+
+{% block title %}Codestorm Assistant - Panel de Control{% endblock %}
+
+{% block extra_css %}
+<style>
+    .terminal {
+        background-color: #0d1117;
+        color: #e6edf3;
+        border-radius: 6px;
+        padding: 15px;
+        height: 300px;
+        overflow-y: auto;
+        font-family: monospace;
+    }
+    
+    .terminal-output {
+        white-space: pre-wrap;
+        word-wrap: break-word;
+    }
+    
+    .file-explorer {
+        border: 1px solid #30363d;
+        border-radius: 6px;
+        height: 100%;
+        overflow-y: auto;
+    }
+    
+    .file-item {
+        cursor: pointer;
+        padding: 8px 12px;
+        border-bottom: 1px solid #21262d;
+        transition: background-color 0.2s;
+    }
+    
+    .file-item:hover {
+        background-color: #161b22;
+    }
+    
+    .file-editor {
+        height: 600px;
+        border: 1px solid #30363d;
+        border-radius: 6px;
+        overflow-y: auto;
+    }
+    
+    .editor-textarea {
+        width: 100%;
+        height: 100%;
+        background-color: #0d1117;
+        color: #e6edf3;
+        border: none;
+        padding: 15px;
+        font-family: monospace;
+        resize: none;
+    }
+    
+    .code-preview {
+        background-color: #0d1117;
+        border-radius: 6px;
+        padding: 15px;
+        height: 300px;
+        overflow-y: auto;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <h1 class="fw-bold">
+                <span class="text-primary">Panel</span> 
+                <span class="text-light">de Control</span>
+            </h1>
+            <p class="lead">Gestiona archivos, ejecuta comandos y visualiza tus proyectos</p>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card border-info bg-dark h-100">
+                <div class="card-header bg-info text-dark">
+                    <h4 class="mb-0">Terminal</h4>
+                </div>
+                <div class="card-body">
+                    <div class="terminal mb-3" id="terminal">
+                        <div class="terminal-output" id="terminal-output">
+$ Bienvenido a Codestorm Terminal
+$ Escribe un comando y presiona Enter para ejecutarlo
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="command-input" placeholder="Escribe un comando...">
+                        <button class="btn btn-info" type="button" id="execute-command">Ejecutar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card border-primary bg-dark h-100">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Procesador de Instrucciones</h4>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label for="natural-language-input" class="form-label">Escribe una instrucción en lenguaje natural:</label>
+                        <textarea class="form-control mb-2" id="natural-language-input" rows="3" placeholder="Ej: Crea un archivo HTML con un formulario de contacto"></textarea>
+                        <div class="d-grid">
+                            <button class="btn btn-primary" id="process-instruction">Procesar Instrucción</button>
+                        </div>
+                    </div>
+                    <div class="alert alert-info" id="instruction-result" style="display: none;">
+                        <p class="mb-0" id="instruction-result-text"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-3">
+            <div class="card border-secondary bg-dark h-100">
+                <div class="card-header bg-secondary text-white d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0">Explorador</h4>
+                    <div>
+                        <button class="btn btn-sm btn-outline-light" id="refresh-files">
+                            <i class="bi bi-arrow-clockwise"></i>
+                        </button>
+                        <button class="btn btn-sm btn-outline-light" id="create-file-btn" data-bs-toggle="modal" data-bs-target="#createFileModal">
+                            <i class="bi bi-plus"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <div class="file-explorer" id="file-explorer">
+                        <div class="p-3 text-center">
+                            <small>Cargando archivos...</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-9">
+            <div class="card border-light bg-dark h-100">
+                <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0" id="editor-title">Editor</h4>
+                    <div>
+                        <button class="btn btn-sm btn-outline-success" id="save-file" disabled>
+                            <i class="bi bi-save"></i> Guardar
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger" id="delete-file" disabled>
+                            <i class="bi bi-trash"></i> Eliminar
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <div class="file-editor">
+                        <textarea class="editor-textarea" id="file-content" placeholder="Selecciona un archivo para editarlo..." disabled></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para crear archivo -->
+<div class="modal fade" id="createFileModal" tabindex="-1" aria-labelledby="createFileModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content bg-dark text-light">
+            <div class="modal-header">
+                <h5 class="modal-title" id="createFileModalLabel">Crear nuevo archivo</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="new-file-name" class="form-label">Nombre del archivo:</label>
+                    <input type="text" class="form-control" id="new-file-name">
+                </div>
+                <div class="mb-3">
+                    <label for="new-file-content" class="form-label">Contenido inicial (opcional):</label>
+                    <textarea class="form-control" id="new-file-content" rows="5"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="create-file-submit">Crear</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Variables globales
+    let currentDirectory = '.';
+    let currentFilePath = null;
+    let fileExplorer = document.getElementById('file-explorer');
+    let fileContent = document.getElementById('file-content');
+    let editorTitle = document.getElementById('editor-title');
+    let saveFileBtn = document.getElementById('save-file');
+    let deleteFileBtn = document.getElementById('delete-file');
+    let terminalOutput = document.getElementById('terminal-output');
+    let commandInput = document.getElementById('command-input');
+    
+    // Cargar archivos al inicio
+    loadFiles(currentDirectory);
+    
+    // Event listeners
+    document.getElementById('refresh-files').addEventListener('click', function() {
+        loadFiles(currentDirectory);
+    });
+    
+    document.getElementById('execute-command').addEventListener('click', function() {
+        executeCommand(commandInput.value);
+    });
+    
+    commandInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+            executeCommand(commandInput.value);
+        }
+    });
+    
+    document.getElementById('process-instruction').addEventListener('click', function() {
+        processInstruction();
+    });
+    
+    saveFileBtn.addEventListener('click', function() {
+        if (currentFilePath) {
+            saveFile(currentFilePath, fileContent.value);
+        }
+    });
+    
+    deleteFileBtn.addEventListener('click', function() {
+        if (currentFilePath && confirm('¿Estás seguro de que quieres eliminar este archivo?')) {
+            deleteFile(currentFilePath);
+        }
+    });
+    
+    document.getElementById('create-file-submit').addEventListener('click', function() {
+        let fileName = document.getElementById('new-file-name').value;
+        let content = document.getElementById('new-file-content').value;
+        
+        if (!fileName) {
+            alert('Por favor, introduce un nombre de archivo.');
+            return;
+        }
+        
+        let filePath = currentDirectory === '.' ? fileName : currentDirectory + '/' + fileName;
+        createFile(filePath, content);
+        
+        // Cerrar modal
+        let modal = bootstrap.Modal.getInstance(document.getElementById('createFileModal'));
+        modal.hide();
+    });
+    
+    // Funciones
+    function loadFiles(directory) {
+        fetch(`/api/files?directory=${encodeURIComponent(directory)}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    fileExplorer.innerHTML = '';
+                    currentDirectory = data.directory;
+                    
+                    // Botón para subir un nivel si no estamos en el directorio raíz
+                    if (currentDirectory !== '.') {
+                        let upDir = document.createElement('div');
+                        upDir.className = 'file-item';
+                        upDir.innerHTML = '<i class="bi bi-arrow-up-circle me-2"></i>Subir nivel';
+                        upDir.addEventListener('click', function() {
+                            // Subir un nivel en la jerarquía de directorios
+                            let newDir = currentDirectory.split('/').slice(0, -1).join('/');
+                            if (newDir === '') newDir = '.';
+                            loadFiles(newDir);
+                        });
+                        fileExplorer.appendChild(upDir);
+                    }
+                    
+                    // Mostrar directorios primero
+                    let dirs = data.files.filter(f => f.type === 'directory');
+                    let files = data.files.filter(f => f.type === 'file');
+                    
+                    dirs.forEach(dir => {
+                        let dirItem = document.createElement('div');
+                        dirItem.className = 'file-item';
+                        dirItem.innerHTML = `<i class="bi bi-folder-fill me-2 text-info"></i>${dir.name}`;
+                        dirItem.addEventListener('click', function() {
+                            loadFiles(dir.path);
+                        });
+                        fileExplorer.appendChild(dirItem);
+                    });
+                    
+                    files.forEach(file => {
+                        let fileItem = document.createElement('div');
+                        fileItem.className = 'file-item';
+                        
+                        // Icono basado en extensión
+                        let icon = 'bi-file-text';
+                        if (['html', 'htm'].includes(file.extension)) icon = 'bi-file-earmark-code';
+                        if (['js', 'ts'].includes(file.extension)) icon = 'bi-filetype-js';
+                        if (['css', 'scss', 'sass'].includes(file.extension)) icon = 'bi-filetype-css';
+                        if (['py'].includes(file.extension)) icon = 'bi-filetype-py';
+                        if (['jpg', 'jpeg', 'png', 'gif', 'svg'].includes(file.extension)) icon = 'bi-file-image';
+                        
+                        fileItem.innerHTML = `<i class="bi ${icon} me-2"></i>${file.name}`;
+                        fileItem.addEventListener('click', function() {
+                            loadFileContent(file.path);
+                        });
+                        fileExplorer.appendChild(fileItem);
+                    });
+                    
+                    if (data.files.length === 0) {
+                        fileExplorer.innerHTML = '<div class="p-3 text-center"><small>No hay archivos en este directorio</small></div>';
+                    }
+                } else {
+                    fileExplorer.innerHTML = `<div class="p-3 text-center text-danger"><small>Error: ${data.error}</small></div>`;
+                }
+            })
+            .catch(error => {
+                fileExplorer.innerHTML = `<div class="p-3 text-center text-danger"><small>Error al cargar archivos: ${error}</small></div>`;
+            });
+    }
+    
+    function loadFileContent(filePath) {
+        fetch(`/api/files/read?file_path=${encodeURIComponent(filePath)}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    currentFilePath = filePath;
+                    fileContent.value = data.content;
+                    fileContent.disabled = false;
+                    editorTitle.innerText = `Editor - ${filePath}`;
+                    saveFileBtn.disabled = false;
+                    deleteFileBtn.disabled = false;
+                } else {
+                    alert(`Error: ${data.error}`);
+                }
+            })
+            .catch(error => {
+                alert(`Error al cargar el archivo: ${error}`);
+            });
+    }
+    
+    function saveFile(filePath, content) {
+        fetch('/api/files/create', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                file_path: filePath,
+                content: content
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Archivo guardado correctamente');
+            } else {
+                alert(`Error: ${data.error}`);
+            }
+        })
+        .catch(error => {
+            alert(`Error al guardar el archivo: ${error}`);
+        });
+    }
+    
+    function createFile(filePath, content) {
+        fetch('/api/files/create', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                file_path: filePath,
+                content: content || ''
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                loadFiles(currentDirectory);
+                loadFileContent(filePath);
+                document.getElementById('new-file-name').value = '';
+                document.getElementById('new-file-content').value = '';
+            } else {
+                alert(`Error: ${data.error}`);
+            }
+        })
+        .catch(error => {
+            alert(`Error al crear el archivo: ${error}`);
+        });
+    }
+    
+    function deleteFile(filePath) {
+        fetch('/api/files/delete', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                file_path: filePath
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                loadFiles(currentDirectory);
+                currentFilePath = null;
+                fileContent.value = '';
+                fileContent.disabled = true;
+                editorTitle.innerText = 'Editor';
+                saveFileBtn.disabled = true;
+                deleteFileBtn.disabled = true;
+            } else {
+                alert(`Error: ${data.error}`);
+            }
+        })
+        .catch(error => {
+            alert(`Error al eliminar el archivo: ${error}`);
+        });
+    }
+    
+    function executeCommand(command) {
+        if (!command) return;
+        
+        addToTerminal(`$ ${command}`);
+        
+        fetch('/api/execute', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                command: command
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                if (data.stdout) addToTerminal(data.stdout);
+                if (data.stderr) addToTerminal(`Error: ${data.stderr}`, true);
+            } else {
+                addToTerminal(`Error: ${data.error}`, true);
+            }
+            
+            // Limpiar el campo de entrada
+            commandInput.value = '';
+        })
+        .catch(error => {
+            addToTerminal(`Error: ${error}`, true);
+        });
+    }
+    
+    function addToTerminal(text, isError = false) {
+        let line = document.createElement('div');
+        line.className = isError ? 'text-danger' : '';
+        line.textContent = text;
+        terminalOutput.appendChild(line);
+        
+        // Auto-scroll al final
+        terminalOutput.scrollTop = terminalOutput.scrollHeight;
+    }
+    
+    function processInstruction() {
+        let instruction = document.getElementById('natural-language-input').value;
+        if (!instruction) return;
+        
+        let resultElement = document.getElementById('instruction-result');
+        let resultTextElement = document.getElementById('instruction-result-text');
+        
+        resultElement.style.display = 'block';
+        resultTextElement.innerHTML = 'Procesando instrucción...';
+        
+        fetch('/api/process', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                instruction: instruction
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                if (data.command) {
+                    resultTextElement.innerHTML = `Comando ejecutado: <code>${data.command}</code><br>${data.result}`;
+                    
+                    // Si hay un comando, ejecutarlo en la terminal también
+                    executeCommand(data.command);
+                } else if (data.file_path) {
+                    resultTextElement.innerHTML = `Archivo creado: <code>${data.file_path}</code>`;
+                    
+                    // Recargar el explorador de archivos
+                    loadFiles(currentDirectory);
+                } else {
+                    resultTextElement.innerHTML = data.result || 'Instrucción procesada correctamente';
+                }
+            } else {
+                resultTextElement.innerHTML = `Error: ${data.error}`;
+                resultElement.className = 'alert alert-danger';
+            }
+        })
+        .catch(error => {
+            resultTextElement.innerHTML = `Error al procesar la instrucción: ${error}`;
+            resultElement.className = 'alert alert-danger';
+        });
+    }
+});
+</script>
+{% endblock %}

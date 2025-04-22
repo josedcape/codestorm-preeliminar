@@ -1,0 +1,456 @@
+/**
+ * Codestorm Assistant - Animaciones y efectos visuales
+ */
+
+/* Estilos para spinners */
+.spinner {
+  display: inline-block;
+  width: 1.5rem;
+  height: 1.5rem;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-top-color: var(--bs-info);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+.spinner-sm {
+  width: 1rem;
+  height: 1rem;
+  border-width: 2px;
+}
+
+.spinner-lg {
+  width: 3rem;
+  height: 3rem;
+  border-width: 3px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Indicador de escritura */
+.typing-indicator {
+  display: flex;
+  align-items: center;
+  column-gap: 0.25rem;
+  padding: 0.5rem 0;
+}
+
+.typing-indicator span {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  background-color: var(--bs-info);
+  border-radius: 50%;
+  animation: typingPulse 1.5s infinite ease-in-out;
+  opacity: 0.8;
+}
+
+.typing-indicator span:nth-child(1) {
+  animation-delay: 0s;
+}
+
+.typing-indicator span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.typing-indicator span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes typingPulse {
+  0%, 100% {
+    transform: scale(0.8);
+    opacity: 0.2;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 1;
+  }
+}
+
+/* Animaciones de transición */
+.fade-in {
+  animation: fadeIn 0.3s ease-in-out forwards;
+}
+
+.fade-out {
+  animation: fadeOut 0.3s ease-in-out forwards;
+}
+
+.slide-in-up {
+  animation: slideInUp 0.3s ease-in-out forwards;
+}
+
+.slide-in-left {
+  animation: slideInLeft 0.3s ease-in-out forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@keyframes slideInUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    transform: translateX(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* Efecto Shimmer para cargas */
+.shimmer-effect {
+  position: relative;
+  overflow: hidden;
+}
+
+.shimmer-effect::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.1) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  transform: translateX(-100%);
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* Efecto de éxito */
+.success-pulse {
+  animation: successPulse 0.5s ease-in-out;
+}
+
+@keyframes successPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(25, 135, 84, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(25, 135, 84, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(25, 135, 84, 0);
+  }
+}
+
+/* Loader de pantalla completa */
+.fullscreen-loader {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(13, 17, 23, 0.8);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.fullscreen-loader .message {
+  margin-top: 1rem;
+  color: white;
+  font-size: 1.2rem;
+  text-align: center;
+}
+
+/* Animaciones para botones y elementos interactivos */
+.hover-lift {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.hover-lift:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.focus-ring:focus {
+  box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.25);
+  outline: none;
+}
+
+.transition-all {
+  transition: all 0.3s ease;
+}
+
+/* Estilos para spinner como texto */
+.spinner-text {
+  display: inline-block;
+  animation: bounceText 1.5s infinite;
+}
+
+.spinner-text span {
+  display: inline-block;
+  animation: bounceLetters 1.5s infinite;
+}
+
+.spinner-text span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.spinner-text span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes bounceText {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes bounceLetters {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+/* Estilos para pulsos de notificación */
+.pulse-notification {
+  position: relative;
+}
+
+.pulse-notification::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 8px;
+  height: 8px;
+  background-color: var(--bs-danger);
+  border-radius: 50%;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(0.8);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(0.8);
+    opacity: 0.8;
+  }
+}
+
+/* Botón animado de ondas */
+.btn-ripple {
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-ripple:after {
+  content: "";
+  background: rgba(255, 255, 255, 0.3);
+  display: block;
+  position: absolute;
+  border-radius: 50%;
+  width: 100px;
+  height: 100px;
+  margin-top: -50px;
+  margin-left: -50px;
+  opacity: 0;
+  transition: all 0.5s;
+  transform: scale(0);
+}
+
+.btn-ripple:active:after {
+  transform: scale(2);
+  opacity: 0;
+  transition: 0s;
+}
+
+/* Efectos para notificaciones */
+.notification-badge {
+  animation: badge-pulse 1.5s infinite;
+}
+
+@keyframes badge-pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.3);
+  }
+}
+
+/* Efecto de iluminación para títulos destacados */
+.glow-text {
+  text-shadow: 0 0 5px rgba(255, 255, 255, 0.5), 
+               0 0 10px rgba(255, 255, 255, 0.3);
+  animation: glow 2s infinite alternate;
+}
+
+@keyframes glow {
+  from {
+    text-shadow: 0 0 5px rgba(255, 255, 255, 0.5), 
+                 0 0 10px rgba(255, 255, 255, 0.3);
+  }
+  to {
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.7),
+                 0 0 20px rgba(255, 255, 255, 0.5),
+                 0 0 30px rgba(255, 255, 255, 0.3);
+  }
+}
+
+/* Efectos para barras de progreso */
+.progress-bar-animated {
+  position: relative;
+  overflow: hidden;
+}
+
+.progress-bar-animated::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, 
+                           transparent, 
+                           rgba(255, 255, 255, 0.2), 
+                           transparent);
+  animation: progress-animation 1.5s infinite;
+}
+
+@keyframes progress-animation {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* Animaciones para tarjetas */
+.card-hover-effect {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card-hover-effect:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+}
+
+/* Animación para indicadores de comandos */
+.command-indicator {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  background: linear-gradient(45deg, #ff7e5f, #feb47b);
+  border-radius: 50%;
+  margin-right: 5px;
+  animation: commandPulse 2s infinite;
+}
+
+@keyframes commandPulse {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.5);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Animación para tooltips */
+.tooltip-anim {
+  animation: tooltipFade 0.3s ease-in-out;
+}
+
+@keyframes tooltipFade {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Estilos para tooltip de copia */
+.copy-tooltip {
+  position: absolute;
+  top: -40px;
+  right: 10px;
+  background-color: var(--bs-success);
+  color: white;
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  opacity: 0;
+  animation: fadeInOut 2s ease forwards;
+  z-index: 1000;
+}
+
+@keyframes fadeInOut {
+  0% { opacity: 0; transform: translateY(10px); }
+  20% { opacity: 1; transform: translateY(0); }
+  80% { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(-10px); }
+}
+
+/* Estilos mejorados para botones de copia */
+.copy-message {
+  opacity: 0.6;
+  transition: all 0.2s ease;
+}
+
+.copy-message:hover {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+.message-info {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}

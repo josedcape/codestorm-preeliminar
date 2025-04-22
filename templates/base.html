@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="es" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Codestorm Assistant{% endblock %}</title>
+    <!-- CSS de Bootstrap con tema oscuro de Replit -->
+    <link rel="stylesheet" href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css">
+    <!-- CSS personalizado -->
+    <link rel="stylesheet" href="/static/css/style.css">
+    <!-- Animaciones de Codestorm -->
+    <link rel="stylesheet" href="/static/css/animations.css">
+    <!-- Prism.js para resaltado de código -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+    <!-- Font Awesome para iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Barra de navegación superior -->
+    <nav class="navbar navbar-expand-lg navbar-dark futuristic-navbar">
+        <div class="container-fluid">
+            <a class="navbar-brand d-flex align-items-center" href="/">
+                <i class="fa-solid fa-code me-2 text-gold"></i>
+                <span class="codestorm-logo">Codestorm Assistant</span>
+            </a>
+            
+            <!-- Botones de navegación principales -->
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-4">
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.path == '/' %}active{% endif %}" href="/">
+                            <i class="fa-solid fa-home"></i> Inicio
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if '/chat' in request.path %}active{% endif %}" href="/chat">
+                            <i class="fa-solid fa-robot"></i> Asistente IA
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if '/files' in request.path %}active{% endif %}" href="/files">
+                            <i class="fa-solid fa-folder-open"></i> Explorador
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if '/code_corrector' in request.path %}active{% endif %}" href="/code_corrector">
+                            <i class="fa-solid fa-code"></i> Corrector de Código
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            
+            <!-- Indicador de workspace y estado -->
+            <div class="workspace-status ms-auto">
+                <span class="workspace-badge">
+                    <i class="fa-solid fa-folder-open me-1"></i> Workspace: default
+                </span>
+                <div class="status-container">
+                    <span class="status-indicator status-connected" id="status-indicator"></span>
+                    <span>Estado del Servidor</span>
+                </div>
+            </div>
+        </div>
+    </nav>
+    
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Barra lateral (solo visible en dashboard, no en chat) -->
+            {% if '/dashboard' in request.path %}
+            <div class="col-md-3 col-lg-2 px-0 sidebar">
+                <div class="d-flex flex-column flex-shrink-0 p-3 futuristic-sidebar">
+                    {% block sidebar %}
+                    <h5 class="sidebar-title mb-3">
+                        <i class="fa-solid fa-sliders me-2"></i> Configuración de Agentes
+                    </h5>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Seleccionar Modelo de IA:</label>
+                        <select class="form-select form-select-sm futuristic-select">
+                            <option value="openai">OpenAI (GPT-4o)</option>
+                            <option value="anthropic">Anthropic (Claude)</option>
+                            <option value="gemini">Google (Gemini)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Seleccionar Agente:</label>
+                        <select class="form-select form-select-sm futuristic-select">
+                            <option value="general">Asistente General</option>
+                            <option value="developer">Desarrollador de Código</option>
+                            <option value="architect">Agente de Arquitectura</option>
+                            <option value="advanced">Experto Avanzado</option>
+                        </select>
+                    </div>
+                    
+                    <div class="agent-card selected">
+                        <div class="agent-icon">
+                            <i class="fa-solid fa-building"></i>
+                        </div>
+                        <div class="agent-info">
+                            <h6>Agente de Arquitectura</h6>
+                            <p class="agent-description">Diseñador de arquitecturas escalables y optimizadas</p>
+                        </div>
+                    </div>
+                    
+                    <h6 class="mt-4 mb-2 sidebar-subtitle">Capacidades:</h6>
+                    <ul class="agent-capabilities">
+                        <li>Definición de estructura del proyecto</li>
+                        <li>Selección de tecnologías y frameworks</li>
+                        <li>Asesoría en elección de bases de datos</li>
+                        <li>Implementación de microservicios</li>
+                        <li>Planificación de UI/UX y patrones de diseño</li>
+                    </ul>
+                    {% endblock %}
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- Contenido principal -->
+            <div class="{% if '/dashboard' in request.path %}col-md-9 ms-sm-auto col-lg-10{% else %}col-12{% endif %} px-md-4 main-content">
+                <div class="content-container">
+                    {% block content %}
+                    <div class="container mt-5">
+                        <h1>Bienvenido a Codestorm Assistant</h1>
+                        <p>Selecciona una opción en el menú para comenzar.</p>
+                    </div>
+                    {% endblock %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Footer futurista -->
+    <footer class="futuristic-footer">
+        <div class="container-fluid">
+            <div class="d-flex justify-content-center align-items-center py-2">
+                <span>CODESTORM-Assistant © 2025 | Herramienta de Desarrollo Impulsada por IA</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript de Bootstrap -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- JQuery (para algunas funcionalidades adicionales) -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Prism.js para resaltado de código -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-css.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-html.min.js"></script>
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <!-- JavaScript personalizado -->
+    <script src="/static/js/main.js"></script>
+    <script src="/static/js/animations.js"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

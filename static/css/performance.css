@@ -1,0 +1,126 @@
+/* 
+  * Performance.css - Optimizaciones para el rendimiento 
+  * CODESTORM Assistant - Versión 2.0
+  * Este archivo contiene optimizaciones CSS específicas para mejorar la velocidad de carga
+  * y el comportamiento general de la aplicación
+*/
+
+/* Transiciones optimizadas para mejor rendimiento */
+.performance-transition {
+  transition-property: opacity, transform;
+  transition-duration: 0.3s;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: opacity, transform;
+}
+
+/* Estilos para navegación optimizada */
+.nav-item .nav-link,
+.dropdown-item {
+  will-change: background-color, color;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+/* Contenedor con carga diferida para elementos pesados */
+.delayed-content {
+  content-visibility: auto;
+  contain-intrinsic-size: 0 500px; /* Reservar espacio aproximado */
+}
+
+/* Optimización para scroll fluido */
+.smooth-scroll {
+  scroll-behavior: smooth;
+  overscroll-behavior: contain;
+}
+
+/* Contenedor principal con margin collapse prevention */
+.main-container {
+  display: flow-root;
+  overflow-x: hidden;
+  max-width: 100vw;
+}
+
+/* Prevenir layout shifts durante la carga */
+.layout-stable {
+  min-height: 1px; /* Prevenir colapso */
+  contain: layout style paint;
+}
+
+/* Optimizaciones para rendimiento en dispositivos móviles */
+@media (max-width: 768px) {
+  .mobile-optimized {
+    contain: layout style;
+    content-visibility: auto;
+  }
+  
+  /* Reducir complejidad visual en móviles */
+  .futuristic-effect {
+    box-shadow: none !important;
+    background: var(--dark-blue) !important;
+  }
+}
+
+/* Mejoras en select y dropdowns para mejor rendimiento */
+.select-optimized {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23838d99' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 0.7em top 50%;
+  background-size: 1em;
+  padding-right: 2em;
+  cursor: pointer;
+}
+
+/* Prevenir parpadeos en cambios de página */
+.prevent-flicker {
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  transform: translateZ(0);
+  perspective: 1000;
+}
+
+/* Optimizaciones para transiciones entre páginas */
+.page-transition-enter {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.page-transition-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 300ms, transform 300ms;
+}
+
+.page-transition-exit {
+  opacity: 1;
+}
+
+.page-transition-exit-active {
+  opacity: 0;
+  transition: opacity 200ms;
+}
+
+/* Sombras optimizadas para rendimiento (solo primera capa) */
+.shadow-optimized {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Imágenes con carga diferida */
+.image-optimized {
+  content-visibility: auto;
+  loading: lazy;
+}
+
+/* Optimización de elementos fijos que causan reflow */
+.sticky-optimized {
+  position: sticky;
+  top: 0;
+  z-index: 1020;
+  will-change: transform;
+}
+
+/* Prevenir saltos visuales durante la carga de fuentes */
+.font-optimized {
+  font-display: swap;
+}

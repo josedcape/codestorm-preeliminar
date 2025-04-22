@@ -1,0 +1,141 @@
+def generate_complex_file_internal(description, file_type="html", filename="", agent_id="general"):
+    """
+    Versión interna de generate_complex_file para uso dentro de handle_chat.
+    Genera archivos complejos basados en descripciones generales.
+    
+    Args:
+        description: Descripción del archivo a generar
+        file_type: Tipo de archivo (html, css, js, py, json, md, txt)
+        filename: Nombre del archivo a crear (opcional)
+        agent_id: ID del agente especializado a utilizar (general, developer, architect, advanced)
+    """
+    # Importar el módulo de agentes generadores
+    import agents_generators
+    
+    # Utilizar la nueva implementación con soporte para agentes
+    return agents_generators.generate_complex_file_with_agent(description, file_type, filename, agent_id)
+            
+            # Añadir extensión según el tipo de archivo
+            if file_type == 'html':
+                filename += '.html'
+            elif file_type == 'css':
+                filename += '.css'
+            elif file_type == 'js':
+                filename += '.js'
+            elif file_type == 'py':
+                filename += '.py'
+            else:
+                filename += '.txt'
+                
+        # Asegurar que el archivo tenga una extensión
+        if '.' not in filename:
+            filename += f'.{file_type}'
+            
+        # Get the user workspace
+        user_id = session.get('user_id', 'default')
+        workspace_path = get_user_workspace(user_id)
+        
+        # Generar el contenido del archivo usando IA
+        try:
+            openai_client = openai.OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
+            
+            # Preparar el prompt específico según el tipo de archivo
+            file_type_prompt = ""
+            if file_type == 'html' or '.html' in filename:
+                file_type_prompt = """Genera un archivo HTML moderno y atractivo. 
+                Usa las mejores prácticas de HTML5, CSS responsivo y, si es necesario, JavaScript moderno.
+                Asegúrate de que el código sea válido, accesible y optimizado para móviles.
+                El archivo debe usar Bootstrap para estilos y ser visualmente atractivo."""
+            elif file_type == 'css' or '.css' in filename:
+                file_type_prompt = """Genera un archivo CSS moderno y eficiente.
+                Usa las mejores prácticas de CSS3, incluyendo flexbox y/o grid donde sea apropiado.
+                El código debe ser responsivo y seguir metodologías como BEM si es apropiado."""
+            elif file_type == 'js' or '.js' in filename:
+                file_type_prompt = """Genera un archivo JavaScript moderno y bien estructurado.
+                Usa características modernas de ES6+ y mejores prácticas.
+                El código debe ser funcional, eficiente y bien comentado."""
+            elif file_type == 'py' or '.py' in filename:
+                file_type_prompt = """Genera un archivo Python bien estructurado y eficiente.
+                Sigue PEP 8 y las mejores prácticas de Python.
+                El código debe incluir documentación adecuada y manejo de errores."""
+            else:
+                file_type_prompt = """Genera un archivo de texto plano con el contenido solicitado,
+                bien estructurado y formateado de manera clara y legible."""
+                
+            # Construir el prompt completo
+            prompt = f"""Como experto desarrollador, crea un archivo {file_type} con el siguiente requerimiento:
+            
+            "{description}"
+            
+            {file_type_prompt}
+            
+            Genera SOLO el código sin explicaciones adicionales. No incluyas markdown ni comentarios sobre lo que haces.
+            """
+            
+            completion = openai_client.chat.completions.create(
+                model="gpt-4o", # the newest OpenAI model is "gpt-4o" which was released May 13, 2024.
+                messages=[
+                    {"role": "system", "content": "Eres un asistente experto en desarrollo de software especializado en crear archivos de alta calidad."},
+                    {"role": "user", "content": prompt}
+                ],
+                temperature=0.7,
+                max_tokens=3000
+            )
+            
+            file_content = completion.choices[0].message.content.strip()
+            
+            # Eliminar marcadores de código de markdown si existen
+            if file_content.startswith("```"):
+                # Extraer el contenido entre los marcadores de código
+                match = re.match(r"```(?:\w+)?\s*([\s\S]+?)\s*```", file_content)
+                if match:
+                    file_content = match.group(1).strip()
+            
+            # Guardar el archivo
+            file_path = filename.replace('..', '')  # Prevenir path traversal
+            target_file = (workspace_path / file_path).resolve()
+            
+            # Verificar que no estamos fuera del workspace
+            if not str(target_file).startswith(str(workspace_path.resolve())):
+                return {
+                    'success': False,
+                    'message': 'Acceso denegado: No se puede acceder a archivos fuera del workspace'
+                }
+                
+            # Crear directorios si no existen
+            target_file.parent.mkdir(parents=True, exist_ok=True)
+            
+            # Escribir el archivo
+            with open(target_file, 'w') as f:
+                f.write(file_content)
+                
+            # Notificar a los clientes sobre el cambio
+            file_data = {
+                'path': file_path,
+                'name': target_file.name,
+                'type': 'file'
+            }
+            notify_file_change(user_id, 'create', file_data)
+            
+            return {
+                'success': True,
+                'message': f'Archivo {file_path} generado correctamente',
+                'file_path': file_path,
+                'file_content': file_content,
+                'request_feedback': True  # Flag para solicitar retroalimentación
+            }
+            
+        except Exception as e:
+            logging.error(f"Error generating file content: {str(e)}")
+            return {
+                'success': False,
+                'message': f'Error al generar el contenido del archivo: {str(e)}'
+            }
+            
+    except Exception as e:
+        logging.error(f"Error in generate_complex_file_internal: {str(e)}")
+        return {
+            'success': False,
+            'message': f'Error generando archivo complejo: {str(e)}'
+        }
+

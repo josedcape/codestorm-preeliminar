@@ -1,0 +1,390 @@
+crea: app_completa.py contenido: """
+import os
+import argparse
+import json
+import logging
+from flask import Flask, request, jsonify, render_template, send_from_directory
+from werkzeug.utils import secure_filename
+from pathlib import Path
+
+# Configurar logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
+
+# Crear la aplicación Flask
+app = Flask(__name__)
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'codestorm-secret-key')
+app.config['MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024  # 50 MB máximo para subidas
+app.config['UPLOAD_FOLDER'] = os.path.join(os.getcwd(), 'uploads')
+app.config['WORKSPACE_FOLDER'] = os.path.join(os.getcwd(), 'workspaces')
+
+# Asegurar que existan los directorios necesarios
+os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+os.makedirs(app.config['WORKSPACE_FOLDER'], exist_ok=True)
+
+# Extensiones permitidas para subida de archivos
+ALLOWED_EXTENSIONS = {'py', 'js', 'html', 'css', 'json', 'txt', 'md', 'csv', 'yml', 'yaml'}
+
+def allowed_file(filename):
+    """Verifica si un archivo tiene una extensión permitida."""
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+def get_user_workspace(user_id='default'):
+    """Obtiene o crea un espacio de trabajo para el usuario."""
+    workspace_dir = os.path.join(app.config['WORKSPACE_FOLDER'], user_id)
+    os.makedirs(workspace_dir, exist_ok=True)
+    return workspace_dir
+
+def list_workspace_files(workspace_path, prefix=''):
+    """Lista archivos y directorios en el espacio de trabajo recursivamente."""
+    result = []
+    
+    for item in os.listdir(workspace_path):
+        item_path = os.path.join(workspace_path, item)
+        rel_path = os.path.join(prefix, item)
+        
+        if os.path.isdir(item_path):
+            result.append({
+                'type': 'directory',
+                'name': item,
+                'path': rel_path,
+                'children': list_workspace_files(item_path, rel_path)
+            })
+        else:
+            result.append({
+                'type': 'file',
+                'name': item,
+                'path': rel_path,
+                'size': os.path.getsize(item_path),
+                'modified': os.path.getmtime(item_path)
+            })
+    
+    return result
+
+@app.route('/')
+def index():
+    """Página principal."""
+    return render_template('index.html')
+
+@app.route('/dashboard')
+def dashboard():
+    """Panel de control del usuario."""
+    # Por simplicidad, usamos el usuario 'default'
+    user_id = 'default'
+    workspace = get_user_workspace(user_id)
+    files = list_workspace_files(workspace)
+    
+    return render_template('dashboard.html', user_id=user_id, files=files)
+
+@app.route('/api/files', methods=['GET'])
+def list_files():
+    """API para listar archivos del workspace."""
+    user_id = request.args.get('user_id', 'default')
+    workspace = get_user_workspace(user_id)
+    
+    try:
+        files = list_workspace_files(workspace)
+        return jsonify({
+            'success': True,
+            'files': files
+        })
+    except Exception as e:
+        logger.error(f"Error al listar archivos: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+@app.route('/api/files/create', methods=['POST'])
+def create_file():
+    """API para crear o actualizar un archivo en el workspace."""
+    user_id = request.json.get('user_id', 'default')
+    file_path = request.json.get('file_path')
+    content = request.json.get('content', '')
+    
+    if not file_path:
+        return jsonify({
+            'success': False,
+            'error': 'Se requiere ruta de archivo'
+        }), 400
+    
+    try:
+        # Asegurar que la ruta del archivo esté dentro del workspace
+        workspace = get_user_workspace(user_id)
+        full_path = os.path.join(workspace, file_path)
+        
+        # Verificar path traversal
+        normalized_path = os.path.normpath(full_path)
+        if not normalized_path.startswith(workspace):
+            return jsonify({
+                'success': False,
+                'error': 'Ruta de archivo inválida'
+            }), 400
+        
+        # Crear directorios si no existen
+        os.makedirs(os.path.dirname(full_path), exist_ok=True)
+        
+        # Escribir el archivo
+        with open(full_path, 'w') as f:
+            f.write(content)
+        
+        return jsonify({
+            'success': True,
+            'file_path': file_path
+        })
+    except Exception as e:
+        logger.error(f"Error al crear archivo: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+@app.route('/api/files/read', methods=['GET'])
+def read_file():
+    """API para leer el contenido de un archivo."""
+    user_id = request.args.get('user_id', 'default')
+    file_path = request.args.get('file_path')
+    
+    if not file_path:
+        return jsonify({
+            'success': False,
+            'error': 'Se requiere ruta de archivo'
+        }), 400
+    
+    try:
+        # Asegurar que la ruta del archivo esté dentro del workspace
+        workspace = get_user_workspace(user_id)
+        full_path = os.path.join(workspace, file_path)
+        
+        # Verificar path traversal
+        normalized_path = os.path.normpath(full_path)
+        if not normalized_path.startswith(workspace):
+            return jsonify({
+                'success': False,
+                'error': 'Ruta de archivo inválida'
+            }), 400
+        
+        # Verificar que el archivo existe
+        if not os.path.exists(full_path) or not os.path.isfile(full_path):
+            return jsonify({
+                'success': False,
+                'error': 'El archivo no existe'
+            }), 404
+        
+        # Leer el archivo
+        with open(full_path, 'r') as f:
+            content = f.read()
+        
+        return jsonify({
+            'success': True,
+            'file_path': file_path,
+            'content': content
+        })
+    except Exception as e:
+        logger.error(f"Error al leer archivo: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+@app.route('/api/files/delete', methods=['DELETE'])
+def delete_file():
+    """API para eliminar un archivo o directorio."""
+    user_id = request.json.get('user_id', 'default')
+    file_path = request.json.get('file_path')
+    
+    if not file_path:
+        return jsonify({
+            'success': False,
+            'error': 'Se requiere ruta de archivo'
+        }), 400
+    
+    try:
+        # Asegurar que la ruta del archivo esté dentro del workspace
+        workspace = get_user_workspace(user_id)
+        full_path = os.path.join(workspace, file_path)
+        
+        # Verificar path traversal
+        normalized_path = os.path.normpath(full_path)
+        if not normalized_path.startswith(workspace):
+            return jsonify({
+                'success': False,
+                'error': 'Ruta de archivo inválida'
+            }), 400
+        
+        # Verificar que el archivo existe
+        if not os.path.exists(full_path):
+            return jsonify({
+                'success': False,
+                'error': 'El archivo o directorio no existe'
+            }), 404
+        
+        # Eliminar archivo o directorio
+        if os.path.isdir(full_path):
+            import shutil
+            shutil.rmtree(full_path)
+        else:
+            os.remove(full_path)
+        
+        return jsonify({
+            'success': True,
+            'file_path': file_path
+        })
+    except Exception as e:
+        logger.error(f"Error al eliminar archivo: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+@app.route('/api/upload', methods=['POST'])
+def upload_file():
+    """API para subir un archivo al workspace."""
+    user_id = request.form.get('user_id', 'default')
+    destination = request.form.get('destination', '')
+    
+    if 'file' not in request.files:
+        return jsonify({
+            'success': False,
+            'error': 'No se encontró el archivo'
+        }), 400
+    
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({
+            'success': False,
+            'error': 'Nombre de archivo vacío'
+        }), 400
+    
+    if file and allowed_file(file.filename):
+        try:
+            # Asegurar que la ruta de destino esté dentro del workspace
+            workspace = get_user_workspace(user_id)
+            secure_name = secure_filename(file.filename)
+            
+            # Determinar la ruta de destino
+            if destination:
+                dest_path = os.path.join(workspace, destination)
+                os.makedirs(dest_path, exist_ok=True)
+                full_path = os.path.join(dest_path, secure_name)
+            else:
+                full_path = os.path.join(workspace, secure_name)
+            
+            # Verificar path traversal
+            normalized_path = os.path.normpath(full_path)
+            if not normalized_path.startswith(workspace):
+                return jsonify({
+                    'success': False,
+                    'error': 'Ruta de destino inválida'
+                }), 400
+            
+            # Guardar el archivo
+            file.save(full_path)
+            
+            return jsonify({
+                'success': True,
+                'file_path': os.path.join(destination, secure_name) if destination else secure_name
+            })
+        except Exception as e:
+            logger.error(f"Error al subir archivo: {str(e)}")
+            return jsonify({
+                'success': False,
+                'error': str(e)
+            }), 500
+    else:
+        return jsonify({
+            'success': False,
+            'error': 'Tipo de archivo no permitido'
+        }), 400
+
+@app.route('/api/execute', methods=['POST'])
+def execute_command():
+    """API para ejecutar un comando en el servidor."""
+    user_id = request.json.get('user_id', 'default')
+    command = request.json.get('command')
+    
+    if not command:
+        return jsonify({
+            'success': False,
+            'error': 'Se requiere un comando'
+        }), 400
+    
+    try:
+        # Ejecutar el comando en el directorio del workspace
+        workspace = get_user_workspace(user_id)
+        
+        import subprocess
+        process = subprocess.Popen(
+            command,
+            shell=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            cwd=workspace
+        )
+        
+        stdout, stderr = process.communicate(timeout=30)
+        status = process.returncode
+        
+        return jsonify({
+            'success': True,
+            'command': command,
+            'stdout': stdout.decode('utf-8', errors='replace'),
+            'stderr': stderr.decode('utf-8', errors='replace'),
+            'status': status
+        })
+    except subprocess.TimeoutExpired:
+        return jsonify({
+            'success': False,
+            'error': 'Tiempo de ejecución agotado (30s)'
+        }), 504
+    except Exception as e:
+        logger.error(f"Error al ejecutar comando: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+@app.route('/api/workspace/create', methods=['POST'])
+def create_workspace():
+    """API para crear un nuevo espacio de trabajo."""
+    user_id = request.json.get('user_id')
+    
+    if not user_id:
+        return jsonify({
+            'success': False,
+            'error': 'Se requiere ID de usuario'
+        }), 400
+    
+    try:
+        workspace = get_user_workspace(user_id)
+        return jsonify({
+            'success': True,
+            'user_id': user_id,
+            'workspace_path': workspace
+        })
+    except Exception as e:
+        logger.error(f"Error al crear workspace: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+@app.route('/api/health')
+def health_check():
+    """Endpoint para verificar el estado de la aplicación."""
+    return jsonify({
+        'status': 'ok',
+        'version': '1.0.0'
+    })
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='Servidor Codestorm')
+    parser.add_argument('-p', '--port', type=int, default=5000, help='Puerto para escuchar')
+    parser.add_argument('-d', '--debug', action='store_true', help='Ejecutar en modo depuración')
+    args = parser.parse_args()
+    
+    app.run(host='0.0.0.0', port=args.port, debug=args.debug)
+"""
