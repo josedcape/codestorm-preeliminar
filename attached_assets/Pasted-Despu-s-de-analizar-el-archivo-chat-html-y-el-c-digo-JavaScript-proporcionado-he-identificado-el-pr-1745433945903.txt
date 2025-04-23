@@ -1,0 +1,141 @@
+Después de analizar el archivo chat.html y el código JavaScript proporcionado, he identificado el problema principal con el envío de mensajes al asistente. Aquí está mi solución:
+
+Problema principal
+
+El problema está en la desconexión entre la interfaz de usuario y el backend. El código JavaScript actual intenta enviar mensajes a través de una API REST (/api/chat), pero no hay una implementación adecuada de Socket.IO para la comunicación en tiempo real.
+
+Solución
+Implementar Socket.IO correctamente:
+// Añadir al inicio de chat.js
+let socket;
+
+// Modificar la función initializeChat
+function initializeChat() {
+    console.log("Inicializando chat...");
+    
+    // Inicializar Socket.IO
+    socket = io();
+    
+    // Configurar eventos de Socket.IO
+    socket.on('connect', function() {
+        console.log('Conexión Socket.IO establecida');
+        addSystemMessage('Conexión establecida con el servidor');
+    });
+    
+    socket.on('disconnect', function() {
+        console.log('Conexión Socket.IO perdida');
+        addSystemMessage('Conexión con el servidor perdida. Intentando reconectar...');
+    });
+    
+    socket.on('assistant_message', function(data) {
+        console.log('Mensaje recibido del asistente:', data);
+        addAgentMessage(data.message, data.agent);
+    });
+    
+    // Resto del código de inicialización...
+}
+
+Modificar la función sendMessage para usar Socket.IO:
+function sendMessage(message) {
+    // Validar que haya un mensaje
+    if (!message || message.trim() === '') {
+        return;
+    }
+    
+    // Añadir mensaje del usuario al chat
+    addUserMessage(message);
+    
+    // Limpiar el campo de entrada
+    document.getElementById('chat-input').value = '';
+    
+    // Mostrar indicador de carga
+    addLoadingMessage();
+    
+    // Obtener información del agente y modelo seleccionados
+    const agentSelector = document.getElementById('agent-selector');
+    const modelSelect = document.getElementById('model-select');
+    const documentSelector = document.getElementById('document-selector');
+    
+    // Preparar datos para enviar
+    const data = {
+        message: message,
+        agent: agentSelector ? agentSelector.value : 'developer',
+        model: modelSelect ? modelSelect.value : 'openai',
+        document: documentSelector ? documentSelector.value : ''
+    };
+    
+    console.log("Enviando mensaje:", data);
+    
+    // Enviar mensaje a través de Socket.IO
+    socket.emit('user_message', data);
+}
+
+Asegurar que el backend tenga implementado Socket.IO:
+En app.py o main_completo.py
+
+from flask import Flask, render_template from flask_socketio import SocketIO, emit
+
+app = Flask(name) socketio = SocketIO(app)
+
+@socketio.on('user_message') def handle_message(data): print(f"Mensaje recibido: {data}")
+
+# Extraer datos
+message = data.get('message', '')
+agent = data.get('agent', 'developer')
+model = data.get('model', 'openai')
+
+# Aquí procesarías el mensaje con el modelo de IA correspondiente
+# Por ahora, simulamos una respuesta
+response = f"He recibido tu mensaje: '{message}'. Estoy usando el agente {agent} con el modelo {model}."
+
+# Enviar respuesta
+emit('assistant_message', {
+    "message": response,
+    "agent": agent
+})
+
+
+if name == 'main': socketio.run(app, debug=True)
+
+Asegurar que las dependencias estén instaladas:
+pip install flask-socketio
+Incluir el script de Socket.IO en el HTML:
+<!-- Añadir antes de los scripts personalizados -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.6.1/socket.io.min.js"></script>
+
+Optimizaciones adicionales
+Mejorar el manejo de errores:
+socket.on('connect_error', function(error) {
+    console.error('Error de conexión Socket.IO:', error);
+    addSystemMessage('Error de conexión con el servidor. Intentando reconectar...');
+});
+
+Añadir indicador de estado de conexión:
+// Añadir en la interfaz un indicador de estado
+const connectionStatus = document.createElement('div');
+connectionStatus.id = 'connection-status';
+connectionStatus.className = 'connection-status';
+document.querySelector('.chat-controls').appendChild(connectionStatus);
+
+// Actualizar estado
+socket.on('connect', function() {
+    connectionStatus.className = 'connection-status connected';
+    connectionStatus.title = 'Conectado al servidor';
+});
+
+socket.on('disconnect', function() {
+    connectionStatus.className = 'connection-status disconnected';
+    connectionStatus.title = 'Desconectado del servidor';
+});
+
+Implementar reconexión automática:
+// Configuración de Socket.IO con reconexión automática
+socket = io({
+    reconnection: true,
+    reconnectionAttempts: 5,
+    reconnectionDelay: 1000,
+    reconnectionDelayMax: 5000
+});
+
+
+Esta solución garantiza una comunicación bidireccional en tiempo real entre el cliente y el servidor, permitiendo que los mensajes se envíen correctamente al asistente y que las respuestas se muestren en la interfaz de usuario.
