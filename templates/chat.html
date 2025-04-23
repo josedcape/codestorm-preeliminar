@@ -596,6 +596,27 @@ pre code {
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 <script src="{{ url_for('static', filename='js/chat/chat.js') }}"></script>
 <script>
+  // Function to escape HTML for safe display
+  function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+  
+  // Function to get current time for messages
+  function getCurrentTime() {
+    const now = new Date();
+    return now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+  }
+  
+  // Function to scroll chat container to bottom
+  function scrollToBottom(element) {
+    if (element) {
+      element.scrollTop = element.scrollHeight;
+    }
+  }
+</script>
+<script>
     document.addEventListener('DOMContentLoaded', function() {
         // Configuración de agentes especializados
         window.SPECIALIZED_AGENTS = {

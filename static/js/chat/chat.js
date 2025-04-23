@@ -1192,4 +1192,6 @@ function removeLoadingMessage() {
 // Formatear markdown y resaltar código con mejoras
 function formatMarkdown(text) {
   // Convertir código en bloques con mejoras para la UI
-  text = text.replace(/```(\w*)([\s\S]*?)
+  text = text.replace(/```(\w*)([\s\S]*?)```/g, function(match, language, code) {
+    return `<div class="code-block"><pre><code class="language-${language || 'text'}">${escapeHtml(code)}</code></pre></div>`;
+  });
