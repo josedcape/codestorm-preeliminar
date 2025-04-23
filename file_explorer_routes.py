@@ -755,14 +755,9 @@ def upload_file():
 def delete_file_or_directory():
     """Delete a file or directory."""
     try:
-        if request.method == 'DELETE':
-            path = request.args.get('path', '')
-        else:
-            try:
-                data = request.get_json(force=True)
-                path = data.get('path', '')
-            except Exception:
-                return jsonify({'error': 'Invalid JSON data'}), 400
+        data = request.get_json(force=True) if request.is_json else {}
+        path = data.get('path') or request.args.get('path', '')
+        workspace_id = data.get('workspace_id') or request.args.get('workspace_id', 'default')
 
         if not path:
             return jsonify({'error': 'No path provided'}), 400
