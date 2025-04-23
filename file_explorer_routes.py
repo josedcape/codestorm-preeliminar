@@ -755,43 +755,76 @@ def upload_file():
 def delete_file_or_directory():
     """Delete a file or directory."""
     try:
-        data = request.get_json(force=True) if request.is_json else {}
-        path = data.get('path') or request.args.get('path', '')
-        workspace_id = data.get('workspace_id') or request.args.get('workspace_id', 'default')
-
+        # Log the incoming request for debugging
+        logger.debug(f"Delete request: Method={request.method}, Content-Type={request.content_type}")
+        
+        # Handle both JSON and query parameters for maximum flexibility
+        if request.method == 'DELETE':
+            # For DELETE requests, typically path is in query parameters
+            path = request.args.get('path', '')
+            if not path and request.is_json:
+                # If no path in query params but we have JSON body
+                try:
+                    data = request.get_json(force=True)
+                    path = data.get('path', '')
+                except Exception as e:
+                    logger.error(f"Error parsing JSON in DELETE request: {str(e)}")
+        else:  # POST
+            # For POST requests, typically path is in JSON body
+            try:
+                if request.is_json:
+                    data = request.get_json(force=True)
+                    path = data.get('path', '')
+                else:
+                    # For form data
+                    path = request.form.get('path', '')
+            except Exception as e:
+                logger.error(f"Error parsing request data: {str(e)}")
+                path = ''
+                
+        # Log the path we're trying to delete
+        logger.debug(f"Attempting to delete path: {path}")
+            
+        # Get workspace ID from either JSON or query params
+        workspace_id = request.args.get('workspace_id', 'default')
+        
         if not path:
-            return jsonify({'error': 'No path provided'}), 400
-
-        if not path:
+            logger.error("No path provided for deletion")
             return jsonify({'error': 'No path provided'}), 400
 
         # Get the user workspace
-        workspace_id = request.args.get('workspace_id', 'default')
         workspace_path = os.path.join('user_workspaces', workspace_id)
-
-        # Build target path
+        
+        # Build target path - handle relative paths properly
         target_path = os.path.join(workspace_path, path.lstrip('./'))
+        logger.debug(f"Target path for deletion: {target_path}")
 
         # Verify path is within workspace
         if not os.path.abspath(target_path).startswith(os.path.abspath(workspace_path)):
+            logger.error(f"Access denied: Path {target_path} outside workspace {workspace_path}")
             return jsonify({'error': 'Access denied: Path outside workspace'}), 403
 
         if os.path.exists(target_path):
             try:
                 if os.path.isdir(target_path):
                     shutil.rmtree(target_path)
+                    logger.info(f"Successfully deleted directory: {target_path}")
                 else:
                     os.remove(target_path)
+                    logger.info(f"Successfully deleted file: {target_path}")
                 return jsonify({'success': True, 'message': f'Deleted {path}'})
-            except PermissionError:
+            except PermissionError as pe:
+                logger.error(f"Permission denied when deleting {target_path}: {str(pe)}")
                 return jsonify({'error': 'Permission denied'}), 403
             except Exception as e:
+                logger.error(f"Error during deletion of {target_path}: {str(e)}")
                 return jsonify({'error': str(e)}), 500
         else:
+            logger.error(f"Path not found for deletion: {target_path}")
             return jsonify({'error': 'Path not found'}), 404
 
     except Exception as e:
-        logger.error(f"Error deleting {path}: {str(e)}")
+        logger.error(f"Unexpected error in delete_file_or_directory: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
 @file_explorer_bp.route('/api/explorer/upload_chunk', methods=['POST'])

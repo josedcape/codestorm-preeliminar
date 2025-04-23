@@ -1538,13 +1538,9 @@
                     elementToDelete.style.pointerEvents = 'none';
                 }
 
-                fetch('/api/explorer/delete', {
+                fetch(`/api/explorer/delete?path=${encodeURIComponent(path)}&workspace_id=default`, {
                     method: 'DELETE',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        path: path,
-                        workspace_id: 'default'
-                    })
+                    headers: { 'Content-Type': 'application/json' }
                 })
                 .then(response => {
                     if (!response.ok) {
