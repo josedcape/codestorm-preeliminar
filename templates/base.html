@@ -25,6 +25,10 @@
                 <span class="codestorm-logo">Codestorm Assistant</span>
             </a>
             
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
             <!-- Botones de navegación principales -->
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-4">
@@ -73,7 +77,7 @@
         <div class="row">
             <!-- Barra lateral (solo visible en dashboard, no en chat) -->
             {% if '/dashboard' in request.path %}
-            <div class="col-md-3 col-lg-2 px-0 sidebar">
+            <div class="col-md-3 col-lg-2 px-0 sidebar d-none d-md-block">
                 <div class="d-flex flex-column flex-shrink-0 p-3 futuristic-sidebar">
                     {% block sidebar %}
                     <h5 class="sidebar-title mb-3">
@@ -122,6 +126,22 @@
             </div>
             {% endif %}
             
+            <!-- Versión móvil de la barra lateral (solo visible en dashboard) -->
+            {% if '/dashboard' in request.path %}
+            <div class="d-md-none px-0 mb-3">
+                <button class="btn btn-primary mb-2 w-100" type="button" data-bs-toggle="collapse" data-bs-target="#mobileSidebar" aria-expanded="false" aria-controls="mobileSidebar">
+                    <i class="fa-solid fa-sliders me-2"></i> Mostrar/Ocultar Configuración
+                </button>
+                <div class="collapse" id="mobileSidebar">
+                    <div class="p-3 futuristic-sidebar rounded">
+                        {% block mobile_sidebar %}
+                        {{ self.sidebar() }}
+                        {% endblock %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            
             <!-- Contenido principal -->
             <div class="{% if '/dashboard' in request.path %}col-md-9 ms-sm-auto col-lg-10{% else %}col-12{% endif %} px-md-4 main-content">
                 <div class="content-container">
@@ -160,6 +180,7 @@
     <!-- JavaScript personalizado -->
     <script src="/static/js/main.js"></script>
     <script src="/static/js/animations.js"></script>
+    <script src="/static/js/mobile-responsive.js"></script>
     {% block extra_js %}{% endblock %}
 </body>
 </html>

@@ -482,33 +482,149 @@ body {
     .preview-container {
         height: 400px;
     }
+    
+    .chat-container-futuristic {
+        height: calc(100vh - 250px);
+    }
+    
+    .card-body {
+        padding: 0.75rem;
+    }
+    
+    .nav-link {
+        padding: 6px 12px !important;
+        font-size: 0.9rem;
+    }
+    
+    .workspace-status span {
+        font-size: 0.8rem;
+        padding: 4px 8px;
+    }
+    
+    .btn-futuristic {
+        padding: 6px 12px;
+        font-size: 0.9rem;
+    }
 }
 
 @media (max-width: 576px) {
+    body {
+        font-size: 0.9rem;
+    }
+    
     .navbar-brand {
-        font-size: 1.2rem;
+        font-size: 1.1rem;
     }
     
     .card-header-futuristic {
-        padding: 12px 15px;
+        padding: 10px 12px;
+        font-size: 0.9rem;
     }
     
     .agent-message .message-content,
     .user-message .message-bubble {
         max-width: 95%;
+        padding: 10px 12px;
+        font-size: 0.9rem;
     }
     
     .chat-input-futuristic {
-        padding: 10px 15px;
+        padding: 8px 12px;
+        font-size: 0.9rem;
     }
     
     .send-button-futuristic {
-        width: 40px;
-        height: 40px;
+        width: 38px;
+        height: 38px;
     }
     
     .preview-container {
         height: 300px;
+    }
+    
+    .device-button {
+        padding: 5px 10px;
+        font-size: 0.8rem;
+    }
+    
+    .code-editor {
+        font-size: 0.85rem;
+    }
+    
+    .agent-avatar {
+        width: 36px;
+        height: 36px;
+        font-size: 1rem;
+    }
+    
+    .file-upload-btn {
+        font-size: 0.8rem;
+        padding: 6px 10px;
+    }
+    
+    .navbar-futuristic {
+        padding: 0.5rem;
+    }
+    
+    .navbar-nav {
+        flex-direction: row !important;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 4px;
+    }
+}
+
+/* Ajustes para dispositivos muy pequeños */
+@media (max-width: 480px) {
+    .chat-container-futuristic {
+        height: calc(100vh - 200px);
+    }
+    
+    .card-header-futuristic {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+    
+    .card-header-futuristic > div {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+    }
+    
+    .btn-sm {
+        padding: 0.2rem 0.4rem;
+        font-size: 0.75rem;
+    }
+    
+    .device-controls {
+        flex-wrap: wrap;
+        gap: 4px;
+        justify-content: center;
+    }
+    
+    .animation-controls {
+        flex-direction: column;
+        bottom: 5px;
+        left: 5px;
+    }
+    
+    .file-upload-container .row {
+        flex-direction: column;
+    }
+    
+    .file-upload-container .col-md-6 {
+        margin-bottom: 8px;
+        text-align: center;
+    }
+    
+    .message-time {
+        font-size: 0.65rem;
+    }
+    
+    .message-content pre {
+        padding: 8px;
+        font-size: 0.8rem;
     }
 }
 
