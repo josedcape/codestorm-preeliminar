@@ -280,15 +280,28 @@
                         <label for="instructions" class="form-label">Instrucciones para la corrección:</label>
                         <textarea id="instructions" class="instructions-textarea" placeholder="Describe qué correcciones necesitas en el código. Por ejemplo: 'Corrige el manejo de errores y optimiza el rendimiento'"></textarea>
                     </div>
+                    
+                    <!-- Selector de modelo de IA -->
+                    <div class="mb-3">
+                        <label for="model-select" class="form-label">Modelo de IA:</label>
+                        <select id="model-select" class="form-select">
+                            <option value="openai" selected>OpenAI (GPT-4o)</option>
+                            <option value="anthropic">Anthropic (Claude)</option>
+                            <option value="gemini">Google (Gemini)</option>
+                        </select>
+                        <small class="text-muted">Selecciona el modelo que deseas utilizar para la corrección de código.</small>
+                    </div>
+                    
                     <div class="mb-3">
                         <div class="d-flex justify-content-between align-items-center mb-2">
                             <label for="code-input" class="form-label mb-0">Código a corregir:</label>
                             <span class="text-muted code-stats">
                                 <span id="line-count">0</span> líneas | <span id="char-count">0</span> caracteres
+                                <span id="size-warning" class="text-warning" style="display: none;"><i class="fa-solid fa-triangle-exclamation"></i> Código extenso</span>
                             </span>
                         </div>
                         <div class="position-relative">
-                            <textarea id="code-input" class="code-textarea" placeholder="Ingresa aquí tu código para revisión..."></textarea>
+                            <textarea id="code-input" class="code-textarea" placeholder="Ingresa aquí tu código para revisión (hasta 2000 líneas)..."></textarea>
                             <button class="fullscreen-btn editor-fullscreen-btn" title="Editar en pantalla completa">
                                 <i class="fa-solid fa-expand"></i>
                             </button>
@@ -448,9 +461,10 @@
         });
         
         // Botón para corregir código
-        correctButton.addEventListener('click', function() {
+        correctButton.addEventListener('click', async function() {
             const code = codeInput.value.trim();
             const instructions = instructionsInput.value.trim();
+            const selectedModel = document.getElementById('model-select').value;
             
             if (!code) {
                 alert('Por favor ingresa código para corregir.');
@@ -462,13 +476,24 @@
                 return;
             }
             
+            // Verificar si el código es demasiado extenso
+            const lines = code.split('\n').length;
+            if (lines > 2000) {
+                alert('El código excede el límite de 2000 líneas. Por favor, reduce su tamaño.');
+                return;
+            }
+            
             // Mostrar overlay de carga
             loadingOverlay.classList.add('active');
             
-            // Simulación de envío al servidor (en producción esto sería una llamada API real)
-            setTimeout(() => {
-                // Simulamos un resultado
-                const result = simulateCodeCorrection(code, instructions, currentLanguage);
+            try {
+                // Procesar el código con la API real
+                const result = await processCode(code, instructions, currentLanguage, selectedModel);
+                
+                // Verificar si hubo algún error
+                if (result.error) {
+                    alert(`Error: ${result.message}`);
+                }
                 
                 // Actualizar vista de código
                 correctedCode.textContent = result.correctedCode;
@@ -477,15 +502,18 @@
                 
                 // Actualizar vista de cambios
                 renderChanges(result.changes);
-                explanationContent.textContent = result.explanation;
+                explanationContent.innerHTML = result.explanation.replace(/\n/g, '<br>');
                 
                 // Mostrar resultado
                 initialMessage.style.display = 'none';
                 correctedCodeContainer.style.display = 'block';
-                
+            } catch (error) {
+                console.error('Error al procesar la solicitud:', error);
+                alert(`Error: ${error.message || 'Ocurrió un error desconocido'}`);
+            } finally {
                 // Ocultar overlay de carga
                 loadingOverlay.classList.remove('active');
-            }, 2000);
+            }
         });
         
         // Botón para limpiar
@@ -619,15 +647,27 @@
                 const code = codeInput.value;
                 const lines = code ? code.split('\n').length : 0;
                 const chars = code.length;
+                const sizeWarning = document.getElementById('size-warning');
                 
                 lineCountElement.textContent = lines;
                 charCountElement.textContent = chars;
                 
                 // Alerta visual si el código es muy extenso
-                if (chars > 10000) {
+                if (lines > 500) {
                     charCountElement.classList.add('text-warning');
+                    if (sizeWarning) sizeWarning.style.display = 'inline';
                 } else {
                     charCountElement.classList.remove('text-warning');
+                    if (sizeWarning) sizeWarning.style.display = 'none';
+                }
+                
+                // Deshabilitar el botón si el código es extremadamente grande
+                if (lines > 2000) {
+                    correctButton.disabled = true;
+                    correctButton.title = "El código es demasiado extenso (máximo 2000 líneas)";
+                } else {
+                    correctButton.disabled = false;
+                    correctButton.title = "";
                 }
             }
             
@@ -656,27 +696,66 @@
             }
         }
         
-        // Función para simular la corrección de código (en producción, esto sería reemplazado por una llamada API real)
-        function simulateCodeCorrection(code, instructions, language) {
-            // Ejemplo simple de respuesta simulada
-            return {
-                correctedCode: improveCode(code, language),
-                changes: [
-                    {
-                        description: "Corregido manejo de errores con bloques try-except",
-                        lineNumbers: [5, 6, 7]
+        // Función para procesar el código usando la API real
+        async function processCode(code, instructions, language, model) {
+            // Mostrar el overlay de carga
+            loadingOverlay.classList.add('active');
+            
+            try {
+                // Preparar los datos para enviar al servidor
+                const requestData = {
+                    code: code,
+                    instructions: instructions,
+                    file_path: `example.${getFileExtension(language)}`,
+                    model: model
+                };
+                
+                // Realizar la solicitud a la API
+                const response = await fetch('/api/process_code', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
                     },
-                    {
-                        description: "Optimizado rendimiento eliminando operaciones redundantes",
-                        lineNumbers: [12, 13]
-                    },
-                    {
-                        description: "Mejorada la legibilidad con mejores nombres de variables",
-                        lineNumbers: [1, 8, 15]
-                    }
-                ],
-                explanation: "El código ha sido refactorizado para mejorar la robustez y el rendimiento. Se implementaron patrones de manejo de errores adecuados, se eliminaron operaciones redundantes y se mejoraron los nombres de variables para incrementar la legibilidad."
-            };
+                    body: JSON.stringify(requestData)
+                });
+                
+                // Verificar si la respuesta es exitosa
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`Error en la API: ${response.status} - ${errorText}`);
+                }
+                
+                // Parsear la respuesta
+                const result = await response.json();
+                
+                // Transformar la respuesta para adaptarla a la estructura esperada
+                return {
+                    correctedCode: result.corrected_code || code,
+                    changes: result.summary ? result.summary.map((item, index) => {
+                        return {
+                            description: item,
+                            lineNumbers: [] // La API no proporciona números de línea específicos
+                        };
+                    }) : [],
+                    explanation: result.explanation || "No se proporcionó una explicación detallada."
+                };
+            } catch (error) {
+                console.error('Error al procesar el código:', error);
+                // Devolver un objeto de error que podamos manejar
+                return {
+                    error: true,
+                    message: error.message,
+                    correctedCode: code, // Devolver el código original
+                    changes: [{
+                        description: "Error al procesar el código",
+                        lineNumbers: []
+                    }],
+                    explanation: `Ocurrió un error al procesar el código: ${error.message}`
+                };
+            } finally {
+                // Ocultar overlay de carga sin importar el resultado
+                loadingOverlay.classList.remove('active');
+            }
         }
         
         // Función simple para "mejorar" el código (solo para demostración)

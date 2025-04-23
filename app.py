@@ -359,7 +359,7 @@ def process_code():
             return jsonify({'error': 'No se proporcionó código para procesar'}), 400
             
         # Verificar tamaño del código
-        if len(code) > 100000:  # Aproximadamente 100KB
+        if len(code) > 1000000:  # Aproximadamente 1MB (suficiente para ~2000 líneas)
             return jsonify({'error': 'El código es demasiado extenso. Por favor, divídelo en partes más pequeñas.'}), 413
             
         # Detectar el lenguaje por la extensión del archivo
@@ -446,8 +446,9 @@ def process_code():
                 model="gpt-4o", # the newest OpenAI model is "gpt-4o" which was released May 13, 2024.
                 response_format={"type": "json_object"},
                 temperature=0.2,
+                max_tokens=8000,  # Aumentar tokens para manejar respuestas más extensas
                 messages=[
-                    {"role": "system", "content": "Eres un experto en programación y tu tarea es corregir y mejorar código. Responde siempre en JSON."},
+                    {"role": "system", "content": "Eres un experto en programación y tu tarea es corregir y mejorar código. Responde siempre en JSON. Procesa el código de manera eficiente incluso si es extenso."},
                     {"role": "user", "content": prompt}
                 ]
             )
