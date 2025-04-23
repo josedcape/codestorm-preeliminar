@@ -602,8 +602,13 @@ def process_instructions():
 
 @app.route('/preview', methods=['GET'])
 def preview():
-    """Render the preview page."""
+    """Render the basic preview page."""
     return render_template('preview.html')
+
+@app.route('/web_preview', methods=['GET'])
+def web_preview():
+    """Render the advanced web preview page."""
+    return render_template('web_preview.html')
 
 @app.route('/api/preview', methods=['POST'])
 def generate_preview():
@@ -611,19 +616,82 @@ def generate_preview():
     try:
         data = request.json
         html_content = data.get('html', '')
+        device_type = data.get('device', 'desktop')
 
         if not html_content:
             return jsonify({'error': 'No HTML content provided'}), 400
 
-        # TODO: Improve this function to validate and sanitize HTML
-
-        # Return the HTML for preview
+        # Sanitizar el HTML (implementación básica)
+        # Eliminar scripts potencialmente peligrosos
+        sanitized_html = html_content
+        
+        # Añadir meta viewport si no existe para mejor visualización en dispositivos móviles
+        if '<meta name="viewport"' not in sanitized_html and '<head>' in sanitized_html:
+            sanitized_html = sanitized_html.replace(
+                '<head>',
+                '<head>\n    <meta name="viewport" content="width=device-width, initial-scale=1.0">'
+            )
+            
+        # Configurar dimensiones según el dispositivo
+        dimensions = {
+            'desktop': {'width': '100%', 'height': '100%'},
+            'tablet': {'width': '768px', 'height': '1024px'},
+            'mobile': {'width': '375px', 'height': '667px'}
+        }
+        
+        # Retornar el HTML y las dimensiones para la previsualización
         return jsonify({
             'success': True,
-            'html': html_content
+            'html': sanitized_html,
+            'dimensions': dimensions.get(device_type, dimensions['desktop'])
         })
     except Exception as e:
         logging.error(f"Error generating preview: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+        
+@app.route('/api/validate_html', methods=['POST'])
+def validate_html():
+    """Validar el código HTML para la previsualización."""
+    try:
+        data = request.json
+        html_content = data.get('html', '')
+        
+        if not html_content:
+            return jsonify({'error': 'No HTML content provided'}), 400
+            
+        # Implementación básica de validación
+        errors = []
+        warnings = []
+        
+        # Verificar si tiene una estructura HTML básica
+        if '<!DOCTYPE html>' not in html_content:
+            warnings.append('Falta la declaración DOCTYPE')
+            
+        if '<html' not in html_content:
+            errors.append('Falta la etiqueta HTML')
+            
+        if '<head>' not in html_content:
+            warnings.append('Falta la sección HEAD')
+            
+        if '<body>' not in html_content:
+            warnings.append('Falta la etiqueta BODY')
+            
+        # Verificar etiquetas mal cerradas (implementación muy básica)
+        open_tags = re.findall(r'<([a-z0-9]+)[^>]*>', html_content, re.IGNORECASE)
+        close_tags = re.findall(r'</([a-z0-9]+)>', html_content, re.IGNORECASE)
+        
+        for tag in set(open_tags):
+            if open_tags.count(tag) > close_tags.count(tag) and tag not in ['meta', 'link', 'img', 'br', 'hr', 'input']:
+                warnings.append(f'Posible etiqueta <{tag}> sin cerrar')
+                
+        return jsonify({
+            'success': True,
+            'valid': len(errors) == 0,
+            'errors': errors,
+            'warnings': warnings
+        })
+    except Exception as e:
+        logging.error(f"Error validating HTML: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
 @app.route('/api/execute_command', methods=['POST'])

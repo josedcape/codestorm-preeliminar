@@ -97,6 +97,56 @@ function showCopyFeedback(messageElement) {
     copyButton.classList.remove('btn-success');
     copyButton.classList.add('btn-outline-light');
   }, 1500);
+
+// Mejorar el HTML para previsualización añadiendo meta tags y estilos necesarios
+function enhanceHtmlForPreview(htmlContent) {
+  // Si el HTML no tiene estructura completa, agregar las etiquetas básicas
+  if (!htmlContent.includes('<!DOCTYPE html>')) {
+    htmlContent = `<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Previsualización CODESTORM</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        line-height: 1.6;
+        color: #333;
+        margin: 0;
+        padding: 20px;
+      }
+    </style>
+</head>
+<body>
+${htmlContent}
+</body>
+</html>`;
+  }
+  
+  // Asegurar que tenga viewport para dispositivos móviles
+  if (!htmlContent.includes('<meta name="viewport"') && htmlContent.includes('<head>')) {
+    htmlContent = htmlContent.replace(
+      '<head>',
+      '<head>\n    <meta name="viewport" content="width=device-width, initial-scale=1.0">'
+    );
+  }
+  
+  return htmlContent;
+}
+
+// Función para abrir previsualización en una nueva ventana o pestaña
+function openPreviewInNewWindow(htmlContent) {
+  const enhancedHtml = enhanceHtmlForPreview(htmlContent);
+  const newWindow = window.open('', '_blank');
+  if (newWindow) {
+    newWindow.document.write(enhancedHtml);
+    newWindow.document.close();
+  } else {
+    alert('El navegador bloqueó la apertura de una nueva ventana. Por favor, permita ventanas emergentes para este sitio.');
+  }
+}
+
 }
 
 // Función principal para inicializar el chat
@@ -963,7 +1013,7 @@ function processHtmlCodeForPreview(text) {
     const htmlContent = htmlMatches[0].replace(/```html/, '').replace(/```$/, '').trim();
     
     // Si existe contenido HTML válido, mostrar previsualización
-    if (htmlContent && htmlContent.includes('<html') || htmlContent.includes('<body') || htmlContent.includes('<div')) {
+    if (htmlContent && (htmlContent.includes('<html') || htmlContent.includes('<body') || htmlContent.includes('<div'))) {
       // Mejorar el HTML añadiendo referencias necesarias y estilos
       const enhancedHtml = enhanceHtmlForPreview(htmlContent);
       
@@ -971,12 +1021,39 @@ function processHtmlCodeForPreview(text) {
       if (typeof window.showPreview === 'function') {
         window.showPreview(enhancedHtml);
         
-        // Añadir botón para ver en diferentes dispositivos en el mensaje
+        // Añadir botones para opciones de previsualización en el mensaje
         const lastMessage = document.querySelector('.chat-message.agent-message:last-child .message-content');
         if (lastMessage) {
           const previewButtonsHtml = `
             <div class="preview-actions mt-3">
               <button class="btn btn-sm btn-futuristic" onclick="document.getElementById('preview-section').scrollIntoView({behavior: 'smooth'})">
+                <i class="bi bi-eye"></i> Ver previsualización
+              </button>
+              <a href="/preview" target="_blank" class="btn btn-sm btn-outline-secondary ms-2">
+                <i class="bi bi-window"></i> Previsualización Simple
+              </a>
+              <a href="/web_preview" target="_blank" class="btn btn-sm btn-outline-info ms-2">
+                <i class="bi bi-code-slash"></i> Editor Web Avanzado
+              </a>
+            </div>
+          `;
+          
+          // Agregar los botones si no existen ya
+          if (!lastMessage.querySelector('.preview-actions')) {
+            lastMessage.insertAdjacentHTML('beforeend', previewButtonsHtml);
+          }
+        }
+      } else {
+        // Si no existe la función showPreview, abrir en nueva ventana
+        openPreviewInNewWindow(enhancedHtml);
+      }
+      
+      return true; // Se procesó el HTML
+    }
+  }
+  
+  return false; // No se encontró HTML para procesar
+}ooth'})">
                 <i class="bi bi-eye"></i> Ver previsualización
               </button>
             </div>`;

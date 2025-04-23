@@ -1,0 +1,1058 @@
+
+{% extends "base.html" %}
+
+{% block title %}CODESTORM - Previsualización Web{% endblock %}
+
+{% block extra_css %}
+<style>
+    .preview-wrapper {
+        display: flex;
+        flex-direction: column;
+        height: calc(100vh - 180px);
+        margin-bottom: 20px;
+    }
+    
+    .editor-container {
+        flex: 1;
+        border-radius: 8px;
+        overflow: hidden;
+        margin-bottom: 15px;
+        border: 1px solid #0A2149;
+    }
+    
+    .editor-header {
+        background-color: #0A2149;
+        color: white;
+        padding: 10px 15px;
+        font-weight: bold;
+        border-bottom: 2px solid #FFB400;
+    }
+    
+    #code-editor {
+        width: 100%;
+        height: 300px;
+        border: none;
+        padding: 10px;
+        font-family: monospace;
+        font-size: 14px;
+        resize: vertical;
+        background-color: #1e1e1e;
+        color: #f8f8f8;
+    }
+    
+    .result-container {
+        border: 1px solid #0A2149;
+        border-radius: 8px;
+        overflow: hidden;
+        flex: 1;
+        min-height: 300px;
+        background-color: white;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .result-header {
+        background-color: #0A2149;
+        color: white;
+        padding: 10px 15px;
+        font-weight: bold;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 2px solid #FFB400;
+    }
+    
+    #result-iframe-container {
+        flex: 1;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    #result-iframe {
+        width: 100%;
+        height: 100%;
+        border: none;
+        background-color: white;
+    }
+    
+    .toolbar {
+        margin-bottom: 15px;
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    
+    .modal-container {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0,0,0,0.7);
+        z-index: 1000;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .modal-content {
+        background-color: #282c34;
+        width: 80%;
+        max-width: 800px;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+    
+    .modal-header {
+        background-color: #0A2149;
+        color: white;
+        padding: 15px;
+        font-weight: bold;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 2px solid #FFB400;
+    }
+    
+    .modal-body {
+        padding: 20px;
+    }
+    
+    .modal-footer {
+        padding: 15px;
+        background-color: #1e1e1e;
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        border-top: 1px solid #444;
+    }
+    
+    #paste-area {
+        width: 100%;
+        height: 300px;
+        background-color: #1e1e1e;
+        color: #f8f8f8;
+        border: 1px solid #444;
+        padding: 10px;
+        font-family: monospace;
+        resize: none;
+    }
+    
+    .notification {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background-color: #4CAF50;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 4px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        display: none;
+        z-index: 1000;
+    }
+    
+    .device-selector {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-right: 10px;
+    }
+    
+    .device-option {
+        background: none;
+        border: none;
+        color: #ffffff80;
+        cursor: pointer;
+        transition: all 0.2s;
+        padding: 4px;
+    }
+    
+    .device-option.active {
+        color: white;
+    }
+    
+    .device-option:hover {
+        color: white;
+    }
+    
+    @media (max-width: 767px) {
+        .preview-wrapper {
+            height: auto;
+            flex-direction: column;
+        }
+        
+        #code-editor {
+            height: 200px;
+        }
+        
+        .result-container {
+            min-height: 400px;
+        }
+        
+        .toolbar {
+            flex-direction: column;
+            align-items: stretch;
+        }
+        
+        .toolbar > div {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+        }
+        
+        .toolbar button {
+            flex: 1;
+            margin: 5px;
+            padding: 8px;
+            font-size: 14px;
+        }
+        
+        .toolbar button i {
+            margin-right: 0;
+        }
+        
+        .toolbar button span {
+            display: none;
+        }
+        
+        .device-selector {
+            margin-right: 5px;
+        }
+        
+        .modal-content {
+            width: 95%;
+        }
+        
+        #paste-area {
+            height: 200px;
+        }
+    }
+    
+    /* Ajustes para pantallas muy pequeñas */
+    @media (max-width: 480px) {
+        .result-header {
+            flex-direction: column;
+            align-items: flex-start;
+            padding-bottom: 5px;
+        }
+        
+        .result-header > div:last-child {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            margin-top: 8px;
+        }
+        
+        .device-selector {
+            margin-right: 0;
+            justify-content: flex-start;
+        }
+        
+        #result-iframe-container {
+            min-height: 350px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            overflow: auto;
+        }
+        
+        /* Mejora específica para visualización en móvil */
+        #result-iframe.mobile-view {
+            height: 100%;
+            max-height: 667px;
+            width: 100%;
+            max-width: 375px;
+            margin: 0 auto;
+            border: 8px solid #444;
+            border-radius: 20px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        #result-iframe.tablet-view {
+            height: 100%; 
+            max-height: 1024px;
+            width: 100%;
+            max-width: 768px;
+            margin: 0 auto;
+            border: 8px solid #444;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="section-header mb-4">
+        <h2><i class="fas fa-tv me-2"></i>Previsualización Web</h2>
+        <p class="text-muted">Visualiza tu código HTML, CSS y JavaScript en tiempo real con soporte para estilos y animaciones.</p>
+    </div>
+
+    <div class="toolbar">
+        <div>
+            <button id="render-btn" class="btn btn-primary">
+                <i class="fas fa-play me-1"></i> Ejecutar
+            </button>
+            <button id="download-btn" class="btn btn-outline-secondary ms-2">
+                <i class="fas fa-download me-1"></i> Descargar
+            </button>
+        </div>
+        <div>
+            <button id="paste-complete-btn" class="btn btn-warning">
+                <i class="fas fa-paste me-1"></i> Pegar HTML Completo
+            </button>
+            <button id="clear-btn" class="btn btn-outline-danger ms-2">
+                <i class="fas fa-trash me-1"></i> Limpiar
+            </button>
+        </div>
+    </div>
+
+    <div class="preview-wrapper">
+        <div class="editor-container">
+            <div class="editor-header">
+                <i class="fas fa-code me-2"></i> Editor de Código
+            </div>
+            <textarea id="code-editor"><!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mi Página Web</title>
+  <style>
+    /* Variables CSS */
+    :root {
+      --primary-color: #0A2149;
+      --accent-color: #FFB400;
+      --text-color: #333;
+      --light-bg: #f8f9fa;
+      --white: #ffffff;
+      --shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      --transition: all 0.3s ease;
+    }
+    
+    /* Estilos generales */
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      line-height: 1.6;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      min-height: 100vh;
+      color: var(--text-color);
+    }
+    
+    /* Encabezado */
+    header {
+      background-color: var(--primary-color);
+      color: var(--white);
+      padding: 2rem;
+      text-align: center;
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    header h1 {
+      margin: 0;
+      font-size: 2.5rem;
+      position: relative;
+      z-index: 2;
+    }
+    
+    /* Efecto de fondo brillante */
+    header::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+      transform: rotate(45deg);
+      animation: shine 4s infinite;
+      z-index: 1;
+    }
+    
+    /* Contenedor principal */
+    .container {
+      max-width: 800px;
+      margin: 30px auto;
+      background-color: var(--white);
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: var(--shadow);
+      transform: translateY(0);
+      transition: var(--transition);
+    }
+    
+    .container:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+    }
+    
+    /* Títulos */
+    h2 {
+      color: var(--primary-color);
+      margin-bottom: 20px;
+      border-bottom: 2px solid var(--accent-color);
+      padding-bottom: 10px;
+      position: relative;
+    }
+    
+    /* Destacado */
+    .highlight-text {
+      background-color: var(--accent-color);
+      color: var(--primary-color);
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-weight: bold;
+      display: inline-block;
+      margin: 5px 0;
+    }
+    
+    /* Tarjetas */
+    .card-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      margin-top: 30px;
+    }
+    
+    .card {
+      background-color: var(--white);
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      transition: var(--transition);
+    }
+    
+    .card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+    }
+    
+    .card-header {
+      background-color: var(--primary-color);
+      color: var(--white);
+      padding: 15px;
+      text-align: center;
+      font-weight: bold;
+    }
+    
+    .card-body {
+      padding: 20px;
+    }
+    
+    /* Botones */
+    .btn {
+      background-color: var(--accent-color);
+      color: var(--primary-color);
+      border: none;
+      padding: 12px 25px;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: var(--transition);
+      position: relative;
+      overflow: hidden;
+      display: inline-block;
+      margin-top: 15px;
+    }
+    
+    .btn:hover {
+      background-color: #e5a300;
+      transform: translateY(-3px);
+      box-shadow: 0 5px 15px rgba(255, 180, 0, 0.3);
+    }
+    
+    .btn:active {
+      transform: translateY(-1px);
+    }
+    
+    /* Efecto de onda al hacer clic */
+    .btn::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 5px;
+      height: 5px;
+      background: rgba(255, 255, 255, 0.6);
+      opacity: 0;
+      border-radius: 100%;
+      transform: scale(1);
+      transition: all 0.6s;
+    }
+    
+    .btn.clicked::after {
+      animation: ripple 0.6s;
+    }
+    
+    /* Animación de brillo para el header */
+    @keyframes shine {
+      0% {
+        left: -100%;
+        opacity: 0;
+      }
+      50% {
+        opacity: 0.5;
+      }
+      100% {
+        left: 100%;
+        opacity: 0;
+      }
+    }
+    
+    /* Animación de onda para el botón */
+    @keyframes ripple {
+      0% {
+        transform: scale(0);
+        opacity: 0.5;
+      }
+      100% {
+        transform: scale(40);
+        opacity: 0;
+      }
+    }
+    
+    /* Animación para tarjetas */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .card:nth-child(1) {
+      animation: fadeInUp 0.6s 0.1s both;
+    }
+    
+    .card:nth-child(2) {
+      animation: fadeInUp 0.6s 0.3s both;
+    }
+    
+    .card:nth-child(3) {
+      animation: fadeInUp 0.6s 0.5s both;
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>Bienvenido a CODESTORM</h1>
+  </header>
+  
+  <div class="container">
+    <h2>Previsualización Web Avanzada</h2>
+    <p>Esta demostración muestra elementos visuales con <span class="highlight-text">animaciones y estilos</span> que puedes visualizar en tiempo real.</p>
+    
+    <button id="miBoton" class="btn">Haz clic aquí</button>
+    
+    <div class="card-container">
+      <div class="card">
+        <div class="card-header">Diseño Interactivo</div>
+        <div class="card-body">
+          <p>Nuestros componentes están diseñados para brindar la mejor experiencia de usuario.</p>
+        </div>
+      </div>
+      
+      <div class="card">
+        <div class="card-header">Animaciones Suaves</div>
+        <div class="card-body">
+          <p>Las transiciones y animaciones mejoran la interacción y enganchan a los usuarios.</p>
+        </div>
+      </div>
+      
+      <div class="card">
+        <div class="card-header">Interfaz Moderna</div>
+        <div class="card-body">
+          <p>Utilizamos las mejores prácticas de diseño web para crear interfaces atractivas.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Esperar a que el DOM esté cargado
+    document.addEventListener('DOMContentLoaded', function() {
+      // Referencia al botón
+      const miBoton = document.getElementById('miBoton');
+      
+      // Evento de clic para el botón
+      miBoton.addEventListener('click', function(e) {
+        // Añadir clase para la animación de onda
+        this.classList.add('clicked');
+        
+        // Cambiar el texto del botón
+        this.textContent = '¡Gracias por hacer clic!';
+        
+        // Cambiar los colores
+        this.style.backgroundColor = '#4CAF50';
+        this.style.color = 'white';
+        
+        // Mostrar alerta después de un retraso
+        setTimeout(() => {
+          alert('¡Animaciones y estilos funcionando correctamente!');
+        }, 600);
+        
+        // Quitar la clase de animación después de terminar
+        setTimeout(() => {
+          this.classList.remove('clicked');
+        }, 700);
+      });
+      
+      // Animación para el título
+      const h2 = document.querySelector('h2');
+      
+      h2.addEventListener('mouseover', function() {
+        this.style.color = '#FFB400';
+        this.style.transition = 'all 0.3s ease';
+      });
+      
+      h2.addEventListener('mouseout', function() {
+        this.style.color = '#0A2149';
+      });
+      
+      // Inicializar animaciones para las tarjetas
+      const cards = document.querySelectorAll('.card');
+      
+      cards.forEach(card => {
+        card.addEventListener('mouseenter', function() {
+          this.style.backgroundColor = '#f8f9fa';
+        });
+        
+        card.addEventListener('mouseleave', function() {
+          this.style.backgroundColor = 'white';
+        });
+      });
+    });
+  </script>
+</body>
+</html></textarea>
+        </div>
+
+        <div class="result-container">
+            <div class="result-header">
+                <div><i class="fas fa-eye me-2"></i> Resultado</div>
+                <div class="d-flex align-items-center">
+                    <div class="device-selector">
+                        <button class="device-option active" data-device="desktop" title="Vista de escritorio">
+                            <i class="fas fa-desktop"></i>
+                        </button>
+                        <button class="device-option" data-device="tablet" title="Vista de tablet">
+                            <i class="fas fa-tablet-alt"></i>
+                        </button>
+                        <button class="device-option" data-device="mobile" title="Vista de móvil">
+                            <i class="fas fa-mobile-alt"></i>
+                        </button>
+                        <button id="rotate-device-btn" class="btn btn-sm btn-outline-light ms-2" title="Rotar dispositivo" style="display: none;">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
+                    </div>
+                    <div>
+                        <button id="auto-adjust-btn" class="btn btn-sm btn-outline-light me-2" title="Ajuste automático">
+                            <i class="fas fa-arrows-alt-h"></i>
+                        </button>
+                        <button id="full-screen-btn" class="btn btn-sm btn-outline-light" title="Pantalla completa">
+                            <i class="fas fa-expand"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div id="result-iframe-container">
+                <iframe id="result-iframe" sandbox="allow-scripts allow-same-origin"></iframe>
+            </div>
+        </div>
+    </div>
+    
+    <div id="notification" class="notification">
+        <i class="fas fa-check-circle me-2"></i> <span id="notification-message"></span>
+    </div>
+</div>
+
+<!-- Modal para pegar HTML completo -->
+<div id="paste-modal" class="modal-container">
+    <div class="modal-content">
+        <div class="modal-header">
+            <div><i class="fas fa-paste me-2"></i> Pegar HTML Completo</div>
+            <button id="close-modal" class="btn-close btn-close-white"></button>
+        </div>
+        <div class="modal-body">
+            <p class="text-light mb-3">Pega tu código HTML completo aquí:</p>
+            <textarea id="paste-area"></textarea>
+        </div>
+        <div class="modal-footer">
+            <button id="cancel-modal" class="btn btn-secondary">Cancelar</button>
+            <button id="apply-html" class="btn btn-warning">Aplicar</button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Elementos del DOM
+    const codeEditor = document.getElementById('code-editor');
+    const resultIframe = document.getElementById('result-iframe');
+    const renderBtn = document.getElementById('render-btn');
+    const downloadBtn = document.getElementById('download-btn');
+    const clearBtn = document.getElementById('clear-btn');
+    const pasteCompleteBtn = document.getElementById('paste-complete-btn');
+    const pasteModal = document.getElementById('paste-modal');
+    const closeModalBtn = document.getElementById('close-modal');
+    const cancelModalBtn = document.getElementById('cancel-modal');
+    const pasteArea = document.getElementById('paste-area');
+    const applyHtmlBtn = document.getElementById('apply-html');
+    const notification = document.getElementById('notification');
+    const notificationMessage = document.getElementById('notification-message');
+    const fullScreenBtn = document.getElementById('full-screen-btn');
+    const deviceOptions = document.querySelectorAll('.device-option');
+
+    // Función para renderizar el código HTML
+    function renderCode() {
+        try {
+            const code = codeEditor.value;
+            const iframeDoc = resultIframe.contentDocument || resultIframe.contentWindow.document;
+            
+            // Limpiar el iframe
+            iframeDoc.open();
+            iframeDoc.write(code);
+            iframeDoc.close();
+            
+            showNotification('Código renderizado correctamente');
+        } catch (error) {
+            console.error('Error al renderizar:', error);
+            showNotification('Error al renderizar el código', 'error');
+        }
+    }
+
+    // Renderizar el código inicial después de que la página esté completamente cargada
+    window.addEventListener('load', function() {
+        setTimeout(renderCode, 300);
+    });
+
+    // Event Listeners
+    renderBtn.addEventListener('click', renderCode);
+
+    // Botón de descarga
+    downloadBtn.addEventListener('click', function() {
+        const code = codeEditor.value;
+        const blob = new Blob([code], {type: 'text/html'});
+        const url = URL.createObjectURL(blob);
+        
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'mi_pagina_web.html';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        
+        showNotification('Archivo descargado correctamente');
+    });
+
+    // Botón para limpiar el editor
+    clearBtn.addEventListener('click', function() {
+        if (confirm('¿Estás seguro de que quieres limpiar el editor?')) {
+            codeEditor.value = '<!DOCTYPE html>\n<html>\n<head>\n  <meta charset="UTF-8">\n  <meta name="viewport" content="width=device-width, initial-scale=1.0">\n  <title>Mi Página Web</title>\n  <style>\n    body {\n      font-family: Arial, sans-serif;\n      line-height: 1.6;\n      margin: 0;\n      padding: 20px;\n    }\n  </style>\n</head>\n<body>\n  <h1>Hola Mundo</h1>\n  <p>Esta es una página web simple.</p>\n</body>\n</html>';
+            renderCode();
+        }
+    });
+
+    // Modal para pegar HTML completo
+    pasteCompleteBtn.addEventListener('click', function() {
+        pasteArea.value = '<!DOCTYPE html>\n<html>\n<head>\n  <meta charset="UTF-8">\n  <meta name="viewport" content="width=device-width, initial-scale=1.0">\n  <title>Mi Página Web</title>\n</head>\n<body>\n  <!-- Pega tu código HTML completo aquí -->\n</body>\n</html>';
+        pasteModal.style.display = 'flex';
+        
+        // Enfocar el área de texto
+        setTimeout(() => {
+            pasteArea.focus();
+            pasteArea.selectionStart = pasteArea.value.indexOf('<!-- Pega tu código HTML completo aquí -->');
+            pasteArea.selectionEnd = pasteArea.value.indexOf('<!-- Pega tu código HTML completo aquí -->') + 39;
+        }, 100);
+    });
+
+    // Cerrar modal
+    closeModalBtn.addEventListener('click', function() {
+        pasteModal.style.display = 'none';
+    });
+
+    // Cancelar modal
+    cancelModalBtn.addEventListener('click', function() {
+        pasteModal.style.display = 'none';
+    });
+
+    // Aplicar HTML del modal
+    applyHtmlBtn.addEventListener('click', function() {
+        const pastedCode = pasteArea.value;
+        codeEditor.value = pastedCode;
+        renderCode();
+        pasteModal.style.display = 'none';
+    });
+
+    // Cerrar modal haciendo clic fuera
+    pasteModal.addEventListener('click', function(e) {
+        if (e.target === pasteModal) {
+            pasteModal.style.display = 'none';
+        }
+    });
+
+    // Función para mostrar notificaciones
+    function showNotification(message, type = 'success') {
+        notificationMessage.textContent = message;
+        notification.style.display = 'block';
+        
+        // Cambiar el color según el tipo
+        if (type === 'error') {
+            notification.style.backgroundColor = '#F44336';
+        } else {
+            notification.style.backgroundColor = '#4CAF50';
+        }
+        
+        setTimeout(function() {
+            notification.style.display = 'none';
+        }, 3000);
+    }
+
+    // Botón de pantalla completa para el resultado
+    fullScreenBtn.addEventListener('click', function() {
+        try {
+            const code = codeEditor.value;
+            
+            // Abrir una nueva ventana con el código
+            const newWindow = window.open('', '_blank', 'width=800,height=600');
+            newWindow.document.write(code);
+            newWindow.document.close();
+        } catch (error) {
+            console.error('Error al abrir en pantalla completa:', error);
+            showNotification('Error al abrir en pantalla completa', 'error');
+        }
+    });
+    
+    // Selector de dispositivos
+    deviceOptions.forEach(option => {
+        option.addEventListener('click', function() {
+            // Quitar clase activa de todas las opciones
+            deviceOptions.forEach(opt => opt.classList.remove('active'));
+            
+            // Agregar clase activa a la opción seleccionada
+            this.classList.add('active');
+            
+            const deviceType = this.getAttribute('data-device');
+            const iframeContainer = document.getElementById('result-iframe-container');
+            
+            // Remover todas las clases de vista previa anteriores
+            resultIframe.classList.remove('desktop-view', 'tablet-view', 'mobile-view');
+            
+            // Ajustar el tamaño del iframe según el dispositivo y agregar clases CSS
+            if (deviceType === 'desktop') {
+                resultIframe.style.width = '100%';
+                resultIframe.style.height = '100%';
+                resultIframe.style.margin = '0';
+                resultIframe.style.transform = 'scale(1)';
+                resultIframe.style.border = 'none';
+                resultIframe.style.borderRadius = '0';
+                resultIframe.style.boxShadow = 'none';
+                resultIframe.classList.add('desktop-view');
+            } else if (deviceType === 'tablet') {
+                // En pantallas pequeñas, ajustamos el ancho para que sea responsivo
+                if (window.innerWidth < 800) {
+                    resultIframe.style.width = '100%';
+                    resultIframe.style.maxWidth = '768px';
+                    resultIframe.style.height = '1024px';
+                    resultIframe.style.maxHeight = '80vh';
+                    resultIframe.style.transform = 'scale(1)';
+                } else {
+                    resultIframe.style.width = '768px';
+                    resultIframe.style.height = '1024px';
+                    resultIframe.style.transform = 'scale(0.85)';
+                }
+                resultIframe.style.margin = '0 auto';
+                resultIframe.style.transformOrigin = 'center top';
+                resultIframe.style.border = '8px solid #444';
+                resultIframe.style.borderRadius = '10px';
+                resultIframe.style.boxShadow = '0 0 15px rgba(0, 0, 0, 0.3)';
+                resultIframe.classList.add('tablet-view');
+            } else if (deviceType === 'mobile') {
+                // En pantallas pequeñas, ajustamos el ancho para que sea responsivo
+                if (window.innerWidth < 500) {
+                    resultIframe.style.width = '100%';
+                    resultIframe.style.maxWidth = '375px';
+                    resultIframe.style.height = '667px';
+                    resultIframe.style.maxHeight = '80vh';
+                    resultIframe.style.transform = 'scale(1)';
+                } else {
+                    resultIframe.style.width = '375px';
+                    resultIframe.style.height = '667px';
+                    resultIframe.style.transform = 'scale(0.9)';
+                }
+                resultIframe.style.margin = '0 auto';
+                resultIframe.style.transformOrigin = 'center top';
+                resultIframe.style.border = '12px solid #444';
+                resultIframe.style.borderRadius = '20px';
+                resultIframe.style.boxShadow = '0 0 15px rgba(0, 0, 0, 0.3)';
+                resultIframe.classList.add('mobile-view');
+            }
+            
+            // Re-renderizar para aplicar los cambios
+            renderCode();
+        });
+    });
+    
+    // Añadir evento para actualizar el iframe cuando cambie el tamaño de la ventana
+    window.addEventListener('resize', function() {
+        // Verificar si el iframe está visible
+        if (resultIframe.offsetParent !== null) {
+            renderCode();
+        }
+    });
+    
+    // Mostrar notificación inicial
+    setTimeout(function() {
+        showNotification('Editor de previsualización listo');
+    }, 1000);
+    
+    // Añadir acceso directo de teclado para ejecutar (Ctrl+Enter o Cmd+Enter)
+    codeEditor.addEventListener('keydown', function(e) {
+        if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+            renderCode();
+        }
+    });
+    
+    // Funcionalidad para el botón de rotación de dispositivo
+    const rotateDeviceBtn = document.getElementById('rotate-device-btn');
+    let isLandscape = false;
+    
+    // Inicializar estado de orientación
+    function updateRotationButtonVisibility() {
+        // Solo mostramos el botón cuando estamos en vista de móvil o tablet
+        const activeDevice = document.querySelector('.device-option.active');
+        if (activeDevice) {
+            const deviceType = activeDevice.getAttribute('data-device');
+            if (deviceType === 'mobile' || deviceType === 'tablet') {
+                rotateDeviceBtn.style.display = 'inline-block';
+            } else {
+                rotateDeviceBtn.style.display = 'none';
+            }
+        }
+    }
+    
+    // Actualizar visibilidad inicial del botón de rotación
+    updateRotationButtonVisibility();
+    
+    // Actualizar cuando se cambia de dispositivo
+    deviceOptions.forEach(option => {
+        option.addEventListener('click', updateRotationButtonVisibility);
+    });
+    
+    // Evento para rotar el dispositivo
+    rotateDeviceBtn.addEventListener('click', function() {
+        isLandscape = !isLandscape;
+        
+        // Obtener el dispositivo activo actual
+        const activeDevice = document.querySelector('.device-option.active');
+        if (!activeDevice) return;
+        
+        const deviceType = activeDevice.getAttribute('data-device');
+        
+        // Solo rotamos si estamos en móvil o tablet
+        if (deviceType === 'mobile' || deviceType === 'tablet') {
+            // Intercambiar ancho y alto
+            let tempWidth = resultIframe.style.width;
+            let tempHeight = resultIframe.style.height;
+            let tempMaxWidth = resultIframe.style.maxWidth;
+            let tempMaxHeight = resultIframe.style.maxHeight;
+            
+            if (deviceType === 'mobile') {
+                if (isLandscape) {
+                    // Cambiar a horizontal (landscape)
+                    resultIframe.style.width = '667px';
+                    resultIframe.style.height = '375px';
+                    resultIframe.style.maxWidth = tempMaxHeight;
+                    resultIframe.style.maxHeight = tempMaxWidth;
+                    rotateDeviceBtn.title = 'Cambiar a vertical';
+                    // Actualizar icono
+                    rotateDeviceBtn.innerHTML = '<i class="fas fa-mobile-alt fa-rotate-90"></i>';
+                } else {
+                    // Cambiar a vertical (portrait)
+                    resultIframe.style.width = '375px';
+                    resultIframe.style.height = '667px';
+                    resultIframe.style.maxWidth = tempMaxHeight;
+                    resultIframe.style.maxHeight = tempMaxWidth;
+                    rotateDeviceBtn.title = 'Cambiar a horizontal';
+                    // Actualizar icono
+                    rotateDeviceBtn.innerHTML = '<i class="fas fa-mobile-alt"></i>';
+                }
+            } else if (deviceType === 'tablet') {
+                if (isLandscape) {
+                    // Cambiar a horizontal (landscape)
+                    resultIframe.style.width = '1024px';
+                    resultIframe.style.height = '768px';
+                    resultIframe.style.maxWidth = tempMaxHeight;
+                    resultIframe.style.maxHeight = tempMaxWidth;
+                    rotateDeviceBtn.title = 'Cambiar a vertical';
+                    // Actualizar icono
+                    rotateDeviceBtn.innerHTML = '<i class="fas fa-tablet-alt fa-rotate-90"></i>';
+                } else {
+                    // Cambiar a vertical (portrait)
+                    resultIframe.style.width = '768px';
+                    resultIframe.style.height = '1024px';
+                    resultIframe.style.maxWidth = tempMaxHeight;
+                    resultIframe.style.maxHeight = tempMaxWidth;
+                    rotateDeviceBtn.title = 'Cambiar a horizontal';
+                    // Actualizar icono
+                    rotateDeviceBtn.innerHTML = '<i class="fas fa-tablet-alt"></i>';
+                }
+            }
+            
+            // Mantener los bordes y estilos
+            resultIframe.style.margin = '0 auto';
+            resultIframe.style.transformOrigin = 'center top';
+            
+            // Re-renderizar para aplicar los cambios
+            renderCode();
+            
+            // Mostrar notificación
+            showNotification(isLandscape ? 'Vista horizontal' : 'Vista vertical');
+        }
+    });
+    
+    // Botón de ajuste automático
+    const autoAdjustBtn = document.getElementById('auto-adjust-btn');
+    
+    autoAdjustBtn.addEventListener('click', function() {
+        const activeDevice = document.querySelector('.device-option.active');
+        if (!activeDevice) return;
+        
+        const deviceType = activeDevice.getAttribute('data-device');
+        
+        // Determinar si debemos usar orientación landscape basado en el contenido
+        try {
+            const iframeDoc = resultIframe.contentDocument || resultIframe.contentWindow.document;
+            const contentWidth = iframeDoc.documentElement.scrollWidth;
+            const contentHeight = iframeDoc.documentElement.scrollHeight;
+            
+            // Si el contenido es más ancho que alto, cambiar a landscape
+            const shouldBeLandscape = contentWidth > contentHeight;
+            
+            // Solo cambiar si la orientación actual es diferente
+            if (shouldBeLandscape !== isLandscape && (deviceType === 'mobile' || deviceType === 'tablet')) {
+                rotateDeviceBtn.click(); // Simular clic en el botón de rotación
+            }
+            
+            showNotification('Ajuste automático de orientación aplicado');
+        } catch (error) {
+            console.error('Error al ajustar automáticamente:', error);
+            showNotification('Error al ajustar automáticamente la orientación', 'error');
+        }
+    });
+});
+</script>
+{% endblock %}
