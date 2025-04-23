@@ -50,16 +50,8 @@ try:
 except Exception as e:
     logger.error(f"Error al registrar rutas del Constructor de Tareas: {str(e)}")
 
-#Added code corrector routes.  Assumed these functions are defined elsewhere and accessible to app.
-@app.route('/code_corrector')
-def code_corrector():
-    """Render the code corrector page."""
-    return render_template('code_corrector.html')
-
-@app.route('/code_corrector/')
-def code_corrector_slash():
-    """Redirect to ensure both with and without trailing slash work."""
-    return render_template('code_corrector.html')
+# Las rutas de code_corrector ya están definidas en app.py
+# No definirlas de nuevo aquí para evitar conflictos
 
 
 # Solo ejecutar la aplicación si este archivo es el punto de entrada
