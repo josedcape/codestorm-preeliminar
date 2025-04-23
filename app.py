@@ -79,12 +79,12 @@ app.secret_key = os.environ.get("SESSION_SECRET", os.urandom(24).hex())
 # Initialize SQLAlchemy
 db = SQLAlchemy(app)
 
-# Inicializar Socket.IO
-socketio = SocketIO(app, cors_allowed_origins="*")
+# Inicializar Socket.IO con configuración mejorada
+socketio = SocketIO(app, cors_allowed_origins="*", async_mode="eventlet", logger=True, engineio_logger=True)
 
 # Import models and create tables
+from models import User, Workspace, Command
 with app.app_context():
-    import models
     db.create_all()
 
 # Create user workspaces directory if it doesn't exist
@@ -780,7 +780,7 @@ def upload_file():
                     'extract_path': str(extract_dir.relative_to(workspace_path))
                 })
             except Exception as zip_error:
-                logging.error(f"Error al extraer ZIP: {str(ziperror)}")
+                logging.error(f"Error al extraer ZIP: {str(zip_error)}")
                 return jsonify({
                     'success': True,
                     'message': f'Archivo {filename} subido pero hubo un error al extraerlo: {str(zip_error)}',

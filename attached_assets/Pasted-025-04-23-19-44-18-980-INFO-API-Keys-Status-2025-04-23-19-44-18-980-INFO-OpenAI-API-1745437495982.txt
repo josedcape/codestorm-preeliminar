@@ -1,0 +1,108 @@
+025-04-23 19:44:18,980 - INFO - === API Keys Status ===
+2025-04-23 19:44:18,980 - INFO - OpenAI API key: Configured
+2025-04-23 19:44:18,980 - INFO - Anthropic API key: Configured
+2025-04-23 19:44:18,980 - INFO - Gemini API key: Configured
+2025-04-23 19:44:19,008 - DEBUG - Request options: {'method': 'get', 'url': '/models', 'post_parser': <function SyncAPIClient._request_api_list.<locals>._parser at 0x7f9ea5f520c0>, 'json_data': None}
+2025-04-23 19:44:19,012 - DEBUG - Sending HTTP Request: GET https://api.openai.com/v1/models
+2025-04-23 19:44:19,012 - DEBUG - connect_tcp.started host='api.openai.com' port=443 local_address=None timeout=30.0 socket_options=None
+2025-04-23 19:44:19,022 - DEBUG - connect_tcp.complete return_value=<httpcore._backends.sync.SyncStream object at 0x7f9ea31bc390>
+2025-04-23 19:44:19,022 - DEBUG - start_tls.started ssl_context=<ssl.SSLContext object at 0x7f9ea3117530> server_hostname='api.openai.com' timeout=30.0
+2025-04-23 19:44:19,032 - DEBUG - start_tls.complete return_value=<httpcore._backends.sync.SyncStream object at 0x7f9ea31bc4d0>
+2025-04-23 19:44:19,032 - DEBUG - send_request_headers.started request=<Request [b'GET']>
+2025-04-23 19:44:19,033 - DEBUG - send_request_headers.complete
+2025-04-23 19:44:19,033 - DEBUG - send_request_body.started request=<Request [b'GET']>
+2025-04-23 19:44:19,033 - DEBUG - send_request_body.complete
+2025-04-23 19:44:19,033 - DEBUG - receive_response_headers.started request=<Request [b'GET']>
+2025-04-23 19:44:19,146 - DEBUG - receive_response_headers.complete return_value=(b'HTTP/1.1', 401, b'Unauthorized', [(b'Date', b'Wed, 23 Apr 2025 19:44:19 GMT'), (b'Content-Type', b'application/json'), (b'Content-Length', b'393'), (b'Connection', b'keep-alive'), (b'www-authenticate', b'Bearer realm="OpenAI API"'), (b'openai-version', b'2020-10-01'), (b'x-request-id', b'ffa9fad32732a0dec2e71410227c827e'), (b'openai-processing-ms', b'8'), (b'strict-transport-security', b'max-age=31536000; includeSubDomains; preload'), (b'cf-cache-status', b'DYNAMIC'), (b'Set-Cookie', b'__cf_bm=EHzF0v2_BSNnu6FZ.ZIXiR5R8UHeh1zPS.R2ByuMbfk-1745437459-1.0.1.1-rK8J74LPIVbv5ViTZ0VlHMFivgm2rHu18ZZpsgrZr6Lw_juMmjPsvRxj5x1pPFKVfnU20mrVhyGxJh_BzOCnxbmQuwYTc59s72dw89ZVQfE; path=/; expires=Wed, 23-Apr-25 20:14:19 GMT; domain=.api.openai.com; HttpOnly; Secure; SameSite=None'), (b'X-Content-Type-Options', b'nosniff'), (b'Set-Cookie', b'_cfuvid=Qc1LdLzVQCl_MxQNxej4lrDglHxffYawBtEY8PGU75I-1745437459143-0.0.1.1-604800000; path=/; domain=.api.openai.com; HttpOnly; Secure; SameSite=None'), (b'Server', b'cloudflare'), (b'CF-RAY', b'934fdad6fe7a76b1-SEA'), (b'alt-svc', b'h3=":443"; ma=86400')])
+2025-04-23 19:44:19,147 - INFO - HTTP Request: GET https://api.openai.com/v1/models "HTTP/1.1 401 Unauthorized"
+2025-04-23 19:44:19,147 - DEBUG - receive_response_body.started request=<Request [b'GET']>
+2025-04-23 19:44:19,147 - DEBUG - receive_response_body.complete
+2025-04-23 19:44:19,147 - DEBUG - response_closed.started
+2025-04-23 19:44:19,147 - DEBUG - response_closed.complete
+2025-04-23 19:44:19,147 - DEBUG - HTTP Response: GET https://api.openai.com/v1/models "401 Unauthorized" Headers([('date', 'Wed, 23 Apr 2025 19:44:19 GMT'), ('content-type', 'application/json'), ('content-length', '393'), ('connection', 'keep-alive'), ('www-authenticate', 'Bearer realm="OpenAI API"'), ('openai-version', '2020-10-01'), ('x-request-id', 'ffa9fad32732a0dec2e71410227c827e'), ('openai-processing-ms', '8'), ('strict-transport-security', 'max-age=31536000; includeSubDomains; preload'), ('cf-cache-status', 'DYNAMIC'), ('set-cookie', '__cf_bm=EHzF0v2_BSNnu6FZ.ZIXiR5R8UHeh1zPS.R2ByuMbfk-1745437459-1.0.1.1-rK8J74LPIVbv5ViTZ0VlHMFivgm2rHu18ZZpsgrZr6Lw_juMmjPsvRxj5x1pPFKVfnU20mrVhyGxJh_BzOCnxbmQuwYTc59s72dw89ZVQfE; path=/; expires=Wed, 23-Apr-25 20:14:19 GMT; domain=.api.openai.com; HttpOnly; Secure; SameSite=None'), ('x-content-type-options', 'nosniff'), ('set-cookie', '_cfuvid=Qc1LdLzVQCl_MxQNxej4lrDglHxffYawBtEY8PGU75I-1745437459143-0.0.1.1-604800000; path=/; domain=.api.openai.com; HttpOnly; Secure; SameSite=None'), ('server', 'cloudflare'), ('cf-ray', '934fdad6fe7a76b1-SEA'), ('alt-svc', 'h3=":443"; ma=86400')])
+2025-04-23 19:44:19,147 - DEBUG - request_id: ffa9fad32732a0dec2e71410227c827e
+2025-04-23 19:44:19,147 - DEBUG - Encountered httpx.HTTPStatusError
+Traceback (most recent call last):
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/openai/_base_client.py", line 1014, in request
+    response.raise_for_status()
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/httpx/_models.py", line 829, in raise_for_status
+    raise HTTPStatusError(message, request=request, response=self)
+httpx.HTTPStatusError: Client error '401 Unauthorized' for url 'https://api.openai.com/v1/models'
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/401
+2025-04-23 19:44:19,148 - DEBUG - Not retrying
+2025-04-23 19:44:19,148 - DEBUG - Re-raising status error
+2025-04-23 19:44:19,149 - ERROR - Error al configurar OpenAI: Error code: 401 - {'error': {'message': 'Incorrect API key provided: sk-proj-********************************************************************************************************************************************************RPUA. You can find your API key at https://platform.openai.com/account/api-keys.', 'type': 'invalid_request_error', 'param': None, 'code': 'invalid_api_key'}}
+2025-04-23 19:44:19,158 - INFO - Anthropic API key configured successfully.
+2025-04-23 19:44:19,158 - INFO - Gemini API key configured successfully.
+2025-04-23 19:44:19,195 - DEBUG - Popen(['git', 'version'], cwd=/home/runner/workspace, stdin=None, shell=False, universal_newlines=False)
+2025-04-23 19:44:19,198 - DEBUG - Popen(['git', 'version'], cwd=/home/runner/workspace, stdin=None, shell=False, universal_newlines=False)
+2025-04-23 19:44:19,205 - INFO - Rutas de exploración de archivos registradas correctamente
+Server initialized for eventlet.
+2025-04-23 19:44:19,224 - INFO - Server initialized for eventlet.
+2025-04-23 19:44:19,234 - INFO - === Initializing AI Clients ===
+2025-04-23 19:44:19,243 - INFO - OpenAI client initialized successfully. Key: sk-pr...yRPUA
+2025-04-23 19:44:19,245 - DEBUG - Request options: {'method': 'post', 'url': '/chat/completions', 'files': None, 'idempotency_key': 'stainless-python-retry-c03a9b0b-75ed-41fe-949e-6dbef21f01cc', 'json_data': {'messages': [{'role': 'user', 'content': 'test'}], 'model': 'gpt-4o', 'max_tokens': 5}}
+2025-04-23 19:44:19,246 - DEBUG - Sending HTTP Request: POST https://api.openai.com/v1/chat/completions
+2025-04-23 19:44:19,246 - DEBUG - connect_tcp.started host='api.openai.com' port=443 local_address=None timeout=5.0 socket_options=None
+2025-04-23 19:44:19,254 - DEBUG - connect_tcp.complete return_value=<httpcore._backends.sync.SyncStream object at 0x7f9ea3921d10>
+2025-04-23 19:44:19,254 - DEBUG - start_tls.started ssl_context=<ssl.SSLContext object at 0x7f9ea2ecd910> server_hostname='api.openai.com' timeout=5.0
+2025-04-23 19:44:19,264 - DEBUG - start_tls.complete return_value=<httpcore._backends.sync.SyncStream object at 0x7f9ea2baaa50>
+2025-04-23 19:44:19,264 - DEBUG - send_request_headers.started request=<Request [b'POST']>
+2025-04-23 19:44:19,265 - DEBUG - send_request_headers.complete
+2025-04-23 19:44:19,265 - DEBUG - send_request_body.started request=<Request [b'POST']>
+2025-04-23 19:44:19,265 - DEBUG - send_request_body.complete
+2025-04-23 19:44:19,265 - DEBUG - receive_response_headers.started request=<Request [b'POST']>
+2025-04-23 19:44:19,351 - DEBUG - receive_response_headers.complete return_value=(b'HTTP/1.1', 401, b'Unauthorized', [(b'Date', b'Wed, 23 Apr 2025 19:44:19 GMT'), (b'Content-Type', b'application/json; charset=utf-8'), (b'Content-Length', b'414'), (b'Connection', b'keep-alive'), (b'vary', b'Origin'), (b'x-request-id', b'req_77b2951ebbd86876cb22db1284ffeb97'), (b'strict-transport-security', b'max-age=31536000; includeSubDomains; preload'), (b'cf-cache-status', b'DYNAMIC'), (b'Set-Cookie', b'__cf_bm=dVKot9x28oSayyIS8d9eXiKV1jyuHygj7N99JUhM9HM-1745437459-1.0.1.1-0YH1XHT2F1F.ispamSSLEL84Q_JVYGzilFbjb9h7KvqKG44Jw8qGTQqZ0oJgjO.FrgXpdXVn0icc0EpFlNqOOwiNsFQLAxG2t8coIHGIByA; path=/; expires=Wed, 23-Apr-25 20:14:19 GMT; domain=.api.openai.com; HttpOnly; Secure; SameSite=None'), (b'X-Content-Type-Options', b'nosniff'), (b'Set-Cookie', b'_cfuvid=q26NxAi5hhZt5JSao7AV.RmNGnd2q_noLZbSqoGkEjg-1745437459347-0.0.1.1-604800000; path=/; domain=.api.openai.com; HttpOnly; Secure; SameSite=None'), (b'Server', b'cloudflare'), (b'CF-RAY', b'934fdad86ecc16d8-SEA'), (b'alt-svc', b'h3=":443"; ma=86400')])
+2025-04-23 19:44:19,351 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 401 Unauthorized"
+2025-04-23 19:44:19,352 - DEBUG - receive_response_body.started request=<Request [b'POST']>
+2025-04-23 19:44:19,352 - DEBUG - receive_response_body.complete
+2025-04-23 19:44:19,352 - DEBUG - response_closed.started
+2025-04-23 19:44:19,352 - DEBUG - response_closed.complete
+2025-04-23 19:44:19,352 - DEBUG - HTTP Response: POST https://api.openai.com/v1/chat/completions "401 Unauthorized" Headers([('date', 'Wed, 23 Apr 2025 19:44:19 GMT'), ('content-type', 'application/json; charset=utf-8'), ('content-length', '414'), ('connection', 'keep-alive'), ('vary', 'Origin'), ('x-request-id', 'req_77b2951ebbd86876cb22db1284ffeb97'), ('strict-transport-security', 'max-age=31536000; includeSubDomains; preload'), ('cf-cache-status', 'DYNAMIC'), ('set-cookie', '__cf_bm=dVKot9x28oSayyIS8d9eXiKV1jyuHygj7N99JUhM9HM-1745437459-1.0.1.1-0YH1XHT2F1F.ispamSSLEL84Q_JVYGzilFbjb9h7KvqKG44Jw8qGTQqZ0oJgjO.FrgXpdXVn0icc0EpFlNqOOwiNsFQLAxG2t8coIHGIByA; path=/; expires=Wed, 23-Apr-25 20:14:19 GMT; domain=.api.openai.com; HttpOnly; Secure; SameSite=None'), ('x-content-type-options', 'nosniff'), ('set-cookie', '_cfuvid=q26NxAi5hhZt5JSao7AV.RmNGnd2q_noLZbSqoGkEjg-1745437459347-0.0.1.1-604800000; path=/; domain=.api.openai.com; HttpOnly; Secure; SameSite=None'), ('server', 'cloudflare'), ('cf-ray', '934fdad86ecc16d8-SEA'), ('alt-svc', 'h3=":443"; ma=86400')])
+2025-04-23 19:44:19,352 - DEBUG - request_id: req_77b2951ebbd86876cb22db1284ffeb97
+2025-04-23 19:44:19,352 - DEBUG - Encountered httpx.HTTPStatusError
+Traceback (most recent call last):
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/openai/_base_client.py", line 1014, in request
+    response.raise_for_status()
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/httpx/_models.py", line 829, in raise_for_status
+    raise HTTPStatusError(message, request=request, response=self)
+httpx.HTTPStatusError: Client error '401 Unauthorized' for url 'https://api.openai.com/v1/chat/completions'
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/401
+2025-04-23 19:44:19,353 - DEBUG - Not retrying
+2025-04-23 19:44:19,353 - DEBUG - Re-raising status error
+2025-04-23 19:44:19,353 - ERROR - OpenAI test error: Error code: 401 - {'error': {'message': 'Incorrect API key provided: sk-proj-********************************************************************************************************************************************************RPUA. You can find your API key at https://platform.openai.com/account/api-keys.', 'type': 'invalid_request_error', 'param': None, 'code': 'invalid_api_key'}}
+2025-04-23 19:44:19,361 - INFO - Anthropic client initialized successfully. Key: sk-an...bzgAA
+2025-04-23 19:44:19,363 - DEBUG - Request options: {'method': 'post', 'url': '/v1/messages', 'timeout': Timeout(connect=5.0, read=600, write=600, pool=600), 'files': None, 'idempotency_key': 'stainless-python-retry-6d13727a-117f-44da-8160-5f89e335726d', 'json_data': {'max_tokens': 5, 'messages': [{'role': 'user', 'content': 'test'}], 'model': 'claude-3-5-sonnet-20241022', 'system': 'test'}}
+2025-04-23 19:44:19,363 - DEBUG - Sending HTTP Request: POST https://api.anthropic.com/v1/messages
+2025-04-23 19:44:19,363 - DEBUG - connect_tcp.started host='api.anthropic.com' port=443 local_address=None timeout=5.0 socket_options=[(1, 9, True), (6, 5, 60), (6, 6, 5), (6, 4, 60)]
+2025-04-23 19:44:19,382 - DEBUG - connect_tcp.complete return_value=<httpcore._backends.sync.SyncStream object at 0x7f9ea2be1d90>
+2025-04-23 19:44:19,383 - DEBUG - start_tls.started ssl_context=<ssl.SSLContext object at 0x7f9ea2ecd9a0> server_hostname='api.anthropic.com' timeout=5.0
+2025-04-23 19:44:19,397 - DEBUG - start_tls.complete return_value=<httpcore._backends.sync.SyncStream object at 0x7f9ea2be1d50>
+2025-04-23 19:44:19,397 - DEBUG - send_request_headers.started request=<Request [b'POST']>
+2025-04-23 19:44:19,397 - DEBUG - send_request_headers.complete
+2025-04-23 19:44:19,397 - DEBUG - send_request_body.started request=<Request [b'POST']>
+2025-04-23 19:44:19,397 - DEBUG - send_request_body.complete
+2025-04-23 19:44:19,397 - DEBUG - receive_response_headers.started request=<Request [b'POST']>
+2025-04-23 19:44:19,494 - DEBUG - receive_response_headers.complete return_value=(b'HTTP/1.1', 401, b'Unauthorized', [(b'Date', b'Wed, 23 Apr 2025 19:44:19 GMT'), (b'Content-Type', b'application/json'), (b'Content-Length', b'86'), (b'Connection', b'keep-alive'), (b'x-should-retry', b'false'), (b'request-id', b'req_011CNSEiaX1Mnf5hWLD2D3CQ'), (b'via', b'1.1 google'), (b'CF-Cache-Status', b'DYNAMIC'), (b'X-Robots-Tag', b'none'), (b'Server', b'cloudflare'), (b'CF-RAY', b'934fdad94f4d7208-SEA')])
+2025-04-23 19:44:19,494 - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 401 Unauthorized"
+2025-04-23 19:44:19,494 - DEBUG - receive_response_body.started request=<Request [b'POST']>
+2025-04-23 19:44:19,495 - DEBUG - receive_response_body.complete
+2025-04-23 19:44:19,495 - DEBUG - response_closed.started
+2025-04-23 19:44:19,495 - DEBUG - response_closed.complete
+2025-04-23 19:44:19,495 - DEBUG - HTTP Response: POST https://api.anthropic.com/v1/messages "401 Unauthorized" Headers({'date': 'Wed, 23 Apr 2025 19:44:19 GMT', 'content-type': 'application/json', 'content-length': '86', 'connection': 'keep-alive', 'x-should-retry': 'false', 'request-id': 'req_011CNSEiaX1Mnf5hWLD2D3CQ', 'via': '1.1 google', 'cf-cache-status': 'DYNAMIC', 'x-robots-tag': 'none', 'server': 'cloudflare', 'cf-ray': '934fdad94f4d7208-SEA'})
+2025-04-23 19:44:19,495 - DEBUG - request_id: req_011CNSEiaX1Mnf5hWLD2D3CQ
+2025-04-23 19:44:19,495 - DEBUG - Encountered httpx.HTTPStatusError
+Traceback (most recent call last):
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/anthropic/_base_client.py", line 1054, in request
+    response.raise_for_status()
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/httpx/_models.py", line 829, in raise_for_status
+    raise HTTPStatusError(message, request=request, response=self)
+httpx.HTTPStatusError: Client error '401 Unauthorized' for url 'https://api.anthropic.com/v1/messages'
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/401
+2025-04-23 19:44:19,496 - DEBUG - Not retrying as header `x-should-retry` is set to `false`
+2025-04-23 19:44:19,496 - DEBUG - Re-raising status error
+2025-04-23 19:44:19,496 - ERROR - Anthropic test error: Error code: 401 - {'type': 'error', 'error': {'type': 'authentication_error', 'message': 'invalid x-api-key'}}
+2025-04-23 19:44:19,496 - INFO - Google Gemini API configured successfully. Key: AIzaS...ZFAcg
+2025-04-23 19:44:20,287 - INFO - Gemini test successful: Okay.
+
+2025-04-23 19:44:20,295 - INFO - Starting server on port 5000, debug_mode=False
