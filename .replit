@@ -7,10 +7,10 @@ packages = ["glibcLocales", "iana-etc", "libarchive", "openssl", "postgresql", "
 
 [deployment]
 deploymentTarget = "autoscale"
-run = ["sh", "-c", "python main_completo.py"]
+run = ["sh", "-c", "gunicorn --bind 0.0.0.0:5000 app:app"]
 
 [workflows]
-runButton = "Project"
+runButton = "Start Flask App"
 
 [[workflows.workflow]]
 name = "Project"
@@ -35,6 +35,15 @@ task = "packager.installForAll"
 task = "shell.exec"
 args = "gunicorn --bind 0.0.0.0:5000 --reuse-port --reload main:app"
 waitForPort = 5000
+
+[[workflows.workflow]]
+name = "Start Flask App"
+author = 41833091
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python app.py"
 
 [[ports]]
 localPort = 5000
