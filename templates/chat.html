@@ -11,9 +11,6 @@
 <!-- Highlight.js para resaltado de sintaxis -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
 
-<!-- Socket.IO para comunicación en tiempo real -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.6.1/socket.io.min.js"></script>
-
 <style>
 /* Estilos generales */
 .chat-interface {
@@ -116,12 +113,6 @@
     transform: translateY(1px);
 }
 
-.action-button:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-    transform: none;
-}
-
 .action-button i {
     font-size: 1.2rem;
 }
@@ -207,37 +198,6 @@
     margin-bottom: 0;
 }
 
-.message-info {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 10px;
-    font-size: 0.8rem;
-    color: rgba(255, 255, 255, 0.6);
-}
-
-.message-agent, .message-user {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-}
-
-.copy-message {
-    background: transparent;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    color: rgba(255, 255, 255, 0.6);
-    border-radius: 4px;
-    padding: 2px 5px;
-    font-size: 0.8rem;
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-.copy-message:hover {
-    background: rgba(255, 255, 255, 0.1);
-    color: rgba(255, 255, 255, 0.9);
-}
-
 /* Selector de Agentes y Modelos */
 .selector-section {
     background: linear-gradient(180deg, rgba(9, 20, 40, 0.8) 0%, rgba(10, 33, 73, 0.8) 100%);
@@ -315,17 +275,6 @@
     color: rgba(255, 255, 255, 0.8);
     font-size: 0.9rem;
     margin-bottom: 0;
-}
-
-.agent-capabilities {
-    margin-top: 8px;
-    padding-left: 20px;
-    color: rgba(255, 255, 255, 0.7);
-    font-size: 0.85rem;
-}
-
-.agent-capabilities li {
-    margin-bottom: 3px;
 }
 
 /* Código */
@@ -411,16 +360,12 @@ pre code {
     animation-delay: -0.16s;
 }
 
-.loading-dot:nth-child(3) {
-    animation-delay: -0.16s;
-}
-
 @keyframes loadingAnimation {
     0%, 80%, 100% {
-    transform: scale(0);
+        transform: scale(0);
     }
     40% {
-    transform: scale(1);
+        transform: scale(1);
     }
 }
 
@@ -459,135 +404,45 @@ pre code {
     border-bottom: 1px solid #2980b9;
 }
 
-/* Indicador de estado de conexión */
-.connection-status {
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    margin-left: 10px;
-    transition: all 0.3s ease;
-}
-
-.connection-status.connected {
-    background-color: #4CAF50;
-    box-shadow: 0 0 5px #4CAF50;
-}
-
-.connection-status.connecting {
-    background-color: #FFC107;
-    box-shadow: 0 0 5px #FFC107;
-    animation: pulse 1s infinite;
-}
-
-.connection-status.disconnected {
-    background-color: #F44336;
-    box-shadow: 0 0 5px #F44336;
-}
-
-/* Typing indicator */
-.typing-indicator {
-    display: flex;
-    align-items: center;
-    column-gap: 5px;
-}
-
-.typing-indicator span {
-    height: 8px;
-    width: 8px;
-    float: left;
-    margin: 0 1px;
-    background-color: rgba(255, 215, 0, 0.5);
-    display: block;
-    border-radius: 50%;
-    opacity: 0.4;
-}
-
-.typing-indicator span:nth-of-type(1) {
-    animation: 1s blink infinite 0.3333s;
-}
-
-.typing-indicator span:nth-of-type(2) {
-    animation: 1s blink infinite 0.6666s;
-}
-
-.typing-indicator span:nth-of-type(3) {
-    animation: 1s blink infinite 0.9999s;
-}
-
-@keyframes blink {
-    50% {
-        opacity: 1;
-    }
-}
-
-/* Shimmer effect */
-.shimmer-effect {
-    background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.2) 50%, rgba(255,255,255,0) 100%);
-    background-size: 200% 100%;
-    animation: shimmer 2s infinite;
-}
-
-@keyframes shimmer {
-    0% {
-        background-position: -200% 0;
-    }
-    100% {
-        background-position: 200% 0;
-    }
-}
-
-/* Copy tooltip */
-.copy-tooltip {
-    position: absolute;
-    top: -30px;
-    right: 10px;
-    background-color: rgba(0, 0, 0, 0.8);
-    color: white;
-    padding: 5px 10px;
-    border-radius: 4px;
-    font-size: 0.8rem;
-    animation: fadeIn 0.3s ease-out;
-}
-
 /* Responsivo */
 @media (max-width: 768px) {
     .chat-controls {
-    flex-direction: column;
-    gap: 10px;
-    padding: 10px;
+        flex-direction: column;
+        gap: 10px;
+        padding: 10px;
     }
 
     .selector-section {
-    width: 100%;
+        width: 100%;
     }
 
     .agent-info-panel {
-    flex-direction: column;
-    text-align: center;
+        flex-direction: column;
+        text-align: center;
     }
 
     .agent-icon {
-    margin: 0 auto 10px;
+        margin: 0 auto 10px;
     }
 
     .chat-input-area {
-    flex-direction: column;
-    gap: 10px;
+        flex-direction: column;
+        gap: 10px;
     }
 
     .input-addons {
-    width: 100%;
-    justify-content: space-between;
+        width: 100%;
+        justify-content: space-between;
     }
 
     .chat-buttons {
-    width: 100%;
-    justify-content: space-between;
-    margin-left: 0;
+        width: 100%;
+        justify-content: space-between;
+        margin-left: 0;
     }
 
     .chat-interface {
-    height: calc(100vh - 280px);
+        height: calc(100vh - 280px);
     }
 }
 </style>
@@ -596,282 +451,519 @@ pre code {
 {% block content %}
 <div class="container-fluid mt-4">
     <div class="row">
-    <!-- Interfaz de Chat Rediseñada -->
-    <div class="col-12">
-    <div class="card card-futuristic">
-    <!-- Cabecera con título -->
-    <div class="card-header card-header-futuristic d-flex justify-content-between align-items-center">
-    <span><i class="bi bi-cpu me-2"></i>Chat con Agente Especializado</span>
-    <div id="connection-status" class="connection-status" title="Estado de conexión"></div>
-    </div>
+        <!-- Interfaz de Chat Rediseñada -->
+        <div class="col-12">
+            <div class="card card-futuristic">
+                <!-- Cabecera con título -->
+                <div class="card-header card-header-futuristic d-flex justify-content-between align-items-center">
+                    <span><i class="bi bi-cpu me-2"></i>Chat con Agente Especializado</span>
+                </div>
 
-    <!-- Contenido del chat -->
-    <div class="card-body p-0">
-    <!-- Panel de control superior -->
-    <div class="chat-controls">
-    <!-- Selector de Modelo -->
-    <div class="selector-section">
-    <span class="selector-label">Modelo de IA:</span>
-    <select id="model-select" class="selector-dropdown">
-    <option value="openai" selected>OpenAI (GPT-4o)</option>
-    <option value="anthropic">Anthropic (Claude)</option>
-    <option value="gemini">Google (Gemini)</option>
-    </select>
-    </div>
+                <!-- Contenido del chat -->
+                <div class="card-body p-0">
+                    <!-- Panel de control superior -->
+                    <div class="chat-controls">
+                        <!-- Selector de Modelo -->
+                        <div class="selector-section">
+                            <span class="selector-label">Modelo de IA:</span>
+                            <select id="model-select" class="selector-dropdown">
+                                <option value="openai" selected>OpenAI (GPT-4o)</option>
+                                <option value="anthropic">Anthropic (Claude)</option>
+                                <option value="gemini">Google (Gemini)</option>
+                            </select>
+                        </div>
 
-    <!-- Selector de Agente -->
-    <div class="selector-section">
-    <span class="selector-label">Agente:</span>
-    <select id="agent-selector" class="selector-dropdown">
-    <option value="developer" selected>Agente de Desarrollo</option>
-    <option value="architect">Arquitecto de Software</option>
-    <option value="advanced">Especialista Avanzado</option>
-    <option value="general">Asistente General</option>
-    </select>
-    </div>
+                        <!-- Selector de Agente -->
+                        <div class="selector-section">
+                            <span class="selector-label">Agente:</span>
+                            <select id="agent-selector" class="selector-dropdown">
+                                <option value="developer" selected>Agente de Desarrollo</option>
+                                <option value="architect">Arquitecto de Software</option>
+                                <option value="advanced">Especialista Avanzado</option>
+                                <option value="general">Asistente General</option>
+                            </select>
+                        </div>
 
-    <!-- Selector de Documentos -->
-    <div class="selector-section">
-    <span class="selector-label">Documento:</span>
-    <select id="document-selector" class="selector-dropdown">
-    <option value="" selected>Sin documento</option>
-    <!-- Aquí se cargarán dinámicamente los documentos disponibles -->
-    </select>
-    <button class="btn btn-sm btn-primary ms-2" data-bs-toggle="modal" data-bs-target="#documentModal">
-    <i class="bi bi-file-earmark-plus"></i>
-    </button>
-    </div>
-    </div>
+                        <!-- Selector de Documentos -->
+                        <div class="selector-section">
+                            <span class="selector-label">Documento:</span>
+                            <select id="document-selector" class="selector-dropdown">
+                                <option value="" selected>Sin documento</option>
+                                <!-- Aquí se cargarán dinámicamente los documentos disponibles -->
+                            </select>
+                            <button class="btn btn-sm btn-primary ms-2" data-bs-toggle="modal" data-bs-target="#documentModal">
+                                <i class="bi bi-file-earmark-plus"></i>
+                            </button>
+                        </div>
+                    </div>
 
-    <!-- Información del agente seleccionado -->
-    <div class="agent-info-panel">
-    <div class="agent-icon">
-    <i class="bi bi-code-slash" id="agent-icon"></i>
-    </div>
-    <div class="agent-details">
-    <h5 class="agent-name" id="agent-name">Agente de Desarrollo</h5>
-    <p class="agent-description" id="agent-description">Experto en optimización y edición de código en tiempo real</p>
-    <ul class="agent-capabilities" id="agent-capabilities">
-        <li>Corrección y refactorización de código</li>
-        <li>Optimización de rendimiento</li>
-        <li>Integración de frameworks y librerías</li>
-    </ul>
-    </div>
-    </div>
+                    <!-- Información del agente seleccionado -->
+                    <div class="agent-info-panel">
+                        <div class="agent-icon">
+                            <i class="bi bi-code-slash" id="agent-icon"></i>
+                        </div>
+                        <div class="agent-details">
+                            <h5 class="agent-name" id="agent-name">Agente de Desarrollo</h5>
+                            <p class="agent-description" id="agent-description">Experto en optimización y edición de código en tiempo real</p>
+                        </div>
+                    </div>
 
-    <!-- Contenedor de mensajes -->
-    <div class="chat-interface">
-    <div class="chat-messages-container" id="chat-messages">
-    <!-- Mensaje de bienvenida del sistema -->
-    <div class="chat-message system-message">
-    <div class="message-content">
-    <p>¡Bienvenido al chat especializado de CODESTORM! Estás hablando con el <strong>Agente de Desarrollo</strong>, un experto en optimización y edición de código en tiempo real.</p>
-    </div>
-    </div>
-    <!-- Aquí se añadirán dinámicamente los mensajes -->
-    </div>
+                    <!-- Contenedor de mensajes -->
+                    <div class="chat-interface">
+                        <div class="chat-messages-container" id="chat-messages">
+                            <!-- Mensaje de bienvenida del sistema -->
+                            <div class="chat-message system-message">
+                                <div class="message-content">
+                                    <p>¡Bienvenido al chat especializado de CODESTORM! Estás hablando con el <strong>Agente de Desarrollo</strong>, un experto en optimización y edición de código en tiempo real.</p>
+                                </div>
+                            </div>
+                            <!-- Aquí se añadirán dinámicamente los mensajes -->
+                        </div>
 
-    <!-- Área de entrada de texto y botones -->
-    <div class="chat-input-area">
-    <div class="input-addons">
-    <button type="button" class="action-button file-upload-button" id="file-button" title="Subir archivo">
-    <i class="bi bi-paperclip"></i>
-    </button>
-    <input type="file" id="file-input" class="file-input" multiple>
+                        <!-- Área de entrada de texto y botones -->
+                        <div class="chat-input-area">
+                            <div class="input-addons">
+                                <button type="button" class="action-button file-upload-button" id="file-button" title="Subir archivo">
+                                    <i class="bi bi-paperclip"></i>
+                                </button>
+                                <input type="file" id="file-input" class="file-input" multiple>
 
-    <button type="button" class="action-button voice-button" id="voice-button" title="Reconocimiento de voz">
-    <i class="bi bi-mic"></i>
-    </button>
-    </div>
+                                <button type="button" class="action-button voice-button" id="voice-button" title="Reconocimiento de voz">
+                                    <i class="bi bi-mic"></i>
+                                </button>
+                            </div>
 
-    <div class="chat-input-wrapper">
-    <textarea id="chat-input" class="chat-input" placeholder="Escribe tu mensaje aquí... Por ejemplo: 'Crea una página de ventas para productos tecnológicos'" rows="1"></textarea>
-    </div>
+                            <div class="chat-input-wrapper">
+                                <textarea id="chat-input" class="chat-input" placeholder="Escribe tu mensaje aquí... Por ejemplo: 'Crea una página de ventas para productos tecnológicos'" rows="1"></textarea>
+                            </div>
 
-    <div class="chat-buttons">
-    <button type="button" class="action-button send-button" id="send-button">
-    <i class="bi bi-send"></i>
-    </button>
-    </div>
-    </div>
-    </div>
-    </div>
-    </div>
-    </div>
+                            <div class="chat-buttons">
+                                <button type="button" class="action-button send-button" id="send-button">
+                                    <i class="bi bi-send"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-    <!-- Previsualización (inicialmente oculta) -->
-    <div class="col-12 mt-4" id="preview-section" style="display: none;">
-    <div class="card card-futuristic">
-    <div class="card-header card-header-futuristic d-flex justify-content-between align-items-center">
-    <span><i class="bi bi-window me-2"></i>Previsualización</span>
-    <div>
-    <button id="toggle-preview" class="btn btn-sm btn-futuristic">
-    <i class="bi bi-x-lg"></i>
-    </button>
-    </div>
-    </div>
-    <div class="card-body p-0">
-    <div class="device-toggle-buttons py-2">
-    <button class="device-toggle-btn active" data-device="desktop">
-    <i class="bi bi-laptop"></i> Escritorio
-    </button>
-    <button class="device-toggle-btn" data-device="tablet">
-    <i class="bi bi-tablet"></i> Tablet
-    </button>
-    <button class="device-toggle-btn" data-device="mobile">
-    <i class="bi bi-phone"></i> Móvil
-    </button>
-    </div>
+        <!-- Previsualización (inicialmente oculta) -->
+        <div class="col-12 mt-4" id="preview-section" style="display: none;">
+            <div class="card card-futuristic">
+                <div class="card-header card-header-futuristic d-flex justify-content-between align-items-center">
+                    <span><i class="bi bi-window me-2"></i>Previsualización</span>
+                    <div>
+                        <button id="toggle-preview" class="btn btn-sm btn-futuristic">
+                            <i class="bi bi-x-lg"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <div class="device-toggle-buttons py-2">
+                        <button class="device-toggle-btn active" data-device="desktop">
+                            <i class="bi bi-laptop"></i> Escritorio
+                        </button>
+                        <button class="device-toggle-btn" data-device="tablet">
+                            <i class="bi bi-tablet"></i> Tablet
+                        </button>
+                        <button class="device-toggle-btn" data-device="mobile">
+                            <i class="bi bi-phone"></i> Móvil
+                        </button>
+                    </div>
 
-    <div class="preview-container" id="preview-container">
-    <div class="preview-header">
-    <div class="preview-controls">
-    <div class="control-btn control-close"></div>
-    <div class="control-btn control-minimize"></div>
-    <div class="control-btn control-expand"></div>
-    </div>
-    <div class="preview-url">
-    <span>preview.html</span>
-    </div>
-    </div>
-    <iframe id="preview-iframe" class="preview-iframe" title="Previsualización"></iframe>
-    </div>
-    </div>
-    </div>
-    </div>
+                    <div class="preview-container" id="preview-container">
+                        <div class="preview-header">
+                            <div class="preview-controls">
+                                <div class="control-btn control-close"></div>
+                                <div class="control-btn control-minimize"></div>
+                                <div class="control-btn control-expand"></div>
+                            </div>
+                            <div class="preview-url">
+                                <span>preview.html</span>
+                            </div>
+                        </div>
+                        <iframe id="preview-iframe" class="preview-iframe" title="Previsualización"></iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %}
 
 {% block extra_js %}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="{{ url_for('static', filename='js/chat/chat.js') }}"></script>
 <script>
-// CODESTORM - Sistema de chat con agentes especializados y funcionalidades avanzadas
+    document.addEventListener('DOMContentLoaded', function() {
+        // Configuración de agentes especializados
+        window.SPECIALIZED_AGENTS = {
+            developer: {
+                id: 'developer',
+                name: 'Agente de Desarrollo',
+                icon: 'bi-code-slash',
+                description: 'Experto en optimización y edición de código en tiempo real',
+                capabilities: [
+                    'Corrección y refactorización de código',
+                    'Optimización de rendimiento',
+                    'Integración de frameworks y librerías',
+                    'Automatización de tareas',
+                    'Generación de código limpio'
+                ]
+            },
+            architect: {
+                id: 'architect',
+                name: 'Arquitecto de Software',
+                icon: 'bi-diagram-3',
+                description: 'Diseñador de arquitecturas escalables y optimizadas',
+                capabilities: [
+                    'Definición de estructura del proyecto',
+                    'Selección de tecnologías y frameworks',
+                    'Asesoría en elección de bases de datos',
+                    'Implementación de microservicios',
+                    'Planificación de UI/UX y patrones de diseño'
+                ]
+            },
+            advanced: {
+                id: 'advanced',
+                name: 'Especialista Avanzado',
+                icon: 'bi-braces',
+                description: 'Experto en soluciones complejas e integraciones',
+                capabilities: [
+                    'Desarrollo de soluciones avanzadas',
+                    'Integración con APIs externas',
+                    'Optimización de rendimiento',
+                    'Seguridad y encriptación',
+                    'Despliegue y configuración de servidores'
+                ]
+            },
+            general: {
+                id: 'general',
+                name: 'Asistente General',
+                icon: 'bi-chat-dots',
+                description: 'Asistente versátil para consultas generales',
+                capabilities: [
+                    'Respuesta a preguntas generales',
+                    'Orientación básica de desarrollo',
+                    'Ayuda con conceptos de programación',
+                    'Consejos de buenas prácticas',
+                    'Resolución de problemas comunes'
+                ]
+            }
+        };
 
-// Variables globales
-let socket;
+        // Inicializar chat
+        initializeChat();
 
-// Función para obtener la hora actual formateada
-function getCurrentTime() {
-  const now = new Date();
-  return now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-}
+        // Funcionalidad para ajustar la altura del textarea
+        const chatInput = document.getElementById('chat-input');
+        chatInput.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = (this.scrollHeight < 150 ? this.scrollHeight : 150) + 'px';
+        });
 
-// Función para escapar HTML y prevenir XSS
-function escapeHtml(text) {
-  const div = document.createElement('div');
-  div.textContent = text;
-  return div.innerHTML;
-}
+        // Funcionalidad para el botón de archivo
+        const fileButton = document.getElementById('file-button');
+        const fileInput = document.getElementById('file-input');
 
-// Función para formatear Markdown a HTML
-function formatMarkdown(text) {
-  // Implementación básica de Markdown
-  // Código en bloque con resaltado de sintaxis
-  text = text.replace(/```(\w+)?\n([\s\S]*?)```/g, function(match, language, code) {
-    language = language || 'plaintext';
-    return `<div class="code-block"><pre><code class="language-${language}">${escapeHtml(code.trim())}</code></pre></div>`;
-  });
+        fileButton.addEventListener('click', function() {
+            fileInput.click();
+        });
 
-  // Código en línea
-  text = text.replace(/`([^`]+)`/g, '<span class="inline-code">$1</span>');
+        fileInput.addEventListener('change', function() {
+            if (this.files.length > 0) {
+                const fileNames = Array.from(this.files).map(file => file.name).join(', ');
+                chatInput.value += `\nArchivos seleccionados: ${fileNames}`;
+                chatInput.dispatchEvent(new Event('input'));
+            }
+        });
 
-  // Enlaces
-  text = text.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" class="chat-link" target="_blank">$1</a>');
+        // Funcionalidad para el botón de voz (básica)
+        const voiceButton = document.getElementById('voice-button');
+        let recognition;
 
-  // Negritas
-  text = text.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+        if ('webkitSpeechRecognition' in window) {
+            recognition = new webkitSpeechRecognition();
+            recognition.continuous = false;
+            recognition.interimResults = true;
+            recognition.lang = 'es-ES';
 
-  // Cursivas
-  text = text.replace(/\*([^*]+)\*/g, '<em>$1</em>');
+            voiceButton.addEventListener('click', function() {
+                if (voiceButton.classList.contains('recording')) {
+                    recognition.stop();
+                    voiceButton.classList.remove('recording');
+                    voiceButton.style.backgroundColor = '';
+                } else {
+                    recognition.start();
+                    voiceButton.classList.add('recording');
+                    voiceButton.style.backgroundColor = 'rgba(255, 0, 0, 0.2)';
+                }
+            });
 
-  // Listas
-  text = text.replace(/^\s*-\s+(.+)$/gm, '<li>$1</li>');
-  text = text.replace(/(<li>.*<\/li>)/s, '<ul>$1</ul>');
+            recognition.onresult = function(event) {
+                const transcript = event.results[0][0].transcript;
+                chatInput.value += transcript;
+                chatInput.dispatchEvent(new Event('input'));
+            };
 
-  // Párrafos (asegurarse de que el contenido esté en párrafos)
-  const paragraphs = text.split('\n\n');
-  return paragraphs.map(p => {
-    if (p.trim() === '') return '';
-    if (p.startsWith('<ul>') || p.startsWith('<div class="code-block">')) return p;
-    return `<p>${p.replace(/\n/g, '<br>')}</p>`;
-  }).join('');
-}
+            recognition.onend = function() {
+                voiceButton.classList.remove('recording');
+                voiceButton.style.backgroundColor = '';
+            };
+        } else {
+            voiceButton.addEventListener('click', function() {
+                alert('El reconocimiento de voz no está soportado en este navegador.');
+            });
+        }
 
-// Función para desplazarse al final del contenedor de mensajes
-function scrollToBottom(container) {
-  if (!container) return;
-  container.scrollTop = container.scrollHeight;
-}
+        // La funcionalidad de envío ya está implementada en chat.js
+        console.log("Inicialización adicional completada.");
 
-// Función para añadir mensaje de sistema
-function addSystemMessage(message) {
-  const chatMessages = document.getElementById('chat-messages');
-  if (!chatMessages) return;
+        // Permitir enviar con Enter (excepto con Shift+Enter para nueva línea)
+        chatInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendButton.click();
+            }
+        });
 
-  const messageElement = document.createElement('div');
-  messageElement.className = 'chat-message system-message';
+        // Inicializar funcionalidad de documentos
+        initializeDocumentFeatures();
+    });
 
-  const messageContent = document.createElement('div');
-  messageContent.className = 'message-content';
-  messageContent.innerHTML = message;
+    // Función para inicializar características de documentos
+    function initializeDocumentFeatures() {
+        // Cargar documentos disponibles
+        loadAvailableDocuments();
 
-  messageElement.appendChild(messageContent);
-  chatMessages.appendChild(messageElement);
+        // Configurar eventos para cargar documentos
+        const uploadDocumentForm = document.getElementById('uploadDocumentForm');
+        if (uploadDocumentForm) {
+            uploadDocumentForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                uploadDocument();
+            });
+        }
 
-  scrollToBottom(chatMessages);
-}
+        // Configurar selector de documentos
+        const documentSelector = document.getElementById('document-selector');
+        if (documentSelector) {
+            documentSelector.addEventListener('change', function() {
+                updateDocumentInfo(this.value);
+            });
+        }
 
-// Función para añadir indicador de carga
-function addLoadingMessage() {
-  const chatMessages = document.getElementById('chat-messages');
-  if (!chatMessages) return;
+        // Configurar botón de eliminar documento
+        const documentRemoveBtn = document.querySelector('.document-remove');
+        if (documentRemoveBtn) {
+            documentRemoveBtn.addEventListener('click', function() {
+                const selectedDoc = document.getElementById('document-selector').value;
+                if (selectedDoc) {
+                    deleteDocument(selectedDoc);
+                }
+            });
+        }
+    }
 
-  // Eliminar cualquier indicador de carga existente
-  removeLoadingMessage();
+    // Cargar documentos disponibles
+    function loadAvailableDocuments() {
+        fetch('/api/documents/list')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const documentSelector = document.getElementById('document-selector');
+                    // Limpiar opciones existentes excepto la primera (Sin documento)
+                    while (documentSelector.options.length > 1) {
+                        documentSelector.remove(1);
+                    }
 
-  const loadingElement = document.createElement('div');
-  loadingElement.className = 'chat-message agent-message loading-message';
-  loadingElement.innerHTML = `
-    <div class="loading-animation">
-      <div class="loading-dot"></div>
-      <div class="loading-dot"></div>
-      <div class="loading-dot"></div>
+                    // Añadir documentos disponibles
+                    data.documents.forEach(doc => {
+                        const option = document.createElement('option');
+                        option.value = doc.filename;
+                        option.textContent = doc.filename;
+                        documentSelector.appendChild(option);
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error al cargar documentos:', error);
+            });
+    }
+
+    // Actualizar información del documento seleccionado
+    function updateDocumentInfo(filename) {
+        const documentDetails = document.querySelector('.document-details');
+        const documentStatus = document.querySelector('.document-status');
+
+        if (!filename) {
+            documentDetails.style.display = 'none';
+            documentStatus.innerHTML = '<small>Selecciona un documento para usarlo como contexto en la conversación.</small>';
+            return;
+        }
+
+        fetch(`/api/documents/info/${encodeURIComponent(filename)}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const doc = data.document;
+
+                    // Mostrar detalles del documento
+                    document.querySelector('.document-type').textContent = doc.type.toUpperCase().substring(1);
+                    document.querySelector('.document-size').textContent = formatFileSize(doc.size);
+                    documentDetails.style.display = 'flex';
+
+                    // Actualizar estado
+                    const wordCount = doc.word_count ? doc.word_count.toLocaleString() : '?';
+                    documentStatus.innerHTML = `
+                        <small>Documento cargado: <strong>${doc.filename}</strong> (${wordCount} palabras)</small>
+                        <div class="mt-1 text-success">
+                            <small><i class="bi bi-check-circle"></i> Listo para usar como contexto</small>
+                        </div>
+                    `;
+                }
+            })
+            .catch(error => {
+                console.error('Error al obtener información del documento:', error);
+                documentDetails.style.display = 'none';
+                documentStatus.innerHTML = '<small class="text-danger">Error al cargar información del documento.</small>';
+            });
+    }
+
+    // Subir documento
+    function uploadDocument() {
+        const fileInput = document.getElementById('documentFile');
+        if (!fileInput.files || fileInput.files.length === 0) {
+            showUploadError('Selecciona un archivo para subir.');
+            return;
+        }
+
+        const allowedTypes = ['.pdf', '.docx', '.doc', '.html', '.htm', '.md', '.txt', '.py', '.js', '.css', '.json', '.csv', '.xml', '.yml', '.yaml', '.pptx', '.epub'];
+        const file = fileInput.files[0];
+        const fileExt = '.' + file.name.split('.').pop().toLowerCase();
+
+        if (!allowedTypes.includes(fileExt)) {
+            showUploadError(`Tipo de archivo no permitido. Formatos soportados: ${allowedTypes.join(', ')}`);
+            return;
+        }
+
+        // Mostrar estado de carga
+        const uploadStatus = document.getElementById('uploadStatus');
+        uploadStatus.innerHTML = '<div class="spinner-border spinner-border-sm text-primary" role="status"></div> Subiendo documento...';
+
+        const formData = new FormData();
+        formData.append('file', file);
+
+        fetch('/api/documents/upload', {
+            method: 'POST',
+            body: formData
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Actualizar lista de documentos
+                    loadAvailableDocuments();
+
+                    // Mostrar mensaje de éxito
+                    uploadStatus.innerHTML = `<div class="text-success"><i class="bi bi-check-circle"></i> Documento subido correctamente.</div>`;
+
+                    // Seleccionar el documento recién subido
+                    setTimeout(() => {
+                        const documentSelector = document.getElementById('document-selector');
+                        documentSelector.value = data.document.filename;
+                        updateDocumentInfo(data.document.filename);
+
+                        // Cerrar modal después de 1 segundo
+                        setTimeout(() => {
+                            const documentModal = bootstrap.Modal.getInstance(document.getElementById('documentModal'));
+                            documentModal.hide();
+                            uploadStatus.innerHTML = '';
+                            fileInput.value = '';
+                        }, 1000);
+                    }, 500);
+                } else {
+                    showUploadError(data.error || 'Error al subir el documento.');
+                }
+            })
+            .catch(error => {
+                console.error('Error al subir documento:', error);
+                showUploadError('Error de conexión al subir el documento.');
+            });
+    }
+
+    // Eliminar documento
+    function deleteDocument(filename) {
+        if (!confirm(`¿Estás seguro de que deseas eliminar el documento "${filename}"?`)) {
+            return;
+        }
+
+        fetch(`/api/documents/delete/${encodeURIComponent(filename)}`, {
+            method: 'DELETE'
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Actualizar lista de documentos
+                    loadAvailableDocuments();
+
+                    // Limpiar selección
+                    document.getElementById('document-selector').value = '';
+                    updateDocumentInfo('');
+
+                    // Mostrar mensaje
+                    addSystemMessage(`El documento "${filename}" ha sido eliminado.`);
+                } else {
+                    console.error('Error al eliminar documento:', data.error);
+                    addSystemMessage(`Error al eliminar el documento: ${data.error}`);
+                }
+            })
+            .catch(error => {
+                console.error('Error al eliminar documento:', error);
+                addSystemMessage('Error de conexión al eliminar el documento.');
+            });
+    }
+
+    // Mostrar error en el formulario de subida
+    function showUploadError(message) {
+        const uploadStatus = document.getElementById('uploadStatus');
+        uploadStatus.innerHTML = `<div class="text-danger"><i class="bi bi-exclamation-circle"></i> ${message}</div>`;
+    }
+
+    // Formatear tamaño de archivo
+    function formatFileSize(bytes) {
+        if (bytes < 1024) return bytes + ' B';
+        else if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+        else if (bytes < 1073741824) return (bytes / 1048576).toFixed(1) + ' MB';
+        else return (bytes / 1073741824).toFixed(1) + ' GB';
+    }
+</script>
+
+<!-- Modal para subir documentos -->
+<div class="modal fade" id="documentModal" tabindex="-1" aria-labelledby="documentModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content bg-dark text-light border-secondary">
+            <div class="modal-header border-secondary">
+                <h5 class="modal-title" id="documentModalLabel">Subir Documento</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="uploadDocumentForm">
+                    <div class="mb-3">
+                        <label for="documentFile" class="form-label">Selecciona un documento:</label>
+                        <input type="file" class="form-control bg-dark text-light border-secondary" id="documentFile" required>
+                        <div class="form-text text-light-50">
+                            Formatos soportados: PDF, DOCX, HTML, MD, TXT, PY, JS, etc.
+                        </div>
+                    </div>
+                    <div id="uploadStatus" class="mb-3"></div>
+                    <div class="d-flex justify-content-end">
+                        <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Subir</button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
-  `;
-
-  chatMessages.appendChild(loadingElement);
-  scrollToBottom(chatMessages);
-}
-
-// Función para eliminar indicador de carga
-function removeLoadingMessage() {
-  const loadingMessage = document.querySelector('.loading-message');
-  if (loadingMessage) {
-    loadingMessage.remove();
-  }
-}
-
-// Función para copiar el contenido de un mensaje al portapapeles
-function copyMessageToClipboard(messageElement) {
-  if (!messageElement) return;
-
-  // Obtener el contenido del mensaje
-  const messageContent = messageElement.querySelector('.message-content');
-  if (!messageContent) return;
-
-  // Extraer el texto plano del contenido HTML para copiar
-  const textToCopy = messageContent.textContent.trim();
-
-  // Usar la API del portapapeles moderna si está disponible
-  if (navigator.clipboard && window.isSecureContext) {
-    navigator.clipboard.writeText(textToCopy)
-      .then(() => {
-        showCopyFeedback(messageElement);
-      })
-      .catch(errhtml([\s\S]*?)```/g;
-  const htmlMatches = text.match(htmlRegex);
-
-  if (htmlMatches && htmlMatches.length > 0) {
-    // Extraer el contenido HTML del primer bloque
-    const htmlContent = htmlMatches[0].replace(/```html/, '').replace(/
+</div>
+{% endblock %}
