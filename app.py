@@ -240,7 +240,20 @@ def index():
 @app.route('/chat')
 def chat():
     """Render the chat page with specialized agents."""
-    return render_template('chat.html')
+    # Verificar disponibilidad de APIs
+    apis_disponibles = {
+        'openai': openai_client is not None,
+        'anthropic': anthropic_client is not None,
+        'gemini': genai_configured
+    }
+    
+    # Al menos una API debe estar disponible para el chat
+    if not any(apis_disponibles.values()):
+        return render_template('error.html', 
+                              error="No hay APIs de IA disponibles", 
+                              message="Por favor configure al menos una API válida (OpenAI, Anthropic o Gemini) para usar el chat.")
+    
+    return render_template('chat.html', apis_disponibles=apis_disponibles)
 
 @app.route('/files')
 def files():
@@ -978,6 +991,23 @@ def handle_chat():
 
         if not user_message:
             return jsonify({'error': 'No message provided'}), 400
+            
+        # Verificar que el modelo seleccionado esté disponible
+        if model_choice == 'openai' and not openai_client:
+            return jsonify({
+                'error': 'OpenAI API no disponible', 
+                'message': 'La API de OpenAI no está configurada correctamente o no está disponible en este momento. Por favor, selecciona otro modelo o verifica la configuración.'
+            }), 503
+        elif model_choice == 'anthropic' and not anthropic_client:
+            return jsonify({
+                'error': 'Anthropic API no disponible', 
+                'message': 'La API de Anthropic no está configurada correctamente o no está disponible en este momento. Por favor, selecciona otro modelo o verifica la configuración.'
+            }), 503
+        elif model_choice == 'gemini' and not genai_configured:
+            return jsonify({
+                'error': 'Gemini API no disponible', 
+                'message': 'La API de Google Gemini no está configurada correctamente o no está disponible en este momento. Por favor, selecciona otro modelo o verifica la configuración.'
+            }), 503
 
         # Get the system prompt for the selected agent
         agent_system_prompt = get_agent_system_prompt(agent_id, agent_prompt)
@@ -1006,7 +1036,18 @@ def handle_chat():
 
     except Exception as e:
         logging.error(f"Error in handle_chat: {str(e)}")
-        return jsonify({'error': f"Error processing the message: {str(e)}"}), 500
+        
+        error_message = str(e)
+        if "401 Unauthorized" in error_message or "invalid_api_key" in error_message:
+            return jsonify({
+                'error': 'Error de autenticación de API',
+                'message': 'La clave API proporcionada no es válida o ha expirado. Por favor, actualiza tus credenciales de API.'
+            }), 401
+        
+        return jsonify({
+            'error': 'Error interno del servidor',
+            'message': f"Error al procesar el mensaje: {error_message}"
+        }), 500
 
 @app.route('/api/documents/list', methods=['GET'])
 def list_documents():
