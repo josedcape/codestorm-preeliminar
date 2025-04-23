@@ -795,8 +795,16 @@ def delete_file_or_directory():
         # Get the user workspace
         workspace_path = os.path.join('user_workspaces', workspace_id)
         
-        # Build target path - handle relative paths properly
-        target_path = os.path.join(workspace_path, path.lstrip('./'))
+        # Limpiar y normalizar la ruta
+        # Eliminar posibles referencias a workspace en la ruta
+        if path.startswith('user_workspaces/'):
+            path = path[path.find('/', 15) + 1:]  # Saltar después de "user_workspaces/default/"
+        
+        # Eliminar './' al inicio si existe
+        path = path.lstrip('./')
+        
+        # Build target path correctamente
+        target_path = os.path.join(workspace_path, path)
         logger.debug(f"Target path for deletion: {target_path}")
 
         # Verify path is within workspace
