@@ -649,6 +649,39 @@ def generate_preview():
         logging.error(f"Error generating preview: {str(e)}")
         return jsonify({'error': str(e)}), 500
         
+@app.route('/api/upload_preview_file', methods=['POST'])
+def upload_preview_file():
+    """Procesar archivos HTML cargados para previsualización."""
+    try:
+        if 'file' not in request.files:
+            return jsonify({'error': 'No file part'}), 400
+            
+        file = request.files['file']
+        if file.filename == '':
+            return jsonify({'error': 'No selected file'}), 400
+            
+        if not file.filename.lower().endswith(('.html', '.htm')):
+            return jsonify({'error': 'Only HTML files are allowed'}), 400
+            
+        # Leer el contenido del archivo
+        html_content = file.read().decode('utf-8')
+        
+        # Validar que sea HTML
+        if not ('<html' in html_content.lower() or '<!doctype html' in html_content.lower()):
+            return jsonify({'error': 'Invalid HTML file'}), 400
+            
+        # Sanitizar el contenido HTML (implementación básica)
+        sanitized_html = html_content
+        
+        return jsonify({
+            'success': True,
+            'html': sanitized_html,
+            'filename': file.filename
+        })
+    except Exception as e:
+        logging.error(f"Error uploading preview file: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+        
 @app.route('/api/validate_html', methods=['POST'])
 def validate_html():
     """Validar el código HTML para la previsualización."""

@@ -30,7 +30,7 @@
         .iframe-container {
             position: relative;
             width: 100%;
-            height: calc(100vh - 120px);
+            height: calc(100vh - 170px);
             overflow: hidden;
             margin-top: 20px;
             border-radius: 8px;
@@ -87,6 +87,83 @@
             font-size: 12px;
             z-index: 100;
         }
+        
+        /* Área para cargar código */
+        .code-input-area {
+            margin-bottom: 15px;
+        }
+        
+        .code-editor {
+            width: 100%;
+            height: 200px;
+            font-family: 'JetBrains Mono', monospace;
+            resize: vertical;
+            background-color: #1e1e1e;
+            color: #f8f8f8;
+            border: 1px solid var(--primary-blue);
+            border-radius: 4px;
+            padding: 10px;
+        }
+        
+        .code-controls {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+        
+        .animation-controls {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            z-index: 100;
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 5px 10px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .animation-controls button {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            margin: 0 5px;
+            padding: 5px;
+        }
+        
+        .animation-controls button:hover {
+            color: var(--accent-gold);
+        }
+        
+        .file-upload-container {
+            margin-bottom: 15px;
+        }
+        
+        .file-upload-btn {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .file-upload-btn input[type=file] {
+            position: absolute;
+            top: 0;
+            right: 0;
+            min-width: 100%;
+            min-height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+        
+        .preview-error {
+            color: #ff5252;
+            background-color: rgba(255, 82, 82, 0.1);
+            border-left: 3px solid #ff5252;
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 0 4px 4px 0;
+        }
     </style>
 </head>
 <body>
@@ -110,6 +187,12 @@
                     <li class="nav-item">
                         <a class="nav-link" href="/files">Explorador de Archivos</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/code_corrector"><i class="bi bi-bug me-1"></i> Corrector de Código</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/preview"><i class="bi bi-eye me-1"></i> Previsualización</a>
+                    </li>
                 </ul>
             </div>
         </div>
@@ -120,14 +203,46 @@
             <div class="col-12">
                 <div class="card card-futuristic">
                     <div class="card-header card-header-futuristic d-flex justify-content-between align-items-center">
-                        <span><i class="bi bi-window me-2"></i>Previsualización</span>
+                        <span><i class="bi bi-window me-2"></i>Previsualización Web</span>
                         <div>
                             <a href="/chat" class="btn btn-sm btn-futuristic">
                                 <i class="bi bi-arrow-left"></i> Volver al Chat
                             </a>
                         </div>
                     </div>
-                    <div class="card-body p-0">
+                    <div class="card-body">
+                        <!-- Área para cargar archivos -->
+                        <div class="file-upload-container">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="d-flex align-items-center">
+                                        <button class="btn btn-futuristic file-upload-btn me-2">
+                                            <i class="bi bi-upload me-2"></i> Subir Archivo HTML
+                                            <input type="file" id="file-upload" accept=".html,.htm">
+                                        </button>
+                                        <button class="btn btn-futuristic" id="paste-code-btn">
+                                            <i class="bi bi-clipboard-plus me-2"></i> Pegar código
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 text-md-end mt-2 mt-md-0">
+                                    <button class="btn btn-primary" id="render-btn">
+                                        <i class="bi bi-play-fill me-2"></i> Renderizar
+                                    </button>
+                                    <button class="btn btn-outline-danger ms-2" id="clear-btn">
+                                        <i class="bi bi-trash me-2"></i> Limpiar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Área para código (oculta por defecto) -->
+                        <div class="code-input-area" id="code-input-area" style="display: none;">
+                            <textarea id="code-editor" class="code-editor" placeholder="Pega tu código HTML/CSS aquí"></textarea>
+                            <div id="preview-error" class="preview-error" style="display: none;"></div>
+                        </div>
+                        
+                        <!-- Controles de dispositivo -->
                         <div class="device-controls">
                             <button class="device-button active" data-device="desktop">
                                 <i class="bi bi-laptop"></i> Escritorio
@@ -140,9 +255,21 @@
                             </button>
                         </div>
                         
+                        <!-- Contenedor del iframe -->
                         <div class="iframe-container" id="iframe-container">
                             <div class="size-indicator" id="size-indicator">1200 x 800</div>
-                            <iframe id="preview-frame" class="preview-frame" srcdoc="<html><body><div style='display: flex; justify-content: center; align-items: center; height: 100vh; flex-direction: column; font-family: sans-serif; color: #333;'><h2>Esperando contenido...</h2><p>El contenido HTML se mostrará aquí</p></div></body></html>"></iframe>
+                            <div class="animation-controls">
+                                <button id="pause-animation-btn" title="Pausar animaciones">
+                                    <i class="bi bi-pause-fill"></i>
+                                </button>
+                                <button id="play-animation-btn" title="Reanudar animaciones" style="display: none;">
+                                    <i class="bi bi-play-fill"></i>
+                                </button>
+                                <button id="restart-animation-btn" title="Reiniciar animaciones">
+                                    <i class="bi bi-arrow-clockwise"></i>
+                                </button>
+                            </div>
+                            <iframe id="preview-frame" class="preview-frame" srcdoc="<html><body><div style='display: flex; justify-content: center; align-items: center; height: 100vh; flex-direction: column; font-family: sans-serif; color: #333; background-color: #f5f5f5;'><h2>Esperando contenido...</h2><p>Carga un archivo HTML o pega tu código para previsualizar</p></div></body></html>" sandbox="allow-same-origin allow-scripts"></iframe>
                         </div>
                     </div>
                 </div>
@@ -152,10 +279,23 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Referencias a elementos DOM
             const iframeContainer = document.getElementById('iframe-container');
             const previewFrame = document.getElementById('preview-frame');
             const deviceButtons = document.querySelectorAll('.device-button');
             const sizeIndicator = document.getElementById('size-indicator');
+            const codeEditor = document.getElementById('code-editor');
+            const codeInputArea = document.getElementById('code-input-area');
+            const renderBtn = document.getElementById('render-btn');
+            const clearBtn = document.getElementById('clear-btn');
+            const fileUpload = document.getElementById('file-upload');
+            const pasteCodeBtn = document.getElementById('paste-code-btn');
+            const previewError = document.getElementById('preview-error');
+            
+            // Controles de animación
+            const pauseAnimationBtn = document.getElementById('pause-animation-btn');
+            const playAnimationBtn = document.getElementById('play-animation-btn');
+            const restartAnimationBtn = document.getElementById('restart-animation-btn');
             
             // Función para cambiar el tamaño según el dispositivo
             function resizePreview(device) {
@@ -201,25 +341,194 @@
                 });
             });
             
-            // Obtener HTML de la sesión si existe
-            const sessionHtml = sessionStorage.getItem('previewHtml');
-            if (sessionHtml) {
-                previewFrame.srcdoc = sessionHtml;
-            }
+            // Cargar archivo HTML
+            fileUpload.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (!file) return;
+                
+                // Verificar si es un archivo HTML
+                if (!file.name.match(/\.(html|htm)$/i)) {
+                    showError('Solo se permiten archivos HTML.');
+                    return;
+                }
+                
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    codeEditor.value = e.target.result;
+                    codeInputArea.style.display = 'block';
+                    hideError();
+                };
+                reader.readAsText(file);
+            });
             
-            // Función para recibir mensajes con HTML
-            window.addEventListener('message', function(event) {
-                if (event.data && event.data.type === 'preview-html') {
-                    previewFrame.srcdoc = event.data.html;
-                    sessionStorage.setItem('previewHtml', event.data.html);
+            // Mostrar área de código al hacer clic en Pegar código
+            pasteCodeBtn.addEventListener('click', function() {
+                codeInputArea.style.display = 'block';
+                codeEditor.focus();
+                
+                // Intentar pegar desde el portapapeles (requiere permisos)
+                try {
+                    navigator.clipboard.readText()
+                        .then(text => {
+                            codeEditor.value = text;
+                        })
+                        .catch(err => {
+                            console.error('Error al leer del portapapeles:', err);
+                        });
+                } catch (e) {
+                    console.log('Portapapeles no disponible automáticamente. Por favor pega manualmente.');
                 }
             });
+            
+            // Renderizar código HTML
+            renderBtn.addEventListener('click', function() {
+                const htmlCode = codeEditor.value.trim();
+                
+                if (!htmlCode) {
+                    showError('Por favor ingresa código HTML para previsualizar.');
+                    return;
+                }
+                
+                // Validación básica
+                if (!htmlCode.includes('<html') && !htmlCode.includes('<!DOCTYPE')) {
+                    // Si no es HTML completo, envolverlo automáticamente
+                    const wrappedHtml = `
+                        <!DOCTYPE html>
+                        <html>
+                        <head>
+                            <meta charset="UTF-8">
+                            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                            <style>
+                                body {
+                                    font-family: Arial, sans-serif;
+                                }
+                            </style>
+                        </head>
+                        <body>
+                            ${htmlCode}
+                        </body>
+                        </html>
+                    `;
+                    renderHtml(wrappedHtml);
+                } else {
+                    renderHtml(htmlCode);
+                }
+            });
+            
+            // Función para renderizar HTML
+            function renderHtml(html) {
+                try {
+                    // Guardar en sessionStorage
+                    sessionStorage.setItem('previewHtml', html);
+                    
+                    // Actualizar iframe
+                    previewFrame.srcdoc = html;
+                    hideError();
+                } catch (e) {
+                    showError(`Error al renderizar: ${e.message}`);
+                }
+            }
+            
+            // Función para mostrar error
+            function showError(message) {
+                previewError.textContent = message;
+                previewError.style.display = 'block';
+            }
+            
+            // Función para ocultar error
+            function hideError() {
+                previewError.style.display = 'none';
+            }
+            
+            // Limpiar todo
+            clearBtn.addEventListener('click', function() {
+                codeEditor.value = '';
+                previewFrame.srcdoc = `<html><body><div style='display: flex; justify-content: center; align-items: center; height: 100vh; flex-direction: column; font-family: sans-serif; color: #333; background-color: #f5f5f5;'><h2>Esperando contenido...</h2><p>Carga un archivo HTML o pega tu código para previsualizar</p></div></body></html>`;
+                hideError();
+            });
+            
+            // Controles de animación
+            pauseAnimationBtn.addEventListener('click', function() {
+                const frame = previewFrame.contentWindow.document;
+                const styleElement = frame.createElement('style');
+                styleElement.id = 'animation-pause';
+                styleElement.textContent = '* { animation-play-state: paused !important; transition: none !important; }';
+                frame.head.appendChild(styleElement);
+                
+                pauseAnimationBtn.style.display = 'none';
+                playAnimationBtn.style.display = 'inline-block';
+            });
+            
+            playAnimationBtn.addEventListener('click', function() {
+                const frame = previewFrame.contentWindow.document;
+                const pauseStyle = frame.getElementById('animation-pause');
+                if (pauseStyle) {
+                    pauseStyle.remove();
+                }
+                
+                playAnimationBtn.style.display = 'none';
+                pauseAnimationBtn.style.display = 'inline-block';
+            });
+            
+            restartAnimationBtn.addEventListener('click', function() {
+                // Guardar el HTML actual
+                const currentHtml = previewFrame.srcdoc;
+                
+                // Recargar el iframe
+                previewFrame.srcdoc = '';
+                setTimeout(() => {
+                    previewFrame.srcdoc = currentHtml;
+                    
+                    // Asegurarse que las animaciones estén reproduciéndose
+                    playAnimationBtn.style.display = 'none';
+                    pauseAnimationBtn.style.display = 'inline-block';
+                }, 50);
+            });
+            
+            // Verificar si hay HTML guardado en sessionStorage
+            const savedHtml = sessionStorage.getItem('previewHtml');
+            if (savedHtml) {
+                codeEditor.value = savedHtml;
+                codeInputArea.style.display = 'block';
+                previewFrame.srcdoc = savedHtml;
+            }
             
             // Actualizar indicador de tamaño al cambiar el tamaño de la ventana
             window.addEventListener('resize', function() {
                 const activeDevice = document.querySelector('.device-button.active').getAttribute('data-device');
                 if (activeDevice === 'desktop') {
                     sizeIndicator.textContent = `${iframeContainer.offsetWidth} x ${iframeContainer.offsetHeight}`;
+                }
+            });
+            
+            // Arrastrar y soltar archivos
+            iframeContainer.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                iframeContainer.style.border = '2px dashed #4e73df';
+            });
+            
+            iframeContainer.addEventListener('dragleave', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                iframeContainer.style.border = 'none';
+            });
+            
+            iframeContainer.addEventListener('drop', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                iframeContainer.style.border = 'none';
+                
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    const file = files[0];
+                    if (file.name.match(/\.(html|htm)$/i)) {
+                        fileUpload.files = files;
+                        const event = new Event('change');
+                        fileUpload.dispatchEvent(event);
+                    } else {
+                        showError('Solo se permiten archivos HTML.');
+                    }
                 }
             });
         });
