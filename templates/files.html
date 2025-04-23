@@ -4,13 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CODESTORM - Explorador de Archivos</title>
-    
+
     <!-- Bootstrap CSS -->
     <link href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css" rel="stylesheet">
-    
+
     <!-- Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
-    
+
     <!-- Prism.js para resaltado de sintaxis -->
     <link href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
@@ -21,10 +21,10 @@
     <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-markup.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-yaml.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-markdown.min.js"></script>
-    
+
     <!-- Marked.js para renderizado de Markdown -->
     <script src="https://cdn.jsdelivr.net/npm/marked@4.3.0/marked.min.js"></script>
-    
+
     <style>
         :root {
             --darker-blue: #091428;
@@ -38,7 +38,7 @@
             --text-primary: #e9ecef;
             --text-secondary: #adb5bd;
         }
-        
+
         body {
             background-color: var(--dark-background);
             color: var(--text-primary);
@@ -47,13 +47,13 @@
             display: flex;
             flex-direction: column;
         }
-        
+
         .navbar-futuristic {
             background: linear-gradient(90deg, var(--darker-blue) 0%, var(--dark-blue) 100%);
             box-shadow: 0 2px 15px rgba(0, 100, 255, 0.2);
             border-bottom: 1px solid var(--medium-blue);
         }
-        
+
         .card-futuristic {
             background-color: var(--card-background);
             border-radius: 0.5rem;
@@ -62,7 +62,7 @@
             transition: all 0.3s ease;
             height: 100%;
         }
-        
+
         .card-header-futuristic {
             background-color: var(--card-header);
             border-bottom: 1px solid rgba(78, 115, 223, 0.2);
@@ -70,7 +70,7 @@
             font-weight: 500;
             color: var(--text-primary);
         }
-        
+
         .file-explorer-item {
             display: flex;
             align-items: center;
@@ -79,58 +79,58 @@
             transition: background-color 0.2s;
             cursor: pointer;
         }
-        
+
         .file-explorer-item:hover {
             background-color: rgba(30, 136, 229, 0.1);
         }
-        
+
         .file-explorer-item .icon {
             margin-right: 0.75rem;
             font-size: 1.25rem;
             width: 1.5rem;
             text-align: center;
         }
-        
+
         .file-explorer-item .file-name {
             flex-grow: 1;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
-        
+
         .file-explorer-item .file-meta {
             font-size: 0.8rem;
             color: var(--text-secondary);
             white-space: nowrap;
         }
-        
+
         .file-explorer-item .actions {
             display: flex;
             gap: 0.5rem;
             opacity: 0;
             transition: opacity 0.2s;
         }
-        
+
         .file-explorer-item:hover .actions {
             opacity: 1;
         }
-        
+
         .breadcrumb-futuristic {
             background-color: rgba(30, 136, 229, 0.05);
             border-radius: 0.25rem;
             padding: 0.5rem 1rem;
             margin-bottom: 1rem;
         }
-        
+
         .breadcrumb-futuristic .breadcrumb-item a {
             color: var(--light-blue);
             text-decoration: none;
         }
-        
+
         .breadcrumb-futuristic .breadcrumb-item.active {
             color: var(--text-primary);
         }
-        
+
         .btn-futuristic {
             background: linear-gradient(135deg, var(--medium-blue) 0%, var(--light-blue) 100%);
             border: none;
@@ -138,36 +138,36 @@
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             transition: all 0.3s ease;
         }
-        
+
         .btn-futuristic:hover {
             transform: translateY(-2px);
             box-shadow: 0 6px 8px rgba(0, 100, 255, 0.3);
         }
-        
+
         .folder-icon {
             color: var(--highlight-color);
         }
-        
+
         .status-indicator {
             width: 10px;
             height: 10px;
             border-radius: 50%;
             display: inline-block;
         }
-        
+
         .status-connected {
             background-color: #20c997;
         }
-        
+
         .status-disconnected {
             background-color: #dc3545;
         }
-        
+
         .status-connecting {
             background-color: #ffc107;
             animation: pulse 1.5s infinite;
         }
-        
+
         @keyframes pulse {
             0% { opacity: 0.5; }
             50% { opacity: 1; }
@@ -260,7 +260,7 @@
             max-height: 100%;
             transition: transform 0.3s ease;
         }
-        
+
         /* Estilos para la nueva visualización mejorada */
         .file-preview-container {
             display: flex;
@@ -268,7 +268,7 @@
             height: 100%;
             overflow: hidden;
         }
-        
+
         .file-preview-toolbar {
             display: flex;
             align-items: center;
@@ -277,12 +277,12 @@
             background-color: rgba(30, 30, 30, 0.8);
             border-bottom: 1px solid rgba(78, 115, 223, 0.2);
         }
-        
+
         .file-preview-toolbar .badge {
             text-transform: uppercase;
             font-size: 0.7rem;
         }
-        
+
         .file-preview-code {
             flex: 1;
             overflow: auto;
@@ -292,7 +292,7 @@
             line-height: 1.5;
             tab-size: 4;
         }
-        
+
         /* Contenedor de imagen con controles */
         .file-preview-image-container {
             display: flex;
@@ -303,42 +303,42 @@
             background-color: rgba(0, 0, 0, 0.1);
             padding: 1rem;
         }
-        
+
         .file-preview-image-container img {
             max-width: 100%;
             max-height: 100%;
             transform-origin: center center;
             transition: transform 0.3s ease;
         }
-        
+
         .file-preview-image-container img.loaded {
             animation: fade-in 0.3s ease-in-out;
         }
-        
+
         @keyframes fade-in {
             from { opacity: 0; }
             to { opacity: 1; }
         }
-        
+
         /* Contenedor de PDF */
         .pdf-container {
             flex: 1;
             overflow: hidden;
         }
-        
+
         .pdf-preview {
             width: 100%;
             height: 100%;
             border: none;
         }
-        
+
         /* Contenedor para markdown */
         .markdown-preview {
             padding: 1rem;
             overflow: auto;
             flex: 1;
         }
-        
+
         /* Estilos para el spinner de carga */
         .spinner-border {
             width: 3rem;
@@ -368,6 +368,11 @@
             background-color: rgba(78, 115, 223, 0.2);
             color: var(--light-blue);
             margin-left: 0.5rem;
+        }
+
+        .file-empty-message {
+            text-align: center;
+            padding: 2rem;
         }
     </style>
 </head>
@@ -504,7 +509,7 @@
     </div>
 
     <!-- Modales -->
-    
+
     <!-- Modal Crear Archivo -->
     <div class="modal fade modal-futuristic" id="createFileModal" tabindex="-1" aria-labelledby="createFileModalLabel" aria-hidden="true">
         <div class="modal-dialog">
@@ -532,7 +537,7 @@
             </div>
         </div>
     </div>
-    
+
     <!-- Modal Crear Carpeta -->
     <div class="modal fade modal-futuristic" id="createFolderModal" tabindex="-1" aria-labelledby="createFolderModalLabel" aria-hidden="true">
         <div class="modal-dialog">
@@ -556,7 +561,7 @@
             </div>
         </div>
     </div>
-    
+
     <!-- Modal Eliminar -->
     <div class="modal fade modal-futuristic" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
         <div class="modal-dialog">
@@ -611,7 +616,7 @@
             </div>
         </div>
     </div>
-    
+
     <!-- Modal Subir Archivo -->
     <div class="modal fade modal-futuristic" id="uploadFileModal" tabindex="-1" aria-labelledby="uploadFileModalLabel" aria-hidden="true">
         <div class="modal-dialog">
@@ -643,7 +648,7 @@
             </div>
         </div>
     </div>
-    
+
     <!-- Modal Comprimir a ZIP -->
     <div class="modal fade modal-futuristic" id="compressToZipModal" tabindex="-1" aria-labelledby="compressToZipModalLabel" aria-hidden="true">
         <div class="modal-dialog">
@@ -670,7 +675,7 @@
             </div>
         </div>
     </div>
-    
+
     <!-- Modal Extraer Archivo -->
     <div class="modal fade modal-futuristic" id="extractFileModal" tabindex="-1" aria-labelledby="extractFileModalLabel" aria-hidden="true">
         <div class="modal-dialog">
@@ -703,7 +708,7 @@
 
     <footer class="footer mt-auto py-3" style="background: linear-gradient(90deg, var(--darker-blue) 0%, var(--dark-blue) 100%);">
         <div class="container text-center">
-            <span class="text-light">CODESTORM-Assistant © 2025 | Herramienta de Desarrollo Impulsada por IA</span>
+            <span class="text-lightCODESTORM-Assistant © 2025 | Herramienta de Desarrollo Impulsada por IA</span>
         </div>
     </footer>
 
@@ -714,7 +719,7 @@
             // Variables globales
             let currentPath = '.';
             let currentFileSelected = null;
-            
+
             // Referencias a elementos DOM
             const filesContainer = document.getElementById('files-container');
             const pathBreadcrumb = document.getElementById('path-breadcrumb');
@@ -730,7 +735,7 @@
             const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
             const searchInput = document.getElementById('search-input');
             const searchBtn = document.getElementById('search-btn');
-            
+
             // Modales
             const createFileModal = new bootstrap.Modal(document.getElementById('createFileModal'));
             const createFolderModal = new bootstrap.Modal(document.getElementById('createFolderModal'));
@@ -739,28 +744,28 @@
             const uploadFileModal = new bootstrap.Modal(document.getElementById('uploadFileModal'));
             const compressToZipModal = new bootstrap.Modal(document.getElementById('compressToZipModal'));
             const extractFileModal = new bootstrap.Modal(document.getElementById('extractFileModal'));
-            
+
             // Cargar archivos iniciales
             loadFiles(currentPath);
-            
+
             // Event Listeners
             refreshBtn.addEventListener('click', () => loadFiles(currentPath));
-            
+
             createFileBtn.addEventListener('click', () => {
                 document.getElementById('file-name').value = '';
                 document.getElementById('file-content').value = '';
                 createFileModal.show();
             });
-            
+
             createFolderBtn.addEventListener('click', () => {
                 document.getElementById('folder-name').value = '';
                 createFolderModal.show();
             });
-            
+
             // GitHub Repository Clone
             const cloneGithubBtn = document.getElementById('clone-github-btn');
             const cloneRepoBtn = document.getElementById('clone-repo-btn');
-            
+
             cloneGithubBtn.addEventListener('click', () => {
                 document.getElementById('repo-url').value = '';
                 document.getElementById('repo-branch').value = '';
@@ -768,22 +773,22 @@
                 document.getElementById('clone-progress-container').style.display = 'none';
                 cloneGithubModal.show();
             });
-            
+
             cloneRepoBtn.addEventListener('click', () => {
                 const repoUrl = document.getElementById('repo-url').value.trim();
                 const repoBranch = document.getElementById('repo-branch').value.trim() || null;
-                
+
                 if (!repoUrl) {
                     showNotification('Por favor, ingresa la URL del repositorio', 'warning');
                     return;
                 }
-                
+
                 // Validar que es una URL de GitHub
                 if (!repoUrl.includes('github.com')) {
                     showNotification('Por favor, ingresa una URL válida de GitHub', 'warning');
                     return;
                 }
-                
+
                 // Mostrar progreso
                 const progressContainer = document.getElementById('clone-progress-container');
                 const statusContainer = document.getElementById('clone-status');
@@ -791,85 +796,85 @@
                 statusContainer.style.display = 'block';
                 statusContainer.className = 'alert alert-info';
                 statusContainer.textContent = 'Clonando repositorio, por favor espera...';
-                
+
                 // Deshabilitar botón mientras se clona
                 cloneRepoBtn.disabled = true;
-                
+
                 // Llamar a la API para clonar
                 cloneGithubRepository(repoUrl, repoBranch);
             });
-            
+
             saveFileBtn.addEventListener('click', () => {
                 const fileName = document.getElementById('file-name').value.trim();
                 const fileContent = document.getElementById('file-content').value;
-                
+
                 if (!fileName) {
                     showNotification('Por favor, ingresa un nombre para el archivo', 'warning');
                     return;
                 }
-                
+
                 const filePath = currentPath === '.' ? fileName : `${currentPath}/${fileName}`;
                 createFile(filePath, fileContent);
                 createFileModal.hide();
             });
-            
+
             saveFolderBtn.addEventListener('click', () => {
                 const folderName = document.getElementById('folder-name').value.trim();
-                
+
                 if (!folderName) {
                     showNotification('Por favor, ingresa un nombre para la carpeta', 'warning');
                     return;
                 }
-                
+
                 const folderPath = currentPath === '.' ? folderName : `${currentPath}/${folderName}`;
                 createFolder(folderPath);
                 createFolderModal.hide();
             });
-            
+
             confirmDeleteBtn.addEventListener('click', () => {
                 if (currentFileSelected) {
                     deleteItem(currentFileSelected);
                     deleteModal.hide();
                 }
             });
-            
+
             searchBtn.addEventListener('click', performSearch);
             searchInput.addEventListener('keypress', (e) => {
                 if (e.key === 'Enter') {
                     performSearch();
                 }
             });
-            
+
             openEditorBtn.addEventListener('click', () => {
                 if (currentFileSelected) {
                     window.location.href = `/edit_file?path=${encodeURIComponent(currentFileSelected)}`;
                 }
             });
-            
+
             // Eventos para subir archivos y manejar archivos comprimidos
             const uploadFileBtn = document.getElementById('upload-file-btn');
             const uploadFileSubmitBtn = document.getElementById('upload-file-submit-btn');
             const confirmCompressBtn = document.getElementById('confirm-compress-btn');
             const confirmExtractBtn = document.getElementById('confirm-extract-btn');
-            
+
             uploadFileBtn.addEventListener('click', () => {
                 document.getElementById('upload-file').value = '';
                 // Ya no utilizamos el checkbox de extracción automática
                 uploadFileModal.show();
             });
-            
+
             uploadFileSubmitBtn.addEventListener('click', uploadFile);
-            
+
             confirmCompressBtn.addEventListener('click', compressToZip);
             confirmExtractBtn.addEventListener('click', extractCompressedFile);
-            
+
             // Funciones de manipulación de archivos
             function loadFiles(path) {
                 currentPath = path;
-                
+
                 // Actualizar la ruta en la miga de pan
                 updateBreadcrumb(path);
-                
+
                 fetch(`/api/files?directory=${encodeURIComponent(path)}`)
                     .then(response => response.json())
                     .then(data => {
@@ -882,22 +887,30 @@
                         }
                     })
                     .catch(error => {
-                        console.error('Error:', error);
-                        showNotification('Error al cargar archivos', 'danger');
+                        console.error('Error loading files:', error);
+                        filesContainer.innerHTML = `
+                            <div class="file-empty-message">
+                                <i class="bi bi-exclamation-circle text-danger fs-1"></i>
+                                <p class="mt-3">Error al cargar archivos: ${error.message || 'Error de conexión'}</p>
+                                <button class="btn btn-sm btn-outline-primary mt-2" onclick="loadFiles(currentPath)">
+                                    <i class="bi bi-arrow-repeat"></i> Reintentar
+                                </button>
+                            </div>
+                        `;
                     });
             }
-            
+
             function displayFiles(files) {
                 filesContainer.innerHTML = '';
-                
+
                 // Si no estamos en la raíz, mostrar opción para subir un nivel
                 if (currentPath !== '.') {
                     const upDir = document.createElement('div');
                     upDir.className = 'file-explorer-item';
-                    
+
                     // Obtener directorio padre
                     const parentPath = currentPath.split('/').slice(0, -1).join('/') || '.';
-                    
+
                     upDir.innerHTML = `
                         <div class="icon">
                             <i class="bi bi-arrow-up-circle"></i>
@@ -906,15 +919,15 @@
                             ..
                         </div>
                     `;
-                    
+
                     upDir.addEventListener('click', () => loadFiles(parentPath));
                     filesContainer.appendChild(upDir);
                 }
-                
+
                 // Ordenar archivos: primero carpetas, luego archivos
                 const directories = files.filter(f => f.type === 'directory');
                 const regularFiles = files.filter(f => f.type === 'file');
-                
+
                 // Mostrar directorios
                 directories.forEach(dir => {
                     const dirElement = document.createElement('div');
@@ -935,21 +948,21 @@
                             </button>
                         </div>
                     `;
-                    
+
                     // Evento para abrir carpeta
                     dirElement.addEventListener('click', function(e) {
                         if (!e.target.closest('.delete-btn')) {
                             loadFiles(dir.path);
                         }
                     });
-                    
+
                     // Evento para eliminar carpeta
                     const deleteBtn = dirElement.querySelector('.delete-btn');
                     deleteBtn.addEventListener('click', (e) => {
                         e.stopPropagation();
                         showDeleteConfirmation(dir.path, 'carpeta', dir.name);
                     });
-                    
+
                     // Evento para comprimir carpeta
                     const compressBtn = dirElement.querySelector('.compress-btn');
                     if (compressBtn) {
@@ -958,19 +971,19 @@
                             showCompressDialog(dir.path, dir.name);
                         });
                     }
-                    
+
                     filesContainer.appendChild(dirElement);
                 });
-                
+
                 // Mostrar archivos
                 regularFiles.forEach(file => {
                     const fileElement = document.createElement('div');
                     fileElement.className = 'file-explorer-item';
-                    
+
                     // Determinar icono según extensión
                     let icon = 'bi-file-earmark';
                     const ext = file.name.split('.').pop().toLowerCase();
-                    
+
                     if (['html', 'htm'].includes(ext)) icon = 'bi-file-earmark-code';
                     else if (['js', 'ts'].includes(ext)) icon = 'bi-filetype-js';
                     else if (['css', 'scss'].includes(ext)) icon = 'bi-filetype-css';
@@ -978,7 +991,7 @@
                     else if (['jpg', 'jpeg', 'png', 'gif', 'svg'].includes(ext)) icon = 'bi-file-earmark-image';
                     else if (['md', 'txt'].includes(ext)) icon = 'bi-file-earmark-text';
                     else if (['json'].includes(ext)) icon = 'bi-file-earmark-code';
-                    
+
                     fileElement.innerHTML = `
                         <div class="icon">
                             <i class="bi ${icon}"></i>
@@ -1008,28 +1021,28 @@
                             </button>
                         </div>
                     `;
-                    
+
                     // Evento para previsualizar archivo
                     fileElement.addEventListener('click', function(e) {
                         if (!e.target.closest('.actions')) {
                             previewFile(file.path, file.name, ext);
                         }
                     });
-                    
+
                     // Evento para editar archivo
                     const editBtn = fileElement.querySelector('.btn-outline-info');
                     editBtn.addEventListener('click', (e) => {
                         e.stopPropagation();
                         window.location.href = `/edit_file?path=${encodeURIComponent(file.path)}`;
                     });
-                    
+
                     // Evento para eliminar archivo
                     const deleteBtn = fileElement.querySelector('.delete-btn');
                     deleteBtn.addEventListener('click', (e) => {
                         e.stopPropagation();
                         showDeleteConfirmation(file.path, 'archivo', file.name);
                     });
-                    
+
                     // Eventos para comprimir o extraer archivos
                     if (['zip', 'rar'].includes(ext)) {
                         const extractBtn = fileElement.querySelector('.extract-btn');
@@ -1048,10 +1061,10 @@
                             });
                         }
                     }
-                    
+
                     filesContainer.appendChild(fileElement);
                 });
-                
+
                 // Si no hay archivos, mostrar mensaje
                 if (directories.length === 0 && regularFiles.length === 0) {
                     const emptyDir = document.createElement('div');
@@ -1060,12 +1073,12 @@
                     filesContainer.appendChild(emptyDir);
                 }
             }
-            
+
             function previewFile(path, name, extension) {
                 currentFileSelected = path;
                 previewTitle.innerHTML = `<i class="bi bi-eye me-2"></i>${name}`;
                 openEditorBtn.style.display = 'inline-block';
-                
+
                 // Mostrar spinner mientras se carga la vista previa
                 filePreview.innerHTML = `
                     <div class="text-center p-5">
@@ -1075,7 +1088,7 @@
                         <p class="mt-2">Cargando vista previa...</p>
                     </div>
                 `;
-                
+
                 // Tipos de archivo para previsualización
                 const textExtensions = ['txt', 'md', 'js', 'css', 'html', 'htm', 'py', 'json', 'csv', 'xml', 'yml', 'yaml'];
                 const codeExtensions = ['js', 'css', 'html', 'htm', 'py', 'json', 'xml', 'yml', 'yaml'];
@@ -1084,7 +1097,7 @@
                 const pdfExtensions = ['pdf'];
                 const audioExtensions = ['mp3', 'wav', 'ogg'];
                 const videoExtensions = ['mp4', 'webm'];
-                
+
                 // Determinar el tipo de contenido
                 if (textExtensions.includes(extension)) {
                     // Previsualizar archivos de texto/código
@@ -1099,7 +1112,7 @@
                                     if (extension === 'py') language = 'python';
                                     if (extension === 'htm') language = 'html';
                                     if (['yml', 'yaml'].includes(extension)) language = 'yaml';
-                                    
+
                                     // Contenedor para el código con controles
                                     filePreview.innerHTML = `
                                         <div class="file-preview-container">
@@ -1115,18 +1128,18 @@
                                             <pre class="file-preview-code language-${language}"><code class="language-${language}">${data.content}</code></pre>
                                         </div>
                                     `;
-                                    
+
                                     // Aplicar resaltado de sintaxis usando Prism
                                     if (window.Prism) {
                                         Prism.highlightAllUnder(filePreview);
                                     }
-                                    
+
                                     // Agregar funcionalidad de copiar código
                                     const copyBtn = filePreview.querySelector('.copy-btn');
                                     copyBtn.addEventListener('click', () => {
                                         const codeElement = filePreview.querySelector('code');
                                         const textToCopy = codeElement.textContent;
-                                        
+
                                         navigator.clipboard.writeText(textToCopy)
                                             .then(() => {
                                                 // Cambiar ícono brevemente
@@ -1139,7 +1152,7 @@
                                                 console.error('Error al copiar al portapapeles:', err);
                                             });
                                     });
-                                    
+
                                     // Funcionalidad de pantalla completa
                                     const fullscreenBtn = filePreview.querySelector('.fullscreen-btn');
                                     fullscreenBtn.addEventListener('click', () => {
@@ -1152,7 +1165,7 @@
                                             document.exitFullscreen();
                                         }
                                     });
-                                    
+
                                 } else if (markdownExtensions.includes(extension)) {
                                     // Renderizar Markdown
                                     filePreview.innerHTML = `
@@ -1170,28 +1183,28 @@
                                             <pre class="file-preview-code language-markdown d-none"><code class="language-markdown">${data.content}</code></pre>
                                         </div>
                                     `;
-                                    
+
                                     // Renderizar el markdown
                                     const markdownPreview = filePreview.querySelector('.markdown-preview');
                                     markdownPreview.innerHTML = marked.parse(data.content);
-                                    
+
                                     // Si hay Prism, aplicar resaltado a los bloques de código
                                     if (window.Prism) {
                                         Prism.highlightAllUnder(markdownPreview);
                                     }
-                                    
+
                                     // Botón para cambiar entre vista previa y código
                                     const toggleBtn = filePreview.querySelector('.toggle-view-btn');
                                     toggleBtn.addEventListener('click', () => {
                                         const markdownPreview = filePreview.querySelector('.markdown-preview');
                                         const codeView = filePreview.querySelector('.file-preview-code');
-                                        
+
                                         if (toggleBtn.dataset.mode === 'preview') {
                                             markdownPreview.classList.add('d-none');
                                             codeView.classList.remove('d-none');
                                             toggleBtn.innerHTML = '<i class="bi bi-eye"></i>';
                                             toggleBtn.dataset.mode = 'code';
-                                            
+
                                             // Aplicar resaltado al código
                                             if (window.Prism) {
                                                 Prism.highlightAllUnder(codeView);
@@ -1216,13 +1229,13 @@
                                             <pre class="file-preview-code">${data.content}</pre>
                                         </div>
                                     `;
-                                    
+
                                     // Agregar funcionalidad de copiar
                                     const copyBtn = filePreview.querySelector('.copy-btn');
                                     copyBtn.addEventListener('click', () => {
                                         const preElement = filePreview.querySelector('pre');
                                         const textToCopy = preElement.textContent;
-                                        
+
                                         navigator.clipboard.writeText(textToCopy)
                                             .then(() => {
                                                 // Cambiar ícono brevemente
@@ -1278,38 +1291,38 @@
                             </div>
                         </div>
                     `;
-                    
+
                     // Funcionalidad de zoom y pantalla completa
                     let zoomLevel = 1;
-                    
+
                     // Una vez que la imagen cargue
                     const img = filePreview.querySelector('.img-preview');
                     img.onload = function() {
                         // Añadir clase para mostrar la imagen solo después de cargar
                         img.classList.add('loaded');
                     };
-                    
+
                     // Botones de zoom
                     const zoomInBtn = filePreview.querySelector('.zoom-in-btn');
                     const zoomOutBtn = filePreview.querySelector('.zoom-out-btn');
                     const resetZoomBtn = filePreview.querySelector('.reset-zoom-btn');
                     const fullscreenBtn = filePreview.querySelector('.fullscreen-btn');
-                    
+
                     zoomInBtn.addEventListener('click', () => {
                         zoomLevel = Math.min(zoomLevel + 0.25, 3);
                         img.style.transform = `scale(${zoomLevel})`;
                     });
-                    
+
                     zoomOutBtn.addEventListener('click', () => {
                         zoomLevel = Math.max(zoomLevel - 0.25, 0.5);
                         img.style.transform = `scale(${zoomLevel})`;
                     });
-                    
+
                     resetZoomBtn.addEventListener('click', () => {
                         zoomLevel = 1;
                         img.style.transform = `scale(${zoomLevel})`;
                     });
-                    
+
                     fullscreenBtn.addEventListener('click', () => {
                         const container = document.querySelector('.file-preview-container');
                         if (!document.fullscreenElement) {
@@ -1338,7 +1351,7 @@
                             </div>
                         </div>
                     `;
-                    
+
                     // Funcionalidad de pantalla completa
                     const fullscreenBtn = filePreview.querySelector('.fullscreen-btn');
                     fullscreenBtn.addEventListener('click', () => {
@@ -1386,7 +1399,7 @@
                             </div>
                         </div>
                     `;
-                    
+
                     // Funcionalidad de pantalla completa
                     const fullscreenBtn = filePreview.querySelector('.fullscreen-btn');
                     fullscreenBtn.addEventListener('click', () => {
@@ -1418,7 +1431,7 @@
                     `;
                 }
             }
-            
+
             function createFile(path, content) {
                 fetch('/api/files/create', {
                     method: 'POST',
@@ -1442,7 +1455,7 @@
                     showNotification('Error al crear archivo', 'danger');
                 });
             }
-            
+
             function createFolder(path) {
                 // En los sistemas de archivos, crear una carpeta vacía a menudo se hace
                 // creando un archivo especial dentro de ella, como .gitkeep
@@ -1468,7 +1481,7 @@
                     showNotification('Error al crear carpeta', 'danger');
                 });
             }
-            
+
             function deleteItem(path) {
                 fetch('/api/files/delete', {
                     method: 'POST',
@@ -1482,7 +1495,7 @@
                     if (data.success) {
                         showNotification('Elemento eliminado correctamente', 'success');
                         loadFiles(currentPath);
-                        
+
                         // Si el archivo eliminado era el que se estaba previsualizando, limpiar la previsualización
                         if (currentFileSelected === path) {
                             filePreview.innerHTML = `
@@ -1504,7 +1517,7 @@
                     showNotification('Error al eliminar', 'danger');
                 });
             }
-            
+
             function showDeleteConfirmation(path, type, name) {
                 currentFileSelected = path;
                 document.getElementById('delete-modal-body').innerHTML = `
@@ -1513,14 +1526,14 @@
                 `;
                 deleteModal.show();
             }
-            
+
             // Función para clonar repositorio de GitHub
             function cloneGithubRepository(repoUrl, branch = null) {
                 const data = {
                     repo_url: repoUrl,
                     branch: branch
                 };
-                
+
                 fetch('/api/github/clone', {
                     method: 'POST',
                     headers: {
@@ -1533,11 +1546,11 @@
                     const statusContainer = document.getElementById('clone-status');
                     const progressContainer = document.getElementById('clone-progress-container');
                     const cloneRepoBtn = document.getElementById('clone-repo-btn');
-                    
+
                     if (data.success) {
                         statusContainer.className = 'alert alert-success';
                         statusContainer.textContent = data.message;
-                        
+
                         // Mostrar detalles del repositorio clonado
                         let repoDetails = document.createElement('div');
                         repoDetails.innerHTML = `
@@ -1546,7 +1559,7 @@
                             <p class="mb-0"><small>El repositorio ha sido clonado exitosamente. Se recargará el explorador de archivos.</small></p>
                         `;
                         statusContainer.appendChild(repoDetails);
-                        
+
                         // Recargar los archivos después de 2 segundos
                         setTimeout(() => {
                             loadFiles('.');
@@ -1561,7 +1574,7 @@
                         statusContainer.textContent = 'Error al clonar repositorio: ' + (data.error || 'Error desconocido');
                         cloneRepoBtn.disabled = false;
                     }
-                    
+
                     progressContainer.style.display = 'none';
                 })
                 .catch(error => {
@@ -1569,20 +1582,20 @@
                     const statusContainer = document.getElementById('clone-status');
                     const progressContainer = document.getElementById('clone-progress-container');
                     const cloneRepoBtn = document.getElementById('clone-repo-btn');
-                    
+
                     statusContainer.className = 'alert alert-danger';
                     statusContainer.textContent = 'Error al procesar la solicitud: ' + error.message;
                     progressContainer.style.display = 'none';
                     cloneRepoBtn.disabled = false;
                 });
             }
-            
+
             // Función para eliminar un repositorio de GitHub
             function deleteGithubRepository(repoPath) {
                 const data = {
                     repo_path: repoPath
                 };
-                
+
                 fetch('/api/github/delete', {
                     method: 'DELETE',
                     headers: {
@@ -1604,11 +1617,11 @@
                     showNotification('Error al procesar la solicitud: ' + error.message, 'danger');
                 });
             }
-            
+
             function updateBreadcrumb(path) {
                 const parts = path === '.' ? [] : path.split('/');
                 let html = '<li class="breadcrumb-item"><a href="#" data-path="."><i class="bi bi-house-door"></i> /</a></li>';
-                
+
                 let currentPath = '';
                 for (let i = 0; i < parts.length; i++) {
                     currentPath += (i === 0 ? '' : '/') + parts[i];
@@ -1618,9 +1631,9 @@
                         html += `<li class="breadcrumb-item"><a href="#" data-path="${currentPath}">${parts[i]}</a></li>`;
                     }
                 }
-                
+
                 pathBreadcrumb.innerHTML = html;
-                
+
                 // Añadir event listeners a los links del breadcrumb
                 document.querySelectorAll('#path-breadcrumb a').forEach(link => {
                     link.addEventListener('click', function(e) {
@@ -1630,22 +1643,22 @@
                     });
                 });
             }
-            
+
             function performSearch() {
                 const query = searchInput.value.trim();
                 if (!query) return;
-                
+
                 // Implementar búsqueda simple en el cliente
                 // En una aplicación real, esto debería ser una búsqueda en el servidor
                 const fileItems = document.querySelectorAll('.file-explorer-item');
-                
+
                 let found = false;
                 fileItems.forEach(item => {
                     const fileName = item.querySelector('.file-name').textContent.trim();
                     if (fileName.toLowerCase().includes(query.toLowerCase())) {
                         item.style.backgroundColor = 'rgba(30, 136, 229, 0.2)';
                         found = true;
-                        
+
                         // Scroll to the found item
                         setTimeout(() => {
                             item.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -1654,82 +1667,82 @@
                         item.style.backgroundColor = '';
                     }
                 });
-                
+
                 if (!found) {
                     showNotification(`No se encontraron archivos que coincidan con "${query}"`, 'info');
                 }
             }
-            
+
             // Funciones de utilidad
             function formatFileSize(bytes) {
                 if (bytes === 0) return '0 Bytes';
-                
+
                 const k = 1024;
                 const sizes = ['Bytes', 'KB', 'MB', 'GB'];
                 const i = Math.floor(Math.log(bytes) / Math.log(k));
-                
+
                 return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
             }
-            
+
             function showNotification(message, type = 'info') {
                 const container = document.getElementById('notifications');
-                
+
                 const notification = document.createElement('div');
                 notification.className = `alert alert-${type} alert-dismissible fade show`;
                 notification.innerHTML = `
                     ${message}
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 `;
-                
+
                 container.appendChild(notification);
-                
+
                 // Auto-quitar después de 5 segundos
                 setTimeout(() => {
                     notification.classList.remove('show');
                     setTimeout(() => notification.remove(), 300);
                 }, 5000);
             }
-            
+
             // Funciones para manejar archivos comprimidos
             function uploadFile() {
                 const fileInput = document.getElementById('upload-file');
                 const uploadPathInput = document.getElementById('upload-current-path');
-                
+
                 if (!fileInput.files || fileInput.files.length === 0) {
                     showNotification('Por favor, selecciona un archivo para subir', 'warning');
                     return;
                 }
-                
+
                 const file = fileInput.files[0];
                 const fileName = file.name;
                 const fileSize = file.size;
-                
+
                 // Deshabilitar botón mientras se sube
                 const uploadBtn = document.getElementById('upload-file-submit-btn');
                 uploadBtn.disabled = true;
                 uploadBtn.innerHTML = '<i class="bi bi-arrow-repeat me-1"></i>Subiendo...';
-                
+
                 // Si el archivo es pequeño (menos de 5MB), usar el método tradicional
                 if (fileSize < 5 * 1024 * 1024) {
                     // Actualizar el valor del path en el formulario
                     uploadPathInput.value = currentPath;
-                    
+
                     // Usar el formulario directamente en lugar de FormData
                     const form = document.getElementById('upload-file-form');
-                    
+
                     // Crear un iframe oculto para manejar la subida sin recargar la página
                     const iframe = document.createElement('iframe');
                     iframe.name = 'upload-frame';
                     iframe.style.display = 'none';
                     document.body.appendChild(iframe);
-                    
+
                     // Configurar callback cuando el iframe se carga (subida completa)
                     iframe.onload = function() {
                         try {
                             // Intentar obtener el resultado JSON del iframe
                             const iframeContent = iframe.contentWindow.document.body.textContent;
                             const data = JSON.parse(iframeContent);
-                            
+
                             if (data.success) {
                                 showNotification(data.message || 'Archivo subido correctamente', 'success');
                                 uploadFileModal.hide();
@@ -1741,24 +1754,24 @@
                             console.error('Error al procesar respuesta:', error);
                             showNotification('Error al subir archivo', 'danger');
                         }
-                        
+
                         // Limpiar
                         document.body.removeChild(iframe);
-                        
+
                         // Rehabilitar botón
                         uploadBtn.disabled = false;
                         uploadBtn.innerHTML = '<i class="bi bi-upload me-1"></i>Subir';
                     };
-                    
+
                     // Configurar el formulario para usar el iframe
                     form.target = 'upload-frame';
-                    
+
                     // Enviar el formulario
                     form.submit();
                 } else {
                     // Para archivos grandes, usar el método de fragmentos
                     uploadFileModal.hide();
-                    
+
                     // Crear modal de progreso si no existe
                     let progressModal = document.getElementById('upload-progress-modal');
                     if (!progressModal) {
@@ -1785,15 +1798,15 @@
                         `;
                         document.body.appendChild(progressModal);
                     }
-                    
+
                     // Inicializar y mostrar modal de progreso
                     const uploadProgressModal = new bootstrap.Modal(progressModal);
                     uploadProgressModal.show();
-                    
+
                     const uploadStatus = document.getElementById('upload-status');
                     const uploadProgressBar = document.getElementById('upload-progress-bar');
                     const uploadDetails = document.getElementById('upload-details');
-                    
+
                     // Asegurar que existe la barra de progreso
                     if (uploadProgressBar) {
                         uploadProgressBar.style.width = '0%';
@@ -1806,23 +1819,23 @@
                             <div id="upload-progress-bar" class="progress-bar progress-bar-striped progress-bar-animated" 
                                 role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
                         `;
-                        
+
                         // Insertar antes del status
                         const statusElement = document.getElementById('upload-status');
                         if (statusElement && statusElement.parentNode) {
                             statusElement.parentNode.insertBefore(progressContainer, statusElement);
                         }
                     }
-                    
+
                     // Configuración de carga por fragmentos
                     const chunkSize = 2 * 1024 * 1024; // 2MB por fragmento
                     const totalChunks = Math.ceil(fileSize / chunkSize);
                     let chunkIndex = 0;
                     let chunksUploaded = 0;
-                    
+
                     uploadStatus.textContent = `Subiendo archivo en ${totalChunks} fragmentos...`;
                     uploadDetails.textContent = `Archivo: ${fileName} (${formatFileSize(fileSize)})`;
-                    
+
                     // Función para actualizar la barra de progreso
                     function updateProgressBar(percent) {
                         const progressBar = document.getElementById('upload-progress-bar');
@@ -1831,24 +1844,24 @@
                             progressBar.setAttribute('aria-valuenow', percent.toString());
                         }
                     }
-                    
+
                     // Función para subir un fragmento
                     const uploadChunk = function() {
                         if (chunkIndex >= totalChunks) {
                             return;
                         }
-                        
+
                         const start = chunkIndex * chunkSize;
                         const end = Math.min(start + chunkSize, fileSize);
                         const chunk = file.slice(start, end);
-                        
+
                         const formData = new FormData();
                         formData.append('chunk', chunk);
                         formData.append('filename', fileName);
                         formData.append('index', chunkIndex);
                         formData.append('total_chunks', totalChunks);
                         formData.append('path', currentPath);
-                        
+
                         fetch('/api/explorer/upload_chunk', {
                             method: 'POST',
                             body: formData
@@ -1860,13 +1873,13 @@
                                 const progress = Math.round((chunksUploaded / totalChunks) * 100);
                                 uploadProgressBar.style.width = `${progress}%`;
                                 uploadStatus.textContent = `Subiendo fragmento ${chunksUploaded}/${totalChunks} (${progress}%)...`;
-                                
+
                                 if (data.completed) {
                                     // El archivo se ha completado
                                     uploadStatus.textContent = 'Archivo subido correctamente';
                                     uploadProgressBar.style.width = '100%';
                                     uploadProgressBar.classList.remove('progress-bar-animated');
-                                    
+
                                     // Si es un archivo ZIP, mostrar opción para extraer
                                     if (data.is_zip) {
                                         uploadDetails.innerHTML = `
@@ -1878,7 +1891,7 @@
                                                 </button>
                                             </div>
                                         `;
-                                        
+
                                         document.getElementById('extract-zip-now').addEventListener('click', () => {
                                             showExtractDialog(data.file_path, fileName);
                                             uploadProgressModal.hide();
@@ -1895,10 +1908,10 @@
                                     chunksUploaded++;
                                     const progress = Math.round((chunksUploaded / totalChunks) * 100);
                                     updateProgressBar(progress);
-                                    
+
                                     // Actualizar texto de estado
                                     uploadStatus.textContent = `Subiendo fragmento ${chunksUploaded} de ${totalChunks} (${progress}%)...`;
-                                    
+
                                     // Continuar con el siguiente fragmento
                                     chunkIndex++;
                                     uploadChunk();
@@ -1906,7 +1919,7 @@
                             } else {
                                 uploadStatus.textContent = `Error: ${data.error || 'Error desconocido'}`;
                                 uploadProgressBar.classList.add('bg-danger');
-                                
+
                                 // Rehabilitar botón
                                 uploadBtn.disabled = false;
                                 uploadBtn.innerHTML = '<i class="bi bi-upload me-1"></i>Subir';
@@ -1916,36 +1929,36 @@
                             console.error('Error:', error);
                             uploadStatus.textContent = `Error al subir fragmento: ${error.message}`;
                             uploadProgressBar.classList.add('bg-danger');
-                            
+
                             // Rehabilitar botón
                             uploadBtn.disabled = false;
                             uploadBtn.innerHTML = '<i class="bi bi-upload me-1"></i>Subir';
                         });
                     };
-                    
+
                     // Iniciar subida
                     uploadChunk();
                 }
             }
-            
+
             function compressToZip() {
                 if (!currentFileSelected) {
                     showNotification('No hay ningún elemento seleccionado para comprimir', 'warning');
                     return;
                 }
-                
+
                 const zipFilename = document.getElementById('zip-filename').value.trim();
-                
+
                 if (!zipFilename) {
                     showNotification('Por favor, especifica un nombre para el archivo ZIP', 'warning');
                     return;
                 }
-                
+
                 // Deshabilitar botón mientras se comprime
                 const compressBtn = document.getElementById('confirm-compress-btn');
                 compressBtn.disabled = true;
                 compressBtn.innerHTML = '<i class="bi bi-arrow-repeat me-1"></i>Comprimiendo...';
-                
+
                 fetch('/api/explorer/compress', {
                     method: 'POST',
                     headers: {
@@ -1976,20 +1989,20 @@
                     compressBtn.innerHTML = '<i class="bi bi-file-earmark-zip me-1"></i>Comprimir';
                 });
             }
-            
+
             function extractCompressedFile() {
                 if (!currentFileSelected) {
                     showNotification('No hay ningún archivo comprimido seleccionado', 'warning');
                     return;
                 }
-                
+
                 const extractDir = document.getElementById('extract-dir').value.trim();
-                
+
                 // Deshabilitar botón mientras se extrae
                 const extractBtn = document.getElementById('confirm-extract-btn');
                 extractBtn.disabled = true;
                 extractBtn.innerHTML = '<i class="bi bi-arrow-repeat me-1"></i>Extrayendo...';
-                
+
                 fetch('/api/explorer/extract', {
                     method: 'POST',
                     headers: {
@@ -2020,25 +2033,25 @@
                     extractBtn.innerHTML = '<i class="bi bi-file-earmark-zip me-1"></i>Extraer';
                 });
             }
-            
+
             // Función para mostrar diálogo de compresión
             function showCompressDialog(path, name) {
                 currentFileSelected = path;
                 document.getElementById('compress-item-name').textContent = name;
-                
+
                 // Sugerir nombre para el archivo ZIP (quitar extensión si tiene)
                 const baseName = name.includes('.') ? name.split('.').slice(0, -1).join('.') : name;
                 document.getElementById('zip-filename').value = `${baseName}.zip`;
-                
+
                 compressToZipModal.show();
             }
-            
+
             // Función para mostrar diálogo de extracción
             function showExtractDialog(path, name) {
                 currentFileSelected = path;
                 document.getElementById('extract-file-name').textContent = name;
                 document.getElementById('extract-dir').value = '';
-                
+
                 extractFileModal.show();
             }
         });
