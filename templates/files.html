@@ -707,7 +707,7 @@
         <div class="container text-center">
             <span class="text-light">CODESTORM-Assistant © 2025 | Herramienta de Desarrollo Impulsada por IA</span>
         </div>
-    </footer
+    </</footer>
 
     <!-- JavaScript -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
@@ -1519,7 +1519,6 @@
 
             function deleteItem(path) {
                 console.log(`[Explorer] Intentando eliminar: ${path}`);
-
                 // Deshabilitar temporalmente la interfaz durante la operación
                 const btnConfirmDelete = document.getElementById('btn-confirm-delete');
                 if (btnConfirmDelete) {
@@ -1539,7 +1538,7 @@
                     elementToDelete.style.pointerEvents = 'none';
                 }
 
-                fetch(`/api/explorer/delete?path=${encodeURIComponent(path)}&workspace_id=default`, {
+                fetch(`/api/explorer/delete?path=${encodeURIComponent(path.replace('user_workspaces/default/', ''))}&workspace_id=default`, {
                     method: 'DELETE',
                     headers: { 'Content-Type': 'application/json' }
                 })

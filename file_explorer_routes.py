@@ -757,7 +757,7 @@ def delete_file_or_directory():
     try:
         # Log the incoming request for debugging
         logger.debug(f"Delete request: Method={request.method}, Content-Type={request.content_type}")
-        
+
         # Handle both JSON and query parameters for maximum flexibility
         if request.method == 'DELETE':
             # For DELETE requests, typically path is in query parameters
@@ -781,30 +781,31 @@ def delete_file_or_directory():
             except Exception as e:
                 logger.error(f"Error parsing request data: {str(e)}")
                 path = ''
-                
+
         # Log the path we're trying to delete
         logger.debug(f"Attempting to delete path: {path}")
-            
+
         # Get workspace ID from either JSON or query params
         workspace_id = request.args.get('workspace_id', 'default')
-        
+
         if not path:
             logger.error("No path provided for deletion")
             return jsonify({'error': 'No path provided'}), 400
 
         # Get the user workspace
         workspace_path = os.path.join('user_workspaces', workspace_id)
-        
+
         # Limpiar y normalizar la ruta
         # Eliminar posibles referencias a workspace en la ruta
         if path.startswith('user_workspaces/'):
             path = path[path.find('/', 15) + 1:]  # Saltar después de "user_workspaces/default/"
-        
+
         # Eliminar './' al inicio si existe
         path = path.lstrip('./')
-        
+
         # Build target path correctamente
         target_path = os.path.join(workspace_path, path)
+        logger.debug(f"Path normalizado: {path}")
         logger.debug(f"Target path for deletion: {target_path}")
 
         # Verify path is within workspace
@@ -857,7 +858,7 @@ def upload_chunk():
         if 'chunk' not in request.files:
             return jsonify({
                 'success': False,
-                'error': 'No se ha enviado ningún fragmento de archivo'
+'error': 'No se ha enviado ningún fragmento de archivo'
             }), 400
 
         chunk = request.files['chunk']
