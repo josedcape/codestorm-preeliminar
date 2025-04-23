@@ -1,13 +1,5 @@
-Collecting anthropic
-  Downloading anthropic-0.50.0-py3-none-any.whl.metadata (25 kB)
-Collecting email-validator
-  Downloading email_validator-2.2.0-py3-none-any.whl.metadata (25 kB)
-Requirement already satisfied: flask-cors in ./.pythonlibs/lib/python3.11/site-packages (5.0.1)
-Requirement already satisfied: flask in ./.pythonlibs/lib/python3.11/site-packages (3.1.0)
-Requirement already satisfied: flask-sqlalchemy in ./.pythonlibs/lib/python3.11/site-packages (3.1.1)
-Collecting gunicorn
-  Downloading gunicorn-23.0.0-py3-none-any.whl.metadata (4.4 kB)
-Requirement already satisfied: openai in ./.pythonlibs/lib/python3.11/site-packages (1.75.0)
+Collecting openai
+  Downloading openai-1.76.0-py3-none-any.whl.metadata (25 kB)
 Collecting psycopg2-binary
   Downloading psycopg2_binary-2.9.10-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (4.9 kB)
 Requirement already satisfied: python-dotenv in ./.pythonlibs/lib/python3.11/site-packages (1.1.0)
@@ -18,7 +10,8 @@ Requirement already satisfied: sqlalchemy in ./.pythonlibs/lib/python3.11/site-p
 Requirement already satisfied: werkzeug in ./.pythonlibs/lib/python3.11/site-packages (3.1.3)
 Collecting numpy
   Downloading numpy-2.2.5-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (62 kB)
-     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 62.0/62.0 kB 2.6 MB/s eta 0:00:00
+     ━━━━━━━━ 62.0/62.0 4.2 MB/s eta 0:00:00
+              kB                            
 Collecting google-generativeai
   Downloading google_generativeai-0.8.5-py3-none-any.whl.metadata (3.9 kB)
 Collecting gitpython
@@ -31,13 +24,10 @@ Collecting beautifulsoup4
   Downloading beautifulsoup4-4.13.4-py3-none-any.whl.metadata (3.8 kB)
 Collecting ebooklib
   Downloading EbookLib-0.18.tar.gz (115 kB)
-     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 115.5/115.5 kB 7.5 MB/s eta 0:00:00
-  Installing build dependencies: started
-  Installing build dependencies: finished with status 'done'
-  Getting requirements to build wheel: started
-  Getting requirements to build wheel: finished with status 'done'
-  Preparing metadata (pyproject.toml): started
-  Preparing metadata (pyproject.toml): finished with status 'done'
+     ━━━━━━━━ 115.5/11… 6.9 MB/s eta 0:00:00
+              kB                            
+  Preparing metadata (setup.py): started
+  Preparing metadata (setup.py): finished with status 'done'
 Collecting markdown
   Downloading markdown-3.8-py3-none-any.whl.metadata (5.1 kB)
 Collecting python-docx
@@ -48,35 +38,34 @@ Collecting pypdf
   Downloading pypdf-5.4.0-py3-none-any.whl.metadata (7.3 kB)
 Collecting docx
   Downloading docx-0.2.4.tar.gz (54 kB)
-     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 54.9/54.9 kB 4.3 MB/s eta 0:00:00
-  Installing build dependencies: started
-  Installing build dependencies: finished with status 'done'
-  Getting requirements to build wheel: started
-  Getting requirements to build wheel: finished with status 'done'
-  Preparing metadata (pyproject.toml): started
-  Preparing metadata (pyproject.toml): finished with status 'done'
+     ━━━━━━━━ 54.9/54.9 2.6 MB/s eta 0:00:00
+              kB                            
+  Preparing metadata (setup.py): started
+  Preparing metadata (setup.py): finished with status 'done'
 Collecting twilio
   Downloading twilio-9.5.2-py2.py3-none-any.whl.metadata (12 kB)
 Collecting rarfile
   Downloading rarfile-4.2-py3-none-any.whl.metadata (4.4 kB)
-Requirement already satisfied: anyio<5,>=3.5.0 in ./.pythonlibs/lib/python3.11/site-packages (from anthropic) (4.9.0)
-Requirement already satisfied: distro<2,>=1.7.0 in ./.pythonlibs/lib/python3.11/site-packages (from anthropic) (1.9.0)
-Requirement already satisfied: httpx<1,>=0.25.0 in ./.pythonlibs/lib/python3.11/site-packages (from anthropic) (0.28.1)
-Requirement already satisfied: jiter<1,>=0.4.0 in ./.pythonlibs/lib/python3.11/site-packages (from anthropic) (0.9.0)
-Requirement already satisfied: pydantic<3,>=1.9.0 in ./.pythonlibs/lib/python3.11/site-packages (from anthropic) (2.11.3)
-Requirement already satisfied: sniffio in ./.pythonlibs/lib/python3.11/site-packages (from anthropic) (1.3.1)
-Requirement already satisfied: typing-extensions<5,>=4.10 in ./.pythonlibs/lib/python3.11/site-packages (from anthropic) (4.13.2)
-Collecting dnspython>=2.0.0 (from email-validator)
-  Downloading dnspython-2.7.0-py3-none-any.whl.metadata (5.8 kB)
-Requirement already satisfied: idna>=2.0.0 in ./.pythonlibs/lib/python3.11/site-packages (from email-validator) (3.10)
-Requirement already satisfied: Jinja2>=3.1.2 in ./.pythonlibs/lib/python3.11/site-packages (from flask) (3.1.6)
-Requirement already satisfied: itsdangerous>=2.2 in ./.pythonlibs/lib/python3.11/site-packages (from flask) (2.2.0)
-Requirement already satisfied: click>=8.1.3 in ./.pythonlibs/lib/python3.11/site-packages (from flask) (8.1.8)
-Requirement already satisfied: blinker>=1.9 in ./.pythonlibs/lib/python3.11/site-packages (from flask) (1.9.0)
-Collecting packaging (from gunicorn)
-  Downloading packaging-25.0-py3-none-any.whl.metadata (3.3 kB)
-Requirement already satisfied: tqdm>4 in ./.pythonlibs/lib/python3.11/site-packages (from openai) (4.67.1)
+Collecting anyio<5,>=3.5.0 (from openai)
+  Downloading anyio-4.9.0-py3-none-any.whl.metadata (4.7 kB)
+Collecting distro<2,>=1.7.0 (from openai)
+  Downloading distro-1.9.0-py3-none-any.whl.metadata (6.8 kB)
+Collecting httpx<1,>=0.23.0 (from openai)
+  Downloading httpx-0.28.1-py3-none-any.whl.metadata (7.1 kB)
+Collecting jiter<1,>=0.4.0 (from openai)
+  Downloading jiter-0.9.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (5.2 kB)
+Requirement already satisfied: pydantic<3,>=1.9.0 in ./.pythonlibs/lib/python3.11/site-packages (from openai) (2.11.3)
+Collecting sniffio (from openai)
+  Downloading sniffio-1.3.1-py3-none-any.whl.metadata (3.9 kB)
+Collecting tqdm>4 (from openai)
+  Downloading tqdm-4.67.1-py3-none-any.whl.metadata (57 kB)
+     ━━━━━━━━ 57.7/57.7 5.7 MB/s eta 0:00:00
+              kB                            
+Requirement already satisfied: typing-extensions<5,>=4.11 in ./.pythonlibs/lib/python3.11/site-packages (from openai) (4.13.2)
+Requirement already satisfied: Flask>=0.9 in ./.pythonlibs/lib/python3.11/site-packages (from flask-socketio) (3.1.0)
 Requirement already satisfied: python-socketio>=5.12.0 in ./.pythonlibs/lib/python3.11/site-packages (from flask-socketio) (5.13.0)
+Collecting dnspython>=1.15.0 (from eventlet)
+  Downloading dnspython-2.7.0-py3-none-any.whl.metadata (5.8 kB)
 Requirement already satisfied: greenlet>=1.0 in ./.pythonlibs/lib/python3.11/site-packages (from eventlet) (3.2.1)
 Requirement already satisfied: MarkupSafe>=2.1.1 in ./.pythonlibs/lib/python3.11/site-packages (from werkzeug) (3.0.2)
 Collecting google-ai-generativelanguage==0.6.15 (from google-generativeai)
@@ -97,9 +86,12 @@ Collecting gitdb<5,>=4.0.1 (from gitpython)
   Downloading gitdb-4.0.12-py3-none-any.whl.metadata (1.2 kB)
 Collecting charset-normalizer<4,>=2 (from requests)
   Downloading charset_normalizer-3.4.1-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (35 kB)
+Collecting idna<4,>=2.5 (from requests)
+  Downloading idna-3.10-py3-none-any.whl.metadata (10 kB)
 Collecting urllib3<3,>=1.21.1 (from requests)
   Downloading urllib3-2.4.0-py3-none-any.whl.metadata (6.5 kB)
-Requirement already satisfied: certifi>=2017.4.17 in ./.pythonlibs/lib/python3.11/site-packages (from requests) (2025.1.31)
+Collecting certifi>=2017.4.17 (from requests)
+  Downloading certifi-2025.1.31-py3-none-any.whl.metadata (2.5 kB)
 Collecting courlan>=1.3.2 (from trafilatura)
   Downloading courlan-1.3.2-py3-none-any.whl.metadata (17 kB)
 Collecting htmldate>=1.9.2 (from trafilatura)
@@ -136,11 +128,16 @@ Collecting propcache>=0.2.0 (from aiohttp>=3.8.4->twilio)
   Downloading propcache-0.3.1-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (10 kB)
 Collecting yarl<2.0,>=1.17.0 (from aiohttp>=3.8.4->twilio)
   Downloading yarl-1.20.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (72 kB)
-     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 72.4/72.4 kB 6.7 MB/s eta 0:00:00
+     ━━━━━━━━ 72.4/72.4 10.0     eta 0:00:00
+              kB        MB/s                
 Collecting babel>=2.16.0 (from courlan>=1.3.2->trafilatura)
   Downloading babel-2.17.0-py3-none-any.whl.metadata (2.0 kB)
 Collecting tld>=0.13 (from courlan>=1.3.2->trafilatura)
   Downloading tld-0.13-py2.py3-none-any.whl.metadata (9.4 kB)
+Requirement already satisfied: Jinja2>=3.1.2 in ./.pythonlibs/lib/python3.11/site-packages (from Flask>=0.9->flask-socketio) (3.1.6)
+Requirement already satisfied: itsdangerous>=2.2 in ./.pythonlibs/lib/python3.11/site-packages (from Flask>=0.9->flask-socketio) (2.2.0)
+Requirement already satisfied: click>=8.1.3 in ./.pythonlibs/lib/python3.11/site-packages (from Flask>=0.9->flask-socketio) (8.1.8)
+Requirement already satisfied: blinker>=1.9 in ./.pythonlibs/lib/python3.11/site-packages (from Flask>=0.9->flask-socketio) (1.9.0)
 Collecting smmap<6,>=3.0.1 (from gitdb<5,>=4.0.1->gitpython)
   Downloading smmap-5.0.2-py3-none-any.whl.metadata (4.3 kB)
 Collecting googleapis-common-protos<2.0.0,>=1.56.2 (from google-api-core->google-generativeai)
@@ -155,11 +152,12 @@ Collecting dateparser>=1.1.2 (from htmldate>=1.9.2->trafilatura)
   Downloading dateparser-1.2.1-py3-none-any.whl.metadata (29 kB)
 Collecting python-dateutil>=2.9.0.post0 (from htmldate>=1.9.2->trafilatura)
   Downloading python_dateutil-2.9.0.post0-py2.py3-none-any.whl.metadata (8.4 kB)
-Requirement already satisfied: httpcore==1.* in ./.pythonlibs/lib/python3.11/site-packages (from httpx<1,>=0.25.0->anthropic) (1.0.8)
-Requirement already satisfied: h11<0.15,>=0.13 in ./.pythonlibs/lib/python3.11/site-packages (from httpcore==1.*->httpx<1,>=0.25.0->anthropic) (0.14.0)
-Requirement already satisfied: annotated-types>=0.6.0 in ./.pythonlibs/lib/python3.11/site-packages (from pydantic<3,>=1.9.0->anthropic) (0.7.0)
-Requirement already satisfied: pydantic-core==2.33.1 in ./.pythonlibs/lib/python3.11/site-packages (from pydantic<3,>=1.9.0->anthropic) (2.33.1)
-Requirement already satisfied: typing-inspection>=0.4.0 in ./.pythonlibs/lib/python3.11/site-packages (from pydantic<3,>=1.9.0->anthropic) (0.4.0)
+Collecting httpcore==1.* (from httpx<1,>=0.23.0->openai)
+  Downloading httpcore-1.0.8-py3-none-any.whl.metadata (21 kB)
+Requirement already satisfied: h11<0.15,>=0.13 in ./.pythonlibs/lib/python3.11/site-packages (from httpcore==1.*->httpx<1,>=0.23.0->openai) (0.14.0)
+Requirement already satisfied: annotated-types>=0.6.0 in ./.pythonlibs/lib/python3.11/site-packages (from pydantic<3,>=1.9.0->openai) (0.7.0)
+Requirement already satisfied: pydantic-core==2.33.1 in ./.pythonlibs/lib/python3.11/site-packages (from pydantic<3,>=1.9.0->openai) (2.33.1)
+Requirement already satisfied: typing-inspection>=0.4.0 in ./.pythonlibs/lib/python3.11/site-packages (from pydantic<3,>=1.9.0->openai) (0.4.0)
 Requirement already satisfied: bidict>=0.21.0 in ./.pythonlibs/lib/python3.11/site-packages (from python-socketio>=5.12.0->flask-socketio) (0.23.1)
 Requirement already satisfied: python-engineio>=4.11.0 in ./.pythonlibs/lib/python3.11/site-packages (from python-socketio>=5.12.0->flask-socketio) (4.12.0)
 Collecting httplib2<1.0.0,>=0.19.0 (from google-api-python-client->google-generativeai)
@@ -172,7 +170,8 @@ Collecting pytz>=2024.2 (from dateparser>=1.1.2->htmldate>=1.9.2->trafilatura)
   Downloading pytz-2025.2-py2.py3-none-any.whl.metadata (22 kB)
 Collecting regex!=2019.02.19,!=2021.8.27,>=2015.06.24 (from dateparser>=1.1.2->htmldate>=1.9.2->trafilatura)
   Downloading regex-2024.11.6-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (40 kB)
-     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 40.5/40.5 kB 3.0 MB/s eta 0:00:00
+     ━━━━━━━━ 40.5/40.5 3.1 MB/s eta 0:00:00
+              kB                            
 Collecting tzlocal>=0.2 (from dateparser>=1.1.2->htmldate>=1.9.2->trafilatura)
   Downloading tzlocal-5.3.1-py3-none-any.whl.metadata (7.6 kB)
 Collecting grpcio<2.0dev,>=1.33.2 (from google-api-core[grpc]!=2.0.*,!=2.1.*,!=2.10.*,!=2.2.*,!=2.3.*,!=2.4.*,!=2.5.*,!=2.6.*,!=2.7.*,!=2.8.*,!=2.9.*,<3.0.0dev,>=1.34.1->google-ai-generativelanguage==0.6.15->google-generativeai)
@@ -187,129 +186,193 @@ Collecting pyasn1<0.7.0,>=0.6.1 (from pyasn1-modules>=0.2.1->google-auth>=2.15.0
   Downloading pyasn1-0.6.1-py3-none-any.whl.metadata (8.4 kB)
 Requirement already satisfied: simple-websocket>=0.10.0 in ./.pythonlibs/lib/python3.11/site-packages (from python-engineio>=4.11.0->python-socketio>=5.12.0->flask-socketio) (1.1.0)
 Requirement already satisfied: wsproto in ./.pythonlibs/lib/python3.11/site-packages (from simple-websocket>=0.10.0->python-engineio>=4.11.0->python-socketio>=5.12.0->flask-socketio) (1.2.0)
-Downloading anthropic-0.50.0-py3-none-any.whl (245 kB)
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 245.3/245.3 kB 11.6 MB/s eta 0:00:00
-Downloading email_validator-2.2.0-py3-none-any.whl (33 kB)
-Downloading gunicorn-23.0.0-py3-none-any.whl (85 kB)
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 85.0/85.0 kB 5.6 MB/s eta 0:00:00
+Downloading openai-1.76.0-py3-none-any.whl (661 kB)
+   ━━━━━━━━━ 661.2/66… 31.0 MB/s eta 0:00:00
+             kB                             
 Downloading psycopg2_binary-2.9.10-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (3.0 MB)
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 3.0/3.0 MB 63.8 MB/s eta 0:00:00
+   ━━━━━━━━━ 3.0/3.0   46.4 MB/s eta 0:00:00
+             MB                             
 Downloading eventlet-0.39.1-py3-none-any.whl (363 kB)
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 363.5/363.5 kB 27.3 MB/s eta 0:00:00
+   ━━━━━━━━━ 363.5/36… 21.0 MB/s eta 0:00:00
+             kB                             
 Downloading numpy-2.2.5-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (16.4 MB)
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 16.4/16.4 MB 73.0 MB/s eta 0:00:00
+   ━━━━━━━━━ 16.4/16.4 60.5 MB/s eta 0:00:00
+             MB                             
 Downloading google_generativeai-0.8.5-py3-none-any.whl (155 kB)
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 155.4/155.4 kB 15.4 MB/s eta 0:00:00
+   ━━━━━━━━━━ 155.4/15… 9.5 MB/s eta 0:00:00
+              kB                            
 Downloading google_ai_generativelanguage-0.6.15-py3-none-any.whl (1.3 MB)
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.3/1.3 MB 52.2 MB/s eta 0:00:00
+   ━━━━━━━━━ 1.3/1.3   38.2 MB/s eta 0:00:00
+             MB                             
 Downloading GitPython-3.1.44-py3-none-any.whl (207 kB)
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 207.6/207.6 kB 14.3 MB/s eta 0:00:00
+   ━━━━━━━━━ 207.6/20… 22.1 MB/s eta 0:00:00
+             kB                             
 Downloading requests-2.32.3-py3-none-any.whl (64 kB)
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 64.9/64.9 kB 5.9 MB/s eta 0:00:00
+   ━━━━━━━━━━ 64.9/64.9 5.4 MB/s eta 0:00:00
+              kB                            
 Downloading trafilatura-2.0.0-py3-none-any.whl (132 kB)
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 132.6/132.6 kB 13.1 MB/s eta 0:00:00
+   ━━━━━━━━━ 132.6/13… 15.2 MB/s eta 0:00:00
+             kB                             
 Downloading beautifulsoup4-4.13.4-py3-none-any.whl (187 kB)
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 187.3/187.3 kB 19.7 MB/s eta 0:00:00
+   ━━━━━━━━━ 187.3/18… 10.4 MB/s eta 0:00:00
+             kB                             
 Downloading markdown-3.8-py3-none-any.whl (106 kB)
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 106.2/106.2 kB 11.6 MB/s eta 0:00:00
+   ━━━━━━━━━ 106.2/10… 12.8 MB/s eta 0:00:00
+             kB                             
 Downloading python_docx-1.1.2-py3-none-any.whl (244 kB)
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 244.3/244.3 kB 23.9 MB/s eta 0:00:00
+   ━━━━━━━━━ 244.3/24… 23.9 MB/s eta 0:00:00
+             kB                             
 Downloading python_pptx-1.0.2-py3-none-any.whl (472 kB)
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 472.8/472.8 kB 37.9 MB/s eta 0:00:00
+   ━━━━━━━━━ 472.8/47… 28.6 MB/s eta 0:00:00
+             kB                             
 Downloading pypdf-5.4.0-py3-none-any.whl (302 kB)
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 302.3/302.3 kB 26.4 MB/s eta 0:00:00
+   ━━━━━━━━━ 302.3/30… 26.9 MB/s eta 0:00:00
+             kB                             
 Downloading twilio-9.5.2-py2.py3-none-any.whl (1.9 MB)
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.9/1.9 MB 62.3 MB/s eta 0:00:00
+   ━━━━━━━━━ 1.9/1.9   26.3 MB/s eta 0:00:00
+             MB                             
 Downloading rarfile-4.2-py3-none-any.whl (29 kB)
 Downloading aiohttp-3.11.18-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (1.7 MB)
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.7/1.7 MB 46.8 MB/s eta 0:00:00
+   ━━━━━━━━━ 1.7/1.7   20.2 MB/s eta 0:00:00
+             MB                             
 Downloading aiohttp_retry-2.9.1-py3-none-any.whl (10.0 kB)
+Downloading anyio-4.9.0-py3-none-any.whl (100 kB)
+   ━━━━━━━━━ 100.9/10… 13.5 MB/s eta 0:00:00
+             kB                             
+Downloading certifi-2025.1.31-py3-none-any.whl (166 kB)
+   ━━━━━━━━━ 166.4/16… 12.5 MB/s eta 0:00:00
+             kB                             
 Downloading charset_normalizer-3.4.1-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (143 kB)
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 143.9/143.9 kB 12.0 MB/s eta 0:00:00
+   ━━━━━━━━━━ 143.9/14… 9.5 MB/s eta 0:00:00
+              kB                            
 Downloading courlan-1.3.2-py3-none-any.whl (33 kB)
+Downloading distro-1.9.0-py3-none-any.whl (20 kB)
 Downloading dnspython-2.7.0-py3-none-any.whl (313 kB)
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 313.6/313.6 kB 26.1 MB/s eta 0:00:00
+   ━━━━━━━━━ 313.6/31… 30.5 MB/s eta 0:00:00
+             kB                             
 Downloading gitdb-4.0.12-py3-none-any.whl (62 kB)
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 62.8/62.8 kB 6.2 MB/s eta 0:00:00
+   ━━━━━━━━━━ 62.8/62.8 8.7 MB/s eta 0:00:00
+              kB                            
 Downloading google_api_core-2.24.2-py3-none-any.whl (160 kB)
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 160.1/160.1 kB 12.7 MB/s eta 0:00:00
+   ━━━━━━━━━ 160.1/16… 15.6 MB/s eta 0:00:00
+             kB                             
 Downloading google_auth-2.39.0-py2.py3-none-any.whl (212 kB)
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 212.3/212.3 kB 21.7 MB/s eta 0:00:00
+   ━━━━━━━━━━ 212.3/21… 8.9 MB/s eta 0:00:00
+              kB                            
 Downloading htmldate-1.9.3-py3-none-any.whl (31 kB)
+Downloading httpx-0.28.1-py3-none-any.whl (73 kB)
+   ━━━━━━━━━━ 73.5/73.5 6.4 MB/s eta 0:00:00
+              kB                            
+Downloading httpcore-1.0.8-py3-none-any.whl (78 kB)
+   ━━━━━━━━━━ 78.7/78.7 1.3 MB/s eta 0:00:00
+              kB                            
+Downloading idna-3.10-py3-none-any.whl (70 kB)
+   ━━━━━━━━━━ 70.4/70.4 7.0 MB/s eta 0:00:00
+              kB                            
+Downloading jiter-0.9.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (351 kB)
+   ━━━━━━━━━ 351.8/35… 29.5 MB/s eta 0:00:00
+             kB                             
 Downloading justext-3.0.2-py2.py3-none-any.whl (837 kB)
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 837.9/837.9 kB 48.4 MB/s eta 0:00:00
+   ━━━━━━━━━ 837.9/83… 53.3 MB/s eta 0:00:00
+             kB                             
 Downloading lxml-5.4.0-cp311-cp311-manylinux_2_28_x86_64.whl (4.9 MB)
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 4.9/4.9 MB 91.1 MB/s eta 0:00:00
+   ━━━━━━━━━ 4.9/4.9   45.4 MB/s eta 0:00:00
+             MB                             
 Downloading pillow-11.2.1-cp311-cp311-manylinux_2_28_x86_64.whl (4.6 MB)
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 4.6/4.6 MB 69.3 MB/s eta 0:00:00
+   ━━━━━━━━━ 4.6/4.6   48.6 MB/s eta 0:00:00
+             MB                             
 Downloading protobuf-5.29.4-cp38-abi3-manylinux2014_x86_64.whl (319 kB)
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 319.7/319.7 kB 13.5 MB/s eta 0:00:00
+   ━━━━━━━━━ 319.7/31… 24.4 MB/s eta 0:00:00
+             kB                             
 Downloading PyJWT-2.10.1-py3-none-any.whl (22 kB)
+Downloading sniffio-1.3.1-py3-none-any.whl (10 kB)
 Downloading soupsieve-2.7-py3-none-any.whl (36 kB)
+Downloading tqdm-4.67.1-py3-none-any.whl (78 kB)
+   ━━━━━━━━━━ 78.5/78.5 8.4 MB/s eta 0:00:00
+              kB                            
 Downloading urllib3-2.4.0-py3-none-any.whl (128 kB)
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 128.7/128.7 kB 13.9 MB/s eta 0:00:00
+   ━━━━━━━━━ 128.7/12… 14.8 MB/s eta 0:00:00
+             kB                             
 Downloading XlsxWriter-3.2.3-py3-none-any.whl (169 kB)
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 169.4/169.4 kB 13.7 MB/s eta 0:00:00
+   ━━━━━━━━━ 169.4/16… 17.9 MB/s eta 0:00:00
+             kB                             
 Downloading google_api_python_client-2.167.0-py2.py3-none-any.whl (13.2 MB)
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 13.2/13.2 MB 88.7 MB/s eta 0:00:00
-Downloading packaging-25.0-py3-none-any.whl (66 kB)
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 66.5/66.5 kB 5.7 MB/s eta 0:00:00
+   ━━━━━━━━━ 13.2/13.2 63.6 MB/s eta 0:00:00
+             MB                             
 Downloading six-1.17.0-py2.py3-none-any.whl (11 kB)
 Downloading aiohappyeyeballs-2.6.1-py3-none-any.whl (15 kB)
 Downloading aiosignal-1.3.2-py2.py3-none-any.whl (7.6 kB)
 Downloading attrs-25.3.0-py3-none-any.whl (63 kB)
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 63.8/63.8 kB 5.7 MB/s eta 0:00:00
+   ━━━━━━━━━━ 63.8/63.8 7.8 MB/s eta 0:00:00
+              kB                            
 Downloading babel-2.17.0-py3-none-any.whl (10.2 MB)
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 10.2/10.2 MB 79.7 MB/s eta 0:00:00
+   ━━━━━━━━━ 10.2/10.2 68.6 MB/s eta 0:00:00
+             MB                             
 Downloading cachetools-5.5.2-py3-none-any.whl (10 kB)
 Downloading dateparser-1.2.1-py3-none-any.whl (295 kB)
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 295.7/295.7 kB 25.5 MB/s eta 0:00:00
+   ━━━━━━━━━ 295.7/29… 20.0 MB/s eta 0:00:00
+             kB                             
 Downloading frozenlist-1.6.0-cp311-cp311-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl (313 kB)
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 313.6/313.6 kB 13.3 MB/s eta 0:00:00
+   ━━━━━━━━━ 313.6/31… 22.2 MB/s eta 0:00:00
+             kB                             
 Downloading google_auth_httplib2-0.2.0-py2.py3-none-any.whl (9.3 kB)
 Downloading googleapis_common_protos-1.70.0-py3-none-any.whl (294 kB)
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 294.5/294.5 kB 22.6 MB/s eta 0:00:00
+   ━━━━━━━━━ 294.5/29… 20.1 MB/s eta 0:00:00
+             kB                             
 Downloading httplib2-0.22.0-py3-none-any.whl (96 kB)
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 96.9/96.9 kB 9.7 MB/s eta 0:00:00
+   ━━━━━━━━━ 96.9/96.9 10.0 MB/s eta 0:00:00
+             kB                             
 Downloading multidict-6.4.3-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (223 kB)
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 223.5/223.5 kB 19.3 MB/s eta 0:00:00
+   ━━━━━━━━━ 223.5/22… 16.4 MB/s eta 0:00:00
+             kB                             
 Downloading propcache-0.3.1-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (232 kB)
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 232.5/232.5 kB 7.2 MB/s eta 0:00:00
+   ━━━━━━━━━ 232.5/23… 19.4 MB/s eta 0:00:00
+             kB                             
 Downloading proto_plus-1.26.1-py3-none-any.whl (50 kB)
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 50.2/50.2 kB 3.1 MB/s eta 0:00:00
+   ━━━━━━━━━━ 50.2/50.2 5.1 MB/s eta 0:00:00
+              kB                            
 Downloading pyasn1_modules-0.4.2-py3-none-any.whl (181 kB)
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 181.3/181.3 kB 12.9 MB/s eta 0:00:00
+   ━━━━━━━━━ 181.3/18… 15.8 MB/s eta 0:00:00
+             kB                             
 Downloading python_dateutil-2.9.0.post0-py2.py3-none-any.whl (229 kB)
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 229.9/229.9 kB 10.9 MB/s eta 0:00:00
+   ━━━━━━━━━━ 229.9/22… 3.8 MB/s eta 0:00:00
+              kB                            
 Downloading rsa-4.9.1-py3-none-any.whl (34 kB)
 Downloading smmap-5.0.2-py3-none-any.whl (24 kB)
 Downloading tld-0.13-py2.py3-none-any.whl (263 kB)
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 263.8/263.8 kB 23.4 MB/s eta 0:00:00
+   ━━━━━━━━━━ 263.8/26… 4.8 MB/s eta 0:00:00
+              kB                            
 Downloading uritemplate-4.1.1-py2.py3-none-any.whl (10 kB)
 Downloading yarl-1.20.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (358 kB)
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 358.1/358.1 kB 26.0 MB/s eta 0:00:00
+   ━━━━━━━━━ 358.1/35… 25.3 MB/s eta 0:00:00
+             kB                             
 Downloading grpcio-1.71.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (5.9 MB)
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 5.9/5.9 MB 88.7 MB/s eta 0:00:00
+   ━━━━━━━━━ 5.9/5.9   58.0 MB/s eta 0:00:00
+             MB                             
 Downloading grpcio_status-1.71.0-py3-none-any.whl (14 kB)
 Downloading pyasn1-0.6.1-py3-none-any.whl (83 kB)
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 83.1/83.1 kB 7.9 MB/s eta 0:00:00
+   ━━━━━━━━━━ 83.1/83.1 8.4 MB/s eta 0:00:00
+              kB                            
 Downloading pyparsing-3.2.3-py3-none-any.whl (111 kB)
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 111.1/111.1 kB 12.4 MB/s eta 0:00:00
+   ━━━━━━━━━ 111.1/11… 13.5 MB/s eta 0:00:00
+             kB                             
 Downloading pytz-2025.2-py2.py3-none-any.whl (509 kB)
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 509.2/509.2 kB 32.9 MB/s eta 0:00:00
+   ━━━━━━━━━ 509.2/50… 20.3 MB/s eta 0:00:00
+             kB                             
 Downloading regex-2024.11.6-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (792 kB)
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 792.7/792.7 kB 45.9 MB/s eta 0:00:00
+   ━━━━━━━━━ 792.7/79… 50.1 MB/s eta 0:00:00
+             kB                             
 Downloading tzlocal-5.3.1-py3-none-any.whl (18 kB)
 Downloading lxml_html_clean-0.4.2-py3-none-any.whl (14 kB)
 Building wheels for collected packages: ebooklib, docx
-  Building wheel for ebooklib (pyproject.toml): started
-  Building wheel for ebooklib (pyproject.toml): finished with status 'done'
-  Created wheel for ebooklib: filename=ebooklib-0.18-py3-none-any.whl size=38883 sha256=07e7ea9509cb221bec25ea37903a9f72f06ad3f50c887b9cee396015396a6078
+  Building wheel for ebooklib (setup.py): started
+  Building wheel for ebooklib (setup.py): finished with status 'done'
+  Created wheel for ebooklib: filename=ebooklib-0.18-py3-none-any.whl size=38883 sha256=ca1ef545fbfc3efce4ca7c6669b296bdb9ce8de563169b6dbaab4efaf8606e1a
   Stored in directory: /home/runner/workspace/.cache/pip/wheels/65/2b/63/68307c736d5a2fafeebe9df3e5eccacfe892204ce1fd31a03c
-  Building wheel for docx (pyproject.toml): started
-  Building wheel for docx (pyproject.toml): finished with status 'done'
-  Created wheel for docx: filename=docx-0.2.4-py3-none-any.whl size=53931 sha256=5786d8ff4ec25db314053d8596c1f6d7dc2fa62b95a0e8dbd13b0e652fb8901f
+  Building wheel for docx (setup.py): started
+  Building wheel for docx (setup.py): finished with status 'done'
+  Created wheel for docx: filename=docx-0.2.4-py3-none-any.whl size=53931 sha256=a344a32a6ecde901b39a29b73ea22fb931c3bd0e30475ea6bdd372bbde3da2ec
   Stored in directory: /home/runner/workspace/.cache/pip/wheels/c1/3e/c3/e81c11effd0be5658a035947c66792dd993bcff317eae0e1ed
 Successfully built ebooklib docx
-Installing collected packages: pytz, XlsxWriter, urllib3, uritemplate, tzlocal, tld, soupsieve, smmap, six, regex, rarfile, pypdf, pyparsing, PyJWT, pyasn1, psycopg2-binary, protobuf, propcache, Pillow, packaging, numpy, multidict, markdown, lxml, grpcio, frozenlist, dnspython, charset-normalizer, cachetools, babel, attrs, aiohappyeyeballs, yarl, rsa, requests, python-pptx, python-docx, python-dateutil, pyasn1-modules, proto-plus, lxml_html_clean, httplib2, gunicorn, googleapis-common-protos, gitdb, eventlet, email-validator, ebooklib, docx, courlan, beautifulsoup4, aiosignal, grpcio-status, google-auth, gitpython, dateparser, anthropic, aiohttp, justext, htmldate, google-auth-httplib2, google-api-core, aiohttp-retry, twilio, trafilatura, google-api-python-client, google-ai-generativelanguage, google-generativeai
-Successfully installed Pillow-11.2.1 PyJWT-2.10.1 XlsxWriter-3.2.3 aiohappyeyeballs-2.6.1 aiohttp-3.11.18 aiohttp-retry-2.9.1 aiosignal-1.3.2 anthropic-0.50.0 attrs-25.3.0 babel-2.17.0 beautifulsoup4-4.13.4 cachetools-5.5.2 charset-normalizer-3.4.1 courlan-1.3.2 dateparser-1.2.1 dnspython-2.7.0 docx-0.2.4 ebooklib-0.18 email-validator-2.2.0 eventlet-0.39.1 frozenlist-1.6.0 gitdb-4.0.12 gitpython-3.1.44 google-ai-generativelanguage-0.6.15 google-api-core-2.24.2 google-api-python-client-2.167.0 google-auth-2.39.0 google-auth-httplib2-0.2.0 google-generativeai-0.8.5 googleapis-common-protos-1.70.0 grpcio-1.71.0 grpcio-status-1.71.0 gunicorn-23.0.0 htmldate-1.9.3 httplib2-0.22.0 justext-3.0.2 lxml-5.4.0 lxml_html_clean-0.4.2 markdown-3.8 multidict-6.4.3 numpy-2.2.5 packaging-25.0 propcache-0.3.1 proto-plus-1.26.1 protobuf-5.29.4 psycopg2-binary-2.9.10 pyasn1-0.6.1 pyasn1-modules-0.4.2 pyparsing-3.2.3 pypdf-5.4.0 python-dateutil-2.9.0.post0 python-docx-1.1.2 python-pptx-1.0.2 pytz-2025.2 rarfile-4.2 regex-2024.11.6 requests-2.32.3 rsa-4.9.1 six-1.17.0 smmap-5.0.2 soupsieve-2.7 tld-0.13 trafilatura-2.0.0 twilio-9.5.2 tzlocal-5.3.1 uritemplate-4.1.1 urllib3-2.4.0 yarl-1.20.0
+Installing collected packages: pytz, XlsxWriter, urllib3, uritemplate, tzlocal, tqdm, tld, soupsieve, sniffio, smmap, six, regex, rarfile, pypdf, pyparsing, PyJWT, pyasn1, psycopg2-binary, protobuf, propcache, Pillow, numpy, multidict, markdown, lxml, jiter, idna, grpcio, frozenlist, dnspython, distro, charset-normalizer, certifi, cachetools, babel, attrs, aiohappyeyeballs, yarl, rsa, requests, python-pptx, python-docx, python-dateutil, pyasn1-modules, proto-plus, lxml_html_clean, httplib2, httpcore, googleapis-common-protos, gitdb, eventlet, ebooklib, docx, courlan, beautifulsoup4, anyio, aiosignal, httpx, grpcio-status, google-auth, gitpython, dateparser, aiohttp, openai, justext, htmldate, google-auth-httplib2, google-api-core, aiohttp-retry, twilio, trafilatura, google-api-python-client, google-ai-generativelanguage, google-generativeai
+Successfully installed Pillow-11.2.1 PyJWT-2.10.1 XlsxWriter-3.2.3 aiohappyeyeballs-2.6.1 aiohttp-3.11.18 aiohttp-retry-2.9.1 aiosignal-1.3.2 anyio-4.9.0 attrs-25.3.0 babel-2.17.0 beautifulsoup4-4.13.4 cachetools-5.5.2 certifi-2025.1.31 charset-normalizer-3.4.1 courlan-1.3.2 dateparser-1.2.1 distro-1.9.0 dnspython-2.7.0 docx-0.2.4 ebooklib-0.18 eventlet-0.39.1 frozenlist-1.6.0 gitdb-4.0.12 gitpython-3.1.44 google-ai-generativelanguage-0.6.15 google-api-core-2.24.2 google-api-python-client-2.167.0 google-auth-2.39.0 google-auth-httplib2-0.2.0 google-generativeai-0.8.5 googleapis-common-protos-1.70.0 grpcio-1.71.0 grpcio-status-1.71.0 htmldate-1.9.3 httpcore-1.0.8 httplib2-0.22.0 httpx-0.28.1 idna-3.10 jiter-0.9.0 justext-3.0.2 lxml-5.4.0 lxml_html_clean-0.4.2 markdown-3.8 multidict-6.4.3 numpy-2.2.5 openai-1.76.0 propcache-0.3.1 proto-plus-1.26.1 protobuf-5.29.4 psycopg2-binary-2.9.10 pyasn1-0.6.1 pyasn1-modules-0.4.2 pyparsing-3.2.3 pypdf-5.4.0 python-dateutil-2.9.0.post0 python-docx-1.1.2 python-pptx-1.0.2 pytz-2025.2 rarfile-4.2 regex-2024.11.6 requests-2.32.3 rsa-4.9.1 six-1.17.0 smmap-5.0.2 sniffio-1.3.1 soupsieve-2.7 tld-0.13 tqdm-4.67.1 trafilatura-2.0.0 twilio-9.5.2 tzlocal-5.3.1 uritemplate-4.1.1 urllib3-2.4.0 yarl-1.20.0
