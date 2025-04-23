@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AUXILIAR OMARDENT</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+            position: relative;
+            background: #090d00;
+            color: rgba(255, 255, 255, 0.25);
+            text-align: center;
+        }
+
+        #video-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: -2;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            max-width: 1200px;
+            gap: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        @media (min-width: 768px) {
+            .container {
+                flex-direction: row;
+                justify-content: space-between;
+            }
+        }
+
+        .chat-section, .video-section {
+            background: rgb(25, 151, 180);
+            background: radial-gradient(circle, rgba(25, 151, 180, 1) 8%, rgba(47, 165, 194, 1) 53%, rgba(206, 207, 231, 0.9955504966887417) 89%);
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            color: white;
+        }
+
+        .video-section {
+            max-width: 400px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #video-wrapper {
+            position: relative;
+            width: 500px;
+            height: 500px;
+            border: 10px solid gold;
+            border-radius: 50%;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        #video-element {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+
+        .chat-buttons-container {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .chat-buttons-container button {
+            background-color: #fff;
+            color: #008080;
+            border: none;
+            padding: 10px;
+            font-size: 1rem;
+            border-radius: 50%;
+            transition: background-color 0.3s, color 0.3s;
+            cursor: pointer;
+        }
+
+        .chat-buttons-container button:active {
+            background-color: #FFD700;
+            color: #fff;
+        }
+
+        .chat-buttons-container button:hover {
+            background-color: #004d4d;
+            color: #fff;
+        }
+
+        #stop-voice::before { content: '🛑'; font-size: 24px; }
+        #stop-response::before { content: '🔇'; font-size: 24px; }
+        #send-button::before { content: '📤'; font-size: 24px; }
+
+        #control-buttons {
+            margin: 20px;
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        /* From Uiverse.io by JkHuger */
+        .sparkle-button {
+            --active: 0;
+            --bg: radial-gradient(
+                    40% 50% at center 100%,
+                    hsl(270 calc(var(--active) * 97%) 72% / var(--active)),
+                    transparent
+                ),
+                radial-gradient(
+                    80% 100% at center 120%,
+                    hsl(260 calc(var(--active) * 97%) 70% / var(--active)),
+                    transparent
+                ),
+                hsl(260 calc(var(--active) * 97%) calc((var(--active) * 44%) + 12%));
+            background: var(--bg);
+            font-size: 1.2rem;
+            font-weight: 500;
+            border: 0;
+            cursor: pointer;
+            padding: 1em 1em;
+            display: flex;
+            align-items: center;
+            gap: 0.25em;
+            white-space: nowrap;
+            border-radius: 100px;
+            position: relative;
+            box-shadow: 0 0 calc(var(--active) * 3em) calc(var(--active) * 1em) hsl(260 97% 61% / 0.75),
+                0 0em 0 0 hsl(260 calc(var(--active) * 97%) calc((var(--active) * 50%) + 30%)) inset,
+                0 -0.05em 0 0 hsl(260 calc(var(--active) * 97%) calc(var(--active) * 60%)) inset;
+            transition: box-shadow var(--transition), scale var(--transition), background var(--transition);
+            scale: calc(1 + (var(--active) * 0.1));
+            transition: .3s;
+        }
+
+        .sparkle-button:active {
+            scale: 1;
+            transition: .3s;
+        }
+
+        .sparkle path {
+            color: hsl(0 0% calc((var(--active, 0) * 70%) + var(--base)));
+            transform-box: fill-box;
+            transform-origin: center;
+            fill: currentColor;
+            stroke: currentColor;
+            animation-delay: calc((var(--transition) * 1.5) + (var(--delay) * 1s));
+            animation-duration: 0.6s;
+            transition: color var(--transition);
+        }
+
+        .sparkle-button:is(:hover, :focus-visible) path {
+            animation-name: bounce;
+        }
+
+        @keyframes bounce {
+            35%, 65% {
+                scale: var(--scale);
+            }
+        }
+
+        .sparkle path:nth-of-type(1) {
+            --scale: 0.5;
+            --delay: 0.1;
+            --base: 40%;
+        }
+
+        .sparkle path:nth-of-type(2) {
+            --scale: 1.5;
+            --delay: 0.2;
+            --base: 20%;
+        }
+
+        .sparkle path:nth-of-type(3) {
+            --scale: 2.5;
+            --delay: 0.35;
+            --base: 30%;
+        }
+
+        .sparkle-button:before {
+            content: "";
+            position: absolute;
+            inset: -0.2em;
+            z-index: -1;
+            border: 0.25em solid hsl(260 97% 50% / 0.5);
+            border-radius: 100px;
+            opacity: var(--active, 0);
+            transition: opacity var(--transition);
+        }
+
+        .spark {
+            position: absolute;
+            inset: 0;
+            border-radius: 100px;
+            rotate: 0deg;
+            overflow: hidden;
+            mask: linear-gradient(white, transparent 50%);
+            animation: flip calc(var(--spark) * 2) infinite steps(2, end);
+        }
+
+        @keyframes flip {
+            to {
+                rotate: 360deg;
+            }
+        }
+
+        .spark:before {
+            content: "";
+            position: absolute;
+            width: 200%;
+            aspect-ratio: 1;
+            top: 0%;
+            left: 50%;
+            z-index: -1;
+            translate: -50% -15%;
+            rotate: 0;
+            transform: rotate(-90deg);
+            opacity: calc((var(--active)) + 0.4);
+            background: conic-gradient(
+                    from 0deg,
+                    transparent 0 340deg,
+                    white 360deg
+            );
+            transition: opacity var(--transition);
+            animation: rotate var(--spark) linear infinite both;
+        }
+
+        .spark:after {
+            content: "";
+            position: absolute;
+            inset: var(--cut);
+            border-radius: 100px;
+        }
+
+        .backdrop {
+            position: absolute;
+            inset: var(--cut);
+            background: var(--bg);
+            border-radius: 100px;
+            transition: background var(--transition);
+        }
+
+        @keyframes rotate {
+            to {
+                transform: rotate(90deg);
+            }
+        }
+
+        @supports(selector(:has(:is(+ *)))) {
+            body:has(button:is(:hover, :focus-visible)) {
+                --active: 1;
+                --play-state: running;
+            }
+
+            .bodydrop {
+                display: none;
+            }
+        }
+
+        .sparkle-button:is(:hover, :focus-visible) ~ :is(.bodydrop, .particle-pen) {
+            --active: 1;
+            --play-state: runnin;
+        }
+
+        .sparkle-button:is(:hover, :focus-visible) {
+            --active: 1;
+            --play-state: running;
+        }
+
+        .sp {
+            position: relative;
+        }
+
+        .particle-pen {
+            position: absolute;
+            width: 200%;
+            aspect-ratio: 1;
+            top: 50%;
+            left: 50%;
+            translate: -50% -50%;
+            -webkit-mask: radial-gradient(white, transparent 65%);
+            z-index: -1;
+            opacity: var(--active, 0);
+            transition: opacity var(--transition);
+        }
+
+        .particle {
+            fill: white;
+            width: calc(var(--size, 0.25) * 1rem);
+            aspect-ratio: 1;
+            position: absolute;
+            top: calc(var(--y) * 1%);
+            left: calc(var(--x) * 1%);
+            opacity: var(--alpha, 1);
+            animation: float-out calc(var(--duration, 1) * 1s) calc(var(--delay) * -1s) infinite linear;
+            transform-origin: var(--origin-x, 1000%) var(--origin-y, 1000%);
+            z-index: -1;
+            animation-play-state: var(--play-state, paused);
+        }
+
+        .particle path {
+            fill: hsl(0 0% 90%);
+            stroke: none;
+        }
+
+        .particle:nth-of-type(even) {
+            animation-direction: reverse;
+        }
+
+        @keyframes float-out {
+            to {
+                rotate: 360deg;
+            }
+        }
+
+        .text {
+            translate: 2% -6%;
+            letter-spacing: 0.01ch;
+            background: linear-gradient(90deg, hsl(0 0% calc((var(--active) * 100%) + 65%)), hsl(0 0% calc((var(--active) * 100%) + 26%)));
+            -webkit-background-clip: text;
+            color: transparent;
+            transition: background var(--transition);
+        }
+
+        .sparkle-button svg {
+            inline-size: 1.25em;
+            translate: -25% -5%;
+        }
+
+        .spinner {
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .spinner img {
+            width: 60px;
+            height: 60px;
+        }
+
+        #chat-container {
+            margin-top: 20px;
+            width: 100%;
+            max-width: 600px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        #chat-box {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: 10px;
+            background-color: rgba(0, 0, 0, 0.9);
+            border-radius: 10px;
+            position: relative;
+            color: white;
+            max-height: 400px;
+        }
+
+        .chat-bubble {
+            max-width: 70%;
+            padding: 10px;
+            border-radius: 10px;
+            margin: 5px 0;
+            word-wrap: break-word;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .chat-bubble.user {
+            background-color: #007bff;
+            align-self: flex-end;
+        }
+
+        .chat-bubble.assistant {
+            background-color: #004d4d;
+            align-self: flex-start;
+        }
+
+        .assistant-text {
+            font-size: 1.2em;
+            display: inline-block;
+            color: white;
+            opacity: 1;
+            animation: typing 5s steps(40) forwards;
+            overflow: visible;
+            border-right: 2px solid white;
+        }
+
+        @keyframes typing {
+            from {
+                width: 0;
+            }
+            to {
+                width: 100%;
+            }
+        }
+
+        #text-area {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 5px;
+            font-size: 18px;
+        }
+
+        #send-button {
+            margin-top: 10px;
+            padding: 10px;
+            width: 100%;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        #send-button:hover {
+            background-color: #0056b3;
+        }
+
+        #download-summary-button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            background-color: #007bff;
+            color: #fff;
+            font-size: 1rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        #download-summary-button:hover {
+            background-color: #0056b3;
+        }
+
+        #download-summary-button:active {
+            background-color: #004494;
+        }
+
+        #voice-selection {
+            margin: 20px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        #voiceType {
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+        }
+
+        button:hover, select:hover, textarea:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        button {
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:active {
+            background-color: #FFD700;
+        }
+
+        textarea {
+            height: 100px;
+        }
+
+        @media (min-width: 768px) {
+            .container {
+                flex-direction: row;
+                justify-content: space-between;
+            }
+
+            .video-section {
+                max-width: 500px;
+            }
+
+            .chat-section {
+                max-width: 600px;
+            }
+        }
+
+        .button-64 {
+            align-items: center;
+            background-image: linear-gradient(144deg,#AF40FF, #5B42F3 50%,#00DDEB);
+            border: 0;
+            border-radius: 8px;
+            box-shadow: rgba(151, 65, 252, 0.2) 0 15px 30px -5px;
+            box-sizing: border-box;
+            color: #FFFFFF;
+            display: flex;
+            font-family: Phantomsans, sans-serif;
+            font-size: 20px;
+            justify-content: center;
+            line-height: 1em;
+            max-width: 100%;
+            min-width: 140px;
+            padding: 3px;
+            text-decoration: none;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: manipulation;
+            white-space: nowrap;
+            cursor: pointer;
+        }
+
+        .button-64:active,
+        .button-64:hover {
+            outline: 0;
+        }
+
+        .button-64 span {
+            background-color: rgb(5, 6, 45);
+            padding: 16px 24px;
+            border-radius: 6px;
+            width: 100%;
+            height: 100%;
+            transition: 300ms;
+        }
+
+        .button-64:hover span {
+            background: none;
+        }
+
+        @media (min-width: 768px) {
+            .button-64 {
+                font-size: 24px;
+                min-width: 196px;
+            }
+        }
+
+        .assistant-selection {
+            margin: 20px 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .assistant-selection label {
+            font-size: 16px;
+            font-weight: bold;
+            color: #fff;
+        }
+
+        .assistant-selection select {
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            background-color: #fff;
+            color: #000;
+            transition: border-color 0.3s, background-color 0.3s;
+        }
+
+        .assistant-selection select:hover {
+            border-color: #007bff;
+        }
+
+        .assistant-selection select:focus {
+            border-color: #007bff;
+            outline: none;
+        }
+
+        .assistant-selection select option {
+            background-color: #fff;
+            color: #000;
+        }
+
+        .assistant-selection select option:hover {
+            background-color: #007bff;
+            color: #fff;
+        }
+
+        .notification-box {
+            display: none;
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: #333;
+            color: #fff;
+            padding: 10px;
+            border-radius: 5px;
+            z-index: 1000;
+        }
+
+        .popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            text-align: left;
+        }
+
+        .popup .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .popup h2 {
+            margin-top: 0;
+        }
+
+        .popup p {
+            margin: 10px 0;
+        }
+
+        .popup a {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        .popup a:hover {
+            background-color: #0056b3;
+        }
+
+        /* From Uiverse.io by gharsh11032000 */
+        .button {
+            position: relative;
+            width: 120px;
+            height: 40px;
+            background-color: #000;
+            display: flex;
+            align-items: center;
+            color: white;
+            flex-direction: column;
+            justify-content: center;
+            border: none;
+            padding: 12px;
+            gap: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .button::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            left: -4px;
+            top: -1px;
+            margin: auto;
+            width: 128px;
+            height: 48px;
+            border-radius: 10px;
+            background: linear-gradient(-45deg, #e81cff 0%, #40c9ff 100% );
+            z-index: -10;
+            pointer-events: none;
+            transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .button::after {
+            content: "";
+            z-index: -1;
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(-45deg, #fc00ff 0%, #00dbde 100% );
+            transform: translate3d(0, 0, 0) scale(0.95);
+            filter: blur(20px);
+        }
+
+        .button:hover::after {
+            filter: blur(30px);
+        }
+
+        .button:hover::before {
+            transform: rotate(-180deg);
+        }
+
+        .button:active::before {
+            scale: 0.7;
+        }
+    </style>
+</head>
+<body>
+    <video id="video-background" autoplay loop muted>
+        <source src="/videos/virtuality.mp4" type="video/mp4">
+        Tu navegador no soporta la etiqueta de video.
+    </video>
+
+    <div class="navbar">
+        <button onclick="location.href='/menu_usuarios'">Inicio</button>
+        <button onclick="location.href='/medico'">Consultar Médico IA</button>
+    </div>
+
+    <div class="spinner" id="recording-spinner">
+        <img src="https://media.tenor.com/b8o4QL3NxV4AAAAC/sound-wave-waves.gif" alt="Grabando...">
+        <p>Grabando...</p>
+    </div>
+
+    <div class="spinner" id="loading-spinner">
+        <img src="/imagenes/cyborg.gif" alt="Cargando...">
+        <p>Cargando respuesta...</p>
+    </div>
+
+    <div class="container">
+        <div class="video-section">
+            <div id="video-wrapper">
+                <video id="video-element" loop muted>
+                    <source src="/videos/Galatea2.mp4" type="video/mp4">
+                    Tu navegador no soporta la etiqueta de video.
+                </video>
+            </div>
+        </div>
+
+        <div class="chat-section">
+            <div id="responseContainer">
+                <h4>Respuesta del Asistente:</h4>
+                <div id="assistantResponseBox" class="response-box" aria-live="polite"></div>
+            </div>
+
+            <div id="voice-selection">
+                <label for="voiceType">Selecciona el tipo de voz:</label>
+                <select id="voiceType">
+                    <option value="female">Femenina</option>
+                    <option value="male">Masculina</option>
+                </select>
+            </div>
+
+            <div id="control-buttons">
+                <button id="start-conversation" class="sparkle-button">
+                    <span class="spark"></span>
+                    <span class="backdrop"></span>
+                    <svg class="sparkle" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M14.187 8.096L15 5.25L15.813 8.096C16.0231 8.83114 16.4171 9.41714 16.9577 9.50062C17.4984 9.5819 18.1679 9.9759 18.903 10.186L21.75 11L18.904 11.813C18.1689 12.0231 17.4994 12.4171 16.9587 12.9577C16.4181 13.4984 16.0241 14.1679 15.814 14.903L15 17.75L14.187 14.904C13.9769 14.1689 13.5829 13.4994 13.0423 12.9587C12.5016 12.4181 11.8321 12.0241 11.097 11.814L8.25 11L11.096 10.187C11.8311 9.9769 12.5006 9.5829 13.0413 9.0423C13.5819 8.50162 13.9759 8.83214 14.186 8.097L14.187 8.096Z" fill="black" stroke="black" stroke-linecap="round" stroke-linejoin="round"></path>
+                        <path d="M6 14.25L5.741 15.285C5.59267 15.8785 5.28579 16.4206 4.85319 16.8532C4.42059 17.2858 3.87853 17.5927 3.285 17.741L2.25 18L3.285 18.259C3.87853 18.4073 4.42059 18.7142 4.85319 19.1468C5.28579 19.5794 5.59267 20.1215 5.741 20.715L6 21.75L6.259 20.715C6.40725 20.1216 6.71398 19.5796 7.14639 19.147C7.5788 18.7144 8.12065 18.4075 8.714 18.259L9.75 18L8.714 17.741C8.12065 17.5925 7.5788 17.2856 7.14639 16.853C6.71398 16.4204 6.40725 15.8784 6.259 15.285L6 14.25Z" fill="black" stroke="black" stroke-linecap="round" stroke-linejoin="round"></path>
+                        <path d="M6.5 4L6.303 4.5915C6.24777 4.75718 6.15472 4.90774 6.03123 5.03123C5.90774 5.15472 5.75718 5.24777 5.5915 5.303L5 5.5L5.5915 5.697C5.75718 5.75223 5.90774 5.84528 6.03123 5.96877C6.15472 6.09226 6.24777 6.24282 6.303 6.4085L6.5 7L6.697 6.4085C6.75223 6.24282 6.84528 6.09226 6.96877 5.96877C7.09226 5.84528 7.24282 5.75223 7.4085 5.697L8 5.5L7.4085 5.303C7.24282 5.24777 7.09226 5.15472 6.96877 5.03123C6.84528 4.90774 6.75223 4.75718 6.697 4.5915L6.5 4Z" fill="black" stroke="black" stroke-linecap="round" stroke-linejoin="round"></path>
+                    </svg>
+                    <span class="text">EMPEZAR CONVERSACIÓN</span>
+                </button>
+            </div>
+            <div class="chat-buttons-container" id="chat-buttons-container">
+                <button id="stop-voice" class="audio-btn" aria-label="Detener captura de voz" disabled></button>
+                <button id="stop-response" class="audio-btn" aria-label="Detener respuesta de voz"></button>
+                <button id="sendToMakeButton" class="button-64" role="button">
+                    <span class="text">Enviar a Make</span>
+                </button>
+                <button id="sendNotificationButton" class="button-64" role="button">
+                    <span class="text">ENVIAR DOCUMENTO</span>
+                </button>
+                <button id="sendUpdateButton" class="button-64" role="button">
+                    <span class="text">Actualización</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="assistant-selection">
+        <label for="assistantType">Selecciona el Asistente:</label>
+        <select id="assistantType">
+            <option value="atencionAuxiliar">Auxiliar</option>
+            <option value="atencionGalatea">Galatea</option>
+            <option value="asistenteRedactor">Redactor</option>
+        </select>
+    </div>
+
+    <div id="chat-container">
+        <div id="chat-box" aria-live="polite"></div>
+        <textarea id="text-area" placeholder="Escribe tu mensaje aquí..."></textarea>
+        <!-- Input para cargar documento -->
+        <input type="file" id="file-input" />
+        <!-- Zona de conversación -->
+        <div id="chat-box"></div>
+        <!-- Botón para enviar mensaje -->
+        <button id="send-button">Enviar</button>
+        <button id="download-summary-button" class="button">Descargar Resumen</button>
+    </div>
+
+    <div id="agent-title" style="font-weight: bold; margin-bottom: 20px;"></div>
+
+    <div id="notification-box" class="notification-box"></div>
+
+    <div class="popup" id="popup">
+        <button class="close-btn" onclick="closePopup()">&times;</button>
+        <h2>Respuesta Recibida</h2>
+        <p>Puedes ver la respuesta en el siguiente enlace:</p>
+        <a href="https://docs.google.com/document/d/1BY7AYgT10vMXFocuUvwEtP-y28YEdms2r5CWaAuWVt4/edit?tab=t.0" target="_blank">Ver Respuesta</a>
+    </div>
+
+    <button id="showPopupButton">Mostrar Ventana Emergente</button>
+    <button id="adjustDeviceButton" class="button">AJUSTAR DISPOSITIVO</button>
+
+    <script src="/scripts/auxiliar.js" defer></script>
+    <script>
+        function showPopup() {
+            document.getElementById('popup').style.display = 'flex';
+        }
+
+        function closePopup() {
+            document.getElementById('popup').style.display = 'none';
+        }
+
+        document.getElementById('showPopupButton').addEventListener('click', showPopup);
+
+        function adjustForMobile() {
+            // Ajustar estilos para dispositivos móviles
+            document.body.style.fontSize = '14px';
+            document.querySelector('.container').style.flexDirection = 'column';
+            document.querySelector('.video-section').style.maxWidth = '100%';
+            document.querySelector('.chat-section').style.maxWidth = '100%';
+            document.querySelector('#video-wrapper').style.width = '300px';
+            document.querySelector('#video-wrapper').style.height = '300px';
+            document.querySelector('#video-wrapper').style.borderWidth = '5px';
+        }
+
+        document.getElementById('adjustDeviceButton').addEventListener('click', adjustForMobile);
+    </script>
+</body>
