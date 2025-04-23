@@ -757,13 +757,15 @@ def delete_file_or_directory():
     try:
         if request.method == 'DELETE':
             path = request.args.get('path', '')
-            if not path:
-                return jsonify({'error': 'No path provided'}), 400
         else:
-            if not request.is_json:
-                return jsonify({'error': 'Content-Type must be application/json'}), 400
-            data = request.json
-            path = data.get('path', '')
+            try:
+                data = request.get_json(force=True)
+                path = data.get('path', '')
+            except Exception:
+                return jsonify({'error': 'Invalid JSON data'}), 400
+
+        if not path:
+            return jsonify({'error': 'No path provided'}), 400
 
         if not path:
             return jsonify({'error': 'No path provided'}), 400
