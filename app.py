@@ -79,8 +79,8 @@ with app.app_context():
     db.create_all()
 
 # Create user workspaces directory if it doesn't exist
-WORKSPACE_ROOT = Path("./user_workspaces")
-WORKSPACE_ROOT.mkdir(parents=True, exist_ok=True)
+WORKSPACE_ROOT = os.path.abspath("./user_workspaces")
+os.makedirs(WORKSPACE_ROOT, exist_ok=True)
 
 # Initialize AI clients
 logging.info("=== Initializing AI Clients ===")
@@ -158,11 +158,12 @@ else:
 
 def get_user_workspace(user_id="default"):
     """Get or create a workspace directory for the user."""
-    workspace_path = WORKSPACE_ROOT / user_id
-    if not workspace_path.exists():
-        workspace_path.mkdir(parents=True)
+    # Ensure path is absolute
+    workspace_path = os.path.abspath(os.path.join(WORKSPACE_ROOT, user_id))
+    if not os.path.exists(workspace_path):
+        os.makedirs(workspace_path, exist_ok=True)
         # Create a README file in the workspace
-        with open(workspace_path / "README.md", "w") as f:
+        with open(os.path.join(workspace_path, "README.md"), "w") as f:
             f.write("# Workspace\n\nThis is your workspace. Use commands to create and modify files here.")
 
     # Track workspace in the database if possible
@@ -190,7 +191,7 @@ def get_user_workspace(user_id="default"):
             # Create a new workspace record
             workspace = Workspace(
                 name=user_id,
-                path=str(workspace_path),
+                path=workspace_path,
                 user_id=default_user.id,
                 is_default=True,
                 last_accessed=datetime.utcnow()
@@ -659,27 +660,34 @@ def list_files_api():
         workspace_path = get_user_workspace(user_id)
 
         # Verificar que el directorio esté dentro del workspace
-        target_dir = (workspace_path / directory).resolve()
-        if not str(target_dir).startswith(str(workspace_path.resolve())):
+        target_dir = os.path.abspath(os.path.join(workspace_path, directory))
+        if not target_dir.startswith(workspace_path):
             return jsonify({'error': 'Acceso denegado: No se puede acceder a directorios fuera del workspace'}), 403
 
-        if not target_dir.exists() or not target_dir.is_dir():
+        if not os.path.exists(target_dir) or not os.path.isdir(target_dir):
             return jsonify({'error': 'Directorio no encontrado'}), 404
 
         # Listar archivos
         files = []
-        for item in target_dir.iterdir():
+        for item in os.listdir(target_dir):
+            item_path = os.path.join(target_dir, item)
+            is_dir = os.path.isdir(item_path)
+            
+            # Calcular ruta relativa al workspace
+            rel_path = os.path.relpath(item_path, workspace_path)
+            
             file_info = {
-                'name': item.name,
-                'path': str(item.relative_to(workspace_path)),
-                'type': 'directory' if item.is_dir() else 'file',
-                'size': item.stat().st_size if item.is_file() else 0,
-                'last_modified': datetime.fromtimestamp(item.stat().st_mtime).isoformat()
+                'name': item,
+                'path': rel_path,
+                'type': 'directory' if is_dir else 'file',
+                'size': os.path.getsize(item_path) if not is_dir else 0,
+                'last_modified': datetime.fromtimestamp(os.path.getmtime(item_path)).isoformat()
             }
 
             # Determinar tipo de archivo para iconos
-            if item.is_file():
-                ext = item.suffix.lower() if item.suffix else ''
+            if not is_dir:
+                _, ext = os.path.splitext(item)
+                ext = ext.lower()
                 if ext in ['.py', '.pyw']:
                     file_info['file_type'] = 'python'
                 elif ext in ['.js', '.ts', '.jsx', '.tsx']:
