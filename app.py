@@ -346,6 +346,11 @@ def code_corrector():
     """Render the code corrector page."""
     return render_template('code_corrector.html')
     
+@app.route('/code_corrector/')
+def code_corrector_slash():
+    """Redirect to ensure both with and without trailing slash work."""
+    return render_template('code_corrector.html')
+    
 @app.route('/api/process_code', methods=['POST'])
 def process_code():
     """Process code for corrections and improvements."""
