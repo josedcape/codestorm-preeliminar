@@ -285,3 +285,25 @@
 ::-webkit-scrollbar-thumb:hover {
   background-color: var(--bs-gray-600);
 }
+
+/* Estilos para resaltado de sintaxis - Añade aquí más estilos específicos */
+
+/* Indicador de estado de conexión */
+.connection-status {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: #666;
+    margin-left: 10px;
+    transition: all 0.3s ease;
+}
+
+.connection-status.connected {
+    background-color: #4CAF50;
+    box-shadow: 0 0 5px #4CAF50;
+}
+
+.connection-status.disconnected {
+    background-color: #F44336;
+    box-shadow: 0 0 5px #F44336;
+}

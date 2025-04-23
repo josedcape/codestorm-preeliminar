@@ -79,6 +79,9 @@ app.secret_key = os.environ.get("SESSION_SECRET", os.urandom(24).hex())
 # Initialize SQLAlchemy
 db = SQLAlchemy(app)
 
+# Inicializar Socket.IO
+socketio = SocketIO(app, cors_allowed_origins="*")
+
 # Import models and create tables
 with app.app_context():
     import models
@@ -1160,6 +1163,52 @@ def get_file_type(filename):
     else:
         return 'text'
 
+# Manejar mensajes del usuario a través de Socket.IO
+@socketio.on('user_message')
+def handle_user_message(data):
+    print(f"Mensaje de usuario recibido via Socket.IO: {data}")
+
+    # Extraer datos
+    message = data.get('message', '')
+    agent_id = data.get('agent', 'developer')
+    model = data.get('model', 'openai')
+    document = data.get('document', '')
+
+    try:
+        # Obtener el sistema de prompt para el agente seleccionado
+        agent_system_prompt = get_agent_system_prompt(agent_id)
+        agent_name = get_agent_name(agent_id)
+
+        # Procesar el mensaje con el modelo seleccionado
+        response_content = generate_content(
+            message,
+            [],  # Sin contexto inicial
+            agent_system_prompt,
+            model,
+            True,  # collaborative_mode
+            "normal"  # chat_mode
+        )
+
+        # Enviar respuesta al cliente
+        emit('assistant_message', {
+            'message': response_content,
+            'agent': {
+                'id': agent_id,
+                'name': agent_name,
+                'icon': 'bi-robot'
+            }
+        })
+    except Exception as e:
+        print(f"Error al procesar mensaje: {str(e)}")
+        emit('assistant_message', {
+            'message': f"Lo siento, ocurrió un error al procesar tu mensaje: {str(e)}",
+            'agent': {
+                'id': 'system',
+                'name': 'Sistema',
+                'icon': 'bi-exclamation-triangle'
+            }
+        })
+
 # Function to start the server with the correct port
 if __name__ == '__main__':
     # Get port from environment or use 5000 as default
@@ -1171,4 +1220,4 @@ if __name__ == '__main__':
     logging.info(f"Starting server on port {port}, debug_mode={debug_mode}")
 
     # Start the application with threaded=True for better handling of concurrent requests
-    app.run(host='0.0.0.0', port=port, debug=debug_mode, threaded=True)
+    socketio.run(app, host='0.0.0.0', port=port, debug=debug_mode)
