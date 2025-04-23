@@ -143,6 +143,12 @@ if gemini_api_key:
         genai_configured = True
         logging.info(f"Google Gemini API configured successfully. Key: {gemini_api_key[:5]}...{gemini_api_key[-5:]}")
 
+
+@app.route('/constructor')
+def constructor():
+    """Render the constructor page for building apps."""
+    return render_template('constructor.html')
+
         # Test Gemini client with a simple request
         try:
             model = genai.GenerativeModel('gemini-1.5-pro')
@@ -647,6 +653,135 @@ def generate_preview():
         })
     except Exception as e:
         logging.error(f"Error generating preview: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+        
+# Rutas para el explorador de archivos
+@app.route('/api/files', methods=['GET'])
+def list_files_api():
+    """API para listar archivos con soporte para AJAX."""
+    try:
+        directory = request.args.get('directory', '.')
+        user_id = session.get('user_id', 'default')
+        workspace_path = get_user_workspace(user_id)
+        
+        # Verificar que el directorio esté dentro del workspace
+        target_dir = (workspace_path / directory).resolve()
+        if not str(target_dir).startswith(str(workspace_path.resolve())):
+            return jsonify({'error': 'Acceso denegado: No se puede acceder a directorios fuera del workspace'}), 403
+            
+        if not target_dir.exists() or not target_dir.is_dir():
+            return jsonify({'error': 'Directorio no encontrado'}), 404
+            
+        # Listar archivos
+        files = []
+        for item in target_dir.iterdir():
+            file_info = {
+                'name': item.name,
+                'path': str(item.relative_to(workspace_path)),
+                'type': 'directory' if item.is_dir() else 'file',
+                'size': item.stat().st_size if item.is_file() else 0,
+                'last_modified': datetime.fromtimestamp(item.stat().st_mtime).isoformat()
+            }
+            
+            # Determinar tipo de archivo para iconos
+            if item.is_file():
+                ext = item.suffix.lower() if item.suffix else ''
+                if ext in ['.py', '.pyw']:
+                    file_info['file_type'] = 'python'
+                elif ext in ['.js', '.ts', '.jsx', '.tsx']:
+                    file_info['file_type'] = 'javascript'
+                elif ext in ['.html', '.htm']:
+                    file_info['file_type'] = 'html'
+                elif ext in ['.css', '.scss', '.sass']:
+                    file_info['file_type'] = 'css'
+                elif ext in ['.json']:
+                    file_info['file_type'] = 'json'
+                elif ext in ['.md', '.markdown']:
+                    file_info['file_type'] = 'markdown'
+                elif ext in ['.jpg', '.jpeg', '.png', '.gif', '.svg', '.webp']:
+                    file_info['file_type'] = 'image'
+                else:
+                    file_info['file_type'] = 'unknown'
+            
+            files.append(file_info)
+            
+        # Ordenar: directorios primero, luego archivos, ambos alfabéticamente
+        files.sort(key=lambda x: (0 if x['type'] == 'directory' else 1, x['name'].lower()))
+        
+        return jsonify({
+            'files': files,
+            'current_dir': directory,
+            'parent_dir': os.path.dirname(directory) if directory != '.' else None
+        })
+        
+    except Exception as e:
+        logging.error(f"Error listando archivos: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
+# Ruta para subir archivos
+@app.route('/api/explorer/upload', methods=['POST'])
+def upload_file():
+    """API para subir archivos."""
+    try:
+        if 'file' not in request.files:
+            return jsonify({'error': 'No se encontró el archivo en la solicitud'}), 400
+            
+        file = request.files['file']
+        if file.filename == '':
+            return jsonify({'error': 'No se seleccionó ningún archivo'}), 400
+            
+        path = request.form.get('path', '.')
+        extract = request.form.get('extract', 'false').lower() == 'true'
+        
+        # Obtener el workspace del usuario
+        user_id = session.get('user_id', 'default')
+        workspace_path = get_user_workspace(user_id)
+        
+        # Verificar que la ruta esté dentro del workspace
+        target_dir = (workspace_path / path).resolve()
+        if not str(target_dir).startswith(str(workspace_path.resolve())):
+            return jsonify({'error': 'Acceso denegado: No se puede acceder a directorios fuera del workspace'}), 403
+            
+        if not target_dir.exists():
+            target_dir.mkdir(parents=True, exist_ok=True)
+            
+        # Guardar el archivo
+        filename = file.filename
+        file_path = target_dir / filename
+        file.save(file_path)
+        
+        # Extraer si es un archivo ZIP y se solicitó extracción
+        is_zip = filename.lower().endswith('.zip')
+        if is_zip and extract:
+            try:
+                with zipfile.ZipFile(file_path, 'r') as zip_ref:
+                    extract_dir = target_dir / filename.rsplit('.', 1)[0]
+                    extract_dir.mkdir(exist_ok=True)
+                    zip_ref.extractall(extract_dir)
+                return jsonify({
+                    'success': True,
+                    'message': f'Archivo {filename} subido y extraído exitosamente',
+                    'extracted': True,
+                    'extract_path': str(extract_dir.relative_to(workspace_path))
+                })
+            except Exception as zip_error:
+                logging.error(f"Error al extraer ZIP: {str(zip_error)}")
+                return jsonify({
+                    'success': True,
+                    'message': f'Archivo {filename} subido pero hubo un error al extraerlo: {str(zip_error)}',
+                    'file_path': str(file_path.relative_to(workspace_path)),
+                    'extracted': False
+                })
+        
+        return jsonify({
+            'success': True,
+            'message': f'Archivo {filename} subido exitosamente',
+            'file_path': str(file_path.relative_to(workspace_path)),
+            'is_zip': is_zip
+        })
+        
+    except Exception as e:
+        logging.error(f"Error subiendo archivo: {str(e)}")
         return jsonify({'error': str(e)}), 500
         
 @app.route('/api/upload_preview_file', methods=['POST'])

@@ -442,3 +442,127 @@
         gap: 0.25rem;
     }
 }
+/* Estilos para el Constructor de Aplicaciones */
+
+/* Variables globales */
+:root {
+    --primary-blue: #0d47a1;
+    --secondary-blue: #1976d2;
+    --dark-blue: #0A2149;
+    --darker-blue: #081B29;
+    --accent-gold: #FFB400;
+    --text-light: #f8f9fa;
+    --text-secondary: #adb5bd;
+    --card-bg: rgba(8, 27, 41, 0.8);
+    --component-selected: rgba(30, 136, 229, 0.3);
+}
+
+/* Estilos del área de trabajo */
+.workspace-component {
+    position: relative;
+    border: 2px solid transparent;
+    margin: 5px;
+    transition: all 0.2s ease;
+}
+
+.workspace-component:hover {
+    border-color: var(--secondary-blue);
+    box-shadow: 0 0 10px rgba(30, 136, 229, 0.5);
+}
+
+.selected-component {
+    border: 2px solid var(--accent-gold) !important;
+    box-shadow: 0 0 15px rgba(255, 180, 0, 0.5) !important;
+}
+
+.workspace-component::after {
+    content: attr(id);
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    background-color: var(--dark-blue);
+    color: var(--text-light);
+    font-size: 0.7rem;
+    padding: 3px 6px;
+    border-radius: 4px;
+    display: none;
+    z-index: 10;
+}
+
+.workspace-component:hover::after {
+    display: block;
+}
+
+.drag-over {
+    border: 2px dashed var(--accent-gold) !important;
+    background-color: rgba(255, 180, 0, 0.1);
+}
+
+/* Efectos futuristas para componentes */
+.component-item {
+    position: relative;
+    overflow: hidden;
+}
+
+.component-item::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    transform: rotate(45deg);
+    transition: all 0.5s ease;
+}
+
+.component-item:hover::before {
+    animation: shine 1.5s;
+}
+
+@keyframes shine {
+    0% {
+        left: -50%;
+        opacity: 0;
+    }
+    50% {
+        opacity: 0.5;
+    }
+    100% {
+        left: 150%;
+        opacity: 0;
+    }
+}
+
+/* Adaptaciones responsive */
+@media (max-width: 992px) {
+    .constructor-container {
+        flex-direction: column;
+    }
+    
+    .component-list {
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    }
+    
+    .component-item {
+        padding: 8px;
+    }
+    
+    .component-item i {
+        font-size: 1.5rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .workspace-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .workspace-header > div:last-child {
+        margin-top: 10px;
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+    }
+}

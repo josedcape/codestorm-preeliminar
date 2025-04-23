@@ -1794,6 +1794,26 @@
                     const uploadProgressBar = document.getElementById('upload-progress-bar');
                     const uploadDetails = document.getElementById('upload-details');
                     
+                    // Asegurar que existe la barra de progreso
+                    if (uploadProgressBar) {
+                        uploadProgressBar.style.width = '0%';
+                        uploadProgressBar.setAttribute('aria-valuenow', '0');
+                    } else {
+                        // Si no existe, crear el contenedor de la barra de progreso
+                        const progressContainer = document.createElement('div');
+                        progressContainer.className = 'progress mb-3';
+                        progressContainer.innerHTML = `
+                            <div id="upload-progress-bar" class="progress-bar progress-bar-striped progress-bar-animated" 
+                                role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                        `;
+                        
+                        // Insertar antes del status
+                        const statusElement = document.getElementById('upload-status');
+                        if (statusElement && statusElement.parentNode) {
+                            statusElement.parentNode.insertBefore(progressContainer, statusElement);
+                        }
+                    }
+                    
                     // Configuración de carga por fragmentos
                     const chunkSize = 2 * 1024 * 1024; // 2MB por fragmento
                     const totalChunks = Math.ceil(fileSize / chunkSize);
@@ -1802,6 +1822,15 @@
                     
                     uploadStatus.textContent = `Subiendo archivo en ${totalChunks} fragmentos...`;
                     uploadDetails.textContent = `Archivo: ${fileName} (${formatFileSize(fileSize)})`;
+                    
+                    // Función para actualizar la barra de progreso
+                    function updateProgressBar(percent) {
+                        const progressBar = document.getElementById('upload-progress-bar');
+                        if (progressBar) {
+                            progressBar.style.width = `${percent}%`;
+                            progressBar.setAttribute('aria-valuenow', percent.toString());
+                        }
+                    }
                     
                     // Función para subir un fragmento
                     const uploadChunk = function() {
@@ -1862,6 +1891,14 @@
                                         }, 2000);
                                     }
                                 } else {
+                                    // Actualizar progreso
+                                    chunksUploaded++;
+                                    const progress = Math.round((chunksUploaded / totalChunks) * 100);
+                                    updateProgressBar(progress);
+                                    
+                                    // Actualizar texto de estado
+                                    uploadStatus.textContent = `Subiendo fragmento ${chunksUploaded} de ${totalChunks} (${progress}%)...`;
+                                    
                                     // Continuar con el siguiente fragmento
                                     chunkIndex++;
                                     uploadChunk();

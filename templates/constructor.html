@@ -353,3 +353,610 @@
     </script>
 </body>
 </html>
+{% extends "base.html" %}
+
+{% block title %}CODESTORM - Constructor de Aplicaciones{% endblock %}
+
+{% block extra_css %}
+<link href="{{ url_for('static', filename='css/constructor.css') }}" rel="stylesheet">
+<style>
+    .constructor-container {
+        min-height: calc(100vh - 90px);
+        padding: 20px;
+    }
+    
+    .tool-panel {
+        background: linear-gradient(135deg, #0A2149 0%, #081B29 100%);
+        border-radius: 8px;
+        padding: 15px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        margin-bottom: 20px;
+    }
+    
+    .component-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+        gap: 15px;
+        margin-top: 15px;
+    }
+    
+    .component-item {
+        background-color: rgba(10, 33, 73, 0.8);
+        border: 1px solid #0d3366;
+        border-radius: 6px;
+        padding: 12px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+    }
+    
+    .component-item:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+        border-color: #1e88e5;
+    }
+    
+    .component-item i {
+        font-size: 2rem;
+        margin-bottom: 10px;
+        color: #1e88e5;
+    }
+    
+    .workspace-area {
+        background-color: rgba(8, 27, 41, 0.5);
+        border-radius: 8px;
+        min-height: 500px;
+        position: relative;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .workspace-header {
+        background-color: #0A2149;
+        border-radius: 8px 8px 0 0;
+        padding: 12px 15px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 2px solid #FFB400;
+    }
+    
+    .workspace-content {
+        flex-grow: 1;
+        padding: 20px;
+        min-height: 440px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .empty-workspace {
+        text-align: center;
+        padding: 40px;
+        color: #6c757d;
+    }
+    
+    .empty-workspace i {
+        font-size: 4rem;
+        margin-bottom: 20px;
+        color: #1e88e5;
+    }
+    
+    .tab-content {
+        padding: 15px 0;
+    }
+    
+    @media (max-width: 767px) {
+        .component-list {
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        }
+        
+        .workspace-content {
+            min-height: 300px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-3">
+    <div class="section-header mb-3">
+        <h2><i class="fas fa-tools me-2"></i>Constructor de Aplicaciones</h2>
+        <p class="text-muted">Diseña y construye aplicaciones usando componentes predefinidos</p>
+    </div>
+    
+    <div class="row constructor-container">
+        <div class="col-lg-3 col-md-4">
+            <div class="tool-panel">
+                <h5><i class="fas fa-th-large me-2"></i>Componentes</h5>
+                
+                <ul class="nav nav-tabs" id="componentsTab" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="ui-tab" data-bs-toggle="tab" data-bs-target="#ui" type="button" role="tab" aria-controls="ui" aria-selected="true">UI</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="data-tab" data-bs-toggle="tab" data-bs-target="#data" type="button" role="tab" aria-controls="data" aria-selected="false">Datos</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="logic-tab" data-bs-toggle="tab" data-bs-target="#logic" type="button" role="tab" aria-controls="logic" aria-selected="false">Lógica</button>
+                    </li>
+                </ul>
+                
+                <div class="tab-content" id="componentsTabContent">
+                    <div class="tab-pane fade show active" id="ui" role="tabpanel" aria-labelledby="ui-tab">
+                        <div class="component-list">
+                            <div class="component-item" draggable="true" data-component="navbar">
+                                <i class="fas fa-bars"></i>
+                                <span>Barra de navegación</span>
+                            </div>
+                            <div class="component-item" draggable="true" data-component="card">
+                                <i class="fas fa-credit-card"></i>
+                                <span>Tarjeta</span>
+                            </div>
+                            <div class="component-item" draggable="true" data-component="button">
+                                <i class="fas fa-square"></i>
+                                <span>Botón</span>
+                            </div>
+                            <div class="component-item" draggable="true" data-component="form">
+                                <i class="fas fa-wpforms"></i>
+                                <span>Formulario</span>
+                            </div>
+                            <div class="component-item" draggable="true" data-component="carousel">
+                                <i class="fas fa-images"></i>
+                                <span>Carrusel</span>
+                            </div>
+                            <div class="component-item" draggable="true" data-component="modal">
+                                <i class="fas fa-window-restore"></i>
+                                <span>Modal</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="tab-pane fade" id="data" role="tabpanel" aria-labelledby="data-tab">
+                        <div class="component-list">
+                            <div class="component-item" draggable="true" data-component="table">
+                                <i class="fas fa-table"></i>
+                                <span>Tabla</span>
+                            </div>
+                            <div class="component-item" draggable="true" data-component="chart">
+                                <i class="fas fa-chart-bar"></i>
+                                <span>Gráfico</span>
+                            </div>
+                            <div class="component-item" draggable="true" data-component="api">
+                                <i class="fas fa-database"></i>
+                                <span>API</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="tab-pane fade" id="logic" role="tabpanel" aria-labelledby="logic-tab">
+                        <div class="component-list">
+                            <div class="component-item" draggable="true" data-component="if">
+                                <i class="fas fa-code-branch"></i>
+                                <span>If/Else</span>
+                            </div>
+                            <div class="component-item" draggable="true" data-component="loop">
+                                <i class="fas fa-redo"></i>
+                                <span>Loop</span>
+                            </div>
+                            <div class="component-item" draggable="true" data-component="function">
+                                <i class="fas fa-cogs"></i>
+                                <span>Función</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="tool-panel">
+                <h5><i class="fas fa-wrench me-2"></i>Propiedades</h5>
+                <div id="properties-panel">
+                    <p class="text-muted">Selecciona un componente para ver sus propiedades</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-9 col-md-8">
+            <div class="workspace-area">
+                <div class="workspace-header">
+                    <div>
+                        <strong><i class="fas fa-desktop me-2"></i>Área de Trabajo</strong>
+                    </div>
+                    <div>
+                        <button id="preview-btn" class="btn btn-sm btn-outline-light">
+                            <i class="fas fa-eye me-1"></i>Vista previa
+                        </button>
+                        <button id="export-btn" class="btn btn-sm btn-outline-warning ms-2">
+                            <i class="fas fa-file-export me-1"></i>Exportar
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="workspace-content" id="workspace">
+                    <div class="empty-workspace">
+                        <i class="fas fa-puzzle-piece"></i>
+                        <h5>Área de trabajo vacía</h5>
+                        <p>Arrastra componentes aquí para empezar a construir tu aplicación</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Obtener referencias a elementos del DOM
+    const componentItems = document.querySelectorAll('.component-item');
+    const workspace = document.getElementById('workspace');
+    const previewBtn = document.getElementById('preview-btn');
+    const exportBtn = document.getElementById('export-btn');
+    const propertiesPanel = document.getElementById('properties-panel');
+    
+    // Variable para llevar el contador de componentes añadidos
+    let componentCounter = 0;
+    
+    // Implementación básica de arrastrar y soltar
+    componentItems.forEach(item => {
+        item.addEventListener('dragstart', function(e) {
+            e.dataTransfer.setData('text/plain', this.getAttribute('data-component'));
+            e.dataTransfer.effectAllowed = 'move';
+        });
+    });
+    
+    // Establecer el área de trabajo como destino de soltar
+    workspace.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        this.classList.add('drag-over');
+    });
+    
+    workspace.addEventListener('dragleave', function() {
+        this.classList.remove('drag-over');
+    });
+    
+    workspace.addEventListener('drop', function(e) {
+        e.preventDefault();
+        this.classList.remove('drag-over');
+        
+        // Obtener el tipo de componente
+        const componentType = e.dataTransfer.getData('text/plain');
+        if (!componentType) return;
+        
+        // Incrementar contador
+        componentCounter++;
+        
+        // Crear el componente según su tipo
+        let componentElement;
+        
+        switch(componentType) {
+            case 'navbar':
+                componentElement = createNavbar(componentCounter);
+                break;
+            case 'card':
+                componentElement = createCard(componentCounter);
+                break;
+            case 'button':
+                componentElement = createButton(componentCounter);
+                break;
+            case 'form':
+                componentElement = createForm(componentCounter);
+                break;
+            case 'carousel':
+                componentElement = createCarousel(componentCounter);
+                break;
+            case 'modal':
+                componentElement = createModal(componentCounter);
+                break;
+            case 'table':
+                componentElement = createTable(componentCounter);
+                break;
+            case 'chart':
+                componentElement = createChart(componentCounter);
+                break;
+            default:
+                componentElement = document.createElement('div');
+                componentElement.textContent = `Componente ${componentType}`;
+                componentElement.className = 'p-3 bg-dark text-light rounded';
+        }
+        
+        // Añadir identificador y clase para manipulación
+        componentElement.id = `component-${componentCounter}`;
+        componentElement.classList.add('workspace-component');
+        
+        // Si es el primer componente, limpiar el mensaje de área vacía
+        if (componentCounter === 1) {
+            workspace.innerHTML = '';
+        }
+        
+        // Añadir al workspace
+        workspace.appendChild(componentElement);
+        
+        // Hacer componente seleccionable
+        componentElement.addEventListener('click', function() {
+            // Deseleccionar otros componentes
+            document.querySelectorAll('.workspace-component').forEach(comp => {
+                comp.classList.remove('selected-component');
+            });
+            
+            // Seleccionar este componente
+            this.classList.add('selected-component');
+            
+            // Mostrar propiedades
+            showProperties(componentType, this.id);
+        });
+    });
+    
+    // Función para mostrar propiedades
+    function showProperties(componentType, componentId) {
+        let propertiesHTML = `
+            <h6 class="mb-3">Propiedades de ${componentType}</h6>
+            <div class="mb-3">
+                <label class="form-label">ID</label>
+                <input type="text" class="form-control form-control-sm" value="${componentId}" readonly>
+            </div>
+        `;
+        
+        // Propiedades específicas según tipo
+        switch(componentType) {
+            case 'navbar':
+                propertiesHTML += `
+                    <div class="mb-3">
+                        <label class="form-label">Título</label>
+                        <input type="text" class="form-control form-control-sm" value="Título de navegación">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Color</label>
+                        <select class="form-select form-select-sm">
+                            <option value="dark">Oscuro</option>
+                            <option value="light">Claro</option>
+                            <option value="primary">Primario</option>
+                        </select>
+                    </div>
+                `;
+                break;
+            case 'button':
+                propertiesHTML += `
+                    <div class="mb-3">
+                        <label class="form-label">Texto</label>
+                        <input type="text" class="form-control form-control-sm" value="Botón">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Tipo</label>
+                        <select class="form-select form-select-sm">
+                            <option value="primary">Primario</option>
+                            <option value="secondary">Secundario</option>
+                            <option value="success">Éxito</option>
+                            <option value="danger">Peligro</option>
+                        </select>
+                    </div>
+                `;
+                break;
+            default:
+                propertiesHTML += `
+                    <div class="mb-3">
+                        <label class="form-label">Nombre</label>
+                        <input type="text" class="form-control form-control-sm" value="${componentType} ${componentId.split('-')[1]}">
+                    </div>
+                `;
+        }
+        
+        // Añadir botones de acción
+        propertiesHTML += `
+            <div class="d-flex justify-content-between mt-4">
+                <button class="btn btn-sm btn-outline-danger" onclick="deleteComponent('${componentId}')">
+                    <i class="fas fa-trash me-1"></i>Eliminar
+                </button>
+                <button class="btn btn-sm btn-outline-primary" onclick="duplicateComponent('${componentId}')">
+                    <i class="fas fa-copy me-1"></i>Duplicar
+                </button>
+            </div>
+        `;
+        
+        propertiesPanel.innerHTML = propertiesHTML;
+    }
+    
+    // Funciones para crear componentes
+    function createNavbar(id) {
+        const navbar = document.createElement('div');
+        navbar.className = 'navbar navbar-expand-lg navbar-dark bg-dark w-100 mb-4';
+        navbar.innerHTML = `
+            <div class="container-fluid">
+                <a class="navbar-brand" href="#">Navbar</a>
+                <button class="navbar-toggler" type="button">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#">Inicio</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">Enlace</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        `;
+        return navbar;
+    }
+    
+    function createCard(id) {
+        const card = document.createElement('div');
+        card.className = 'card text-white bg-dark mb-3';
+        card.style.maxWidth = '18rem';
+        card.innerHTML = `
+            <div class="card-header">Encabezado</div>
+            <div class="card-body">
+                <h5 class="card-title">Título de la tarjeta</h5>
+                <p class="card-text">Este es un ejemplo de tarjeta con título y texto.</p>
+            </div>
+        `;
+        return card;
+    }
+    
+    function createButton(id) {
+        const button = document.createElement('button');
+        button.className = 'btn btn-primary';
+        button.textContent = 'Botón';
+        return button;
+    }
+    
+    function createForm(id) {
+        const form = document.createElement('div');
+        form.className = 'card p-3 bg-dark text-white';
+        form.style.maxWidth = '400px';
+        form.innerHTML = `
+            <h5 class="mb-3">Formulario</h5>
+            <div class="mb-3">
+                <label class="form-label">Nombre</label>
+                <input type="text" class="form-control" placeholder="Ingrese su nombre">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Email</label>
+                <input type="email" class="form-control" placeholder="Ingrese su email">
+            </div>
+            <button class="btn btn-primary">Enviar</button>
+        `;
+        return form;
+    }
+    
+    function createCarousel(id) {
+        const carousel = document.createElement('div');
+        carousel.className = 'carousel slide';
+        carousel.style.width = '400px';
+        carousel.innerHTML = `
+            <div class="carousel-inner">
+                <div class="carousel-item active">
+                    <div class="bg-dark d-flex align-items-center justify-content-center" style="height: 200px;">
+                        <span class="text-light">Slide 1</span>
+                    </div>
+                </div>
+                <div class="carousel-item">
+                    <div class="bg-secondary d-flex align-items-center justify-content-center" style="height: 200px;">
+                        <span class="text-light">Slide 2</span>
+                    </div>
+                </div>
+            </div>
+        `;
+        return carousel;
+    }
+    
+    function createModal(id) {
+        const modal = document.createElement('div');
+        modal.className = 'card p-3 bg-dark text-white';
+        modal.style.maxWidth = '300px';
+        modal.innerHTML = `
+            <h5>Modal</h5>
+            <p>Este es un componente modal que se abrirá en una ventana emergente.</p>
+            <button class="btn btn-sm btn-outline-light">Abrir Modal</button>
+        `;
+        return modal;
+    }
+    
+    function createTable(id) {
+        const table = document.createElement('div');
+        table.className = 'table-responsive';
+        table.innerHTML = `
+            <table class="table table-dark table-striped">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Nombre</th>
+                        <th>Apellido</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>Juan</td>
+                        <td>Pérez</td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>Ana</td>
+                        <td>Gómez</td>
+                    </tr>
+                </tbody>
+            </table>
+        `;
+        return table;
+    }
+    
+    function createChart(id) {
+        const chart = document.createElement('div');
+        chart.className = 'card p-3 bg-dark text-white';
+        chart.style.width = '300px';
+        chart.innerHTML = `
+            <h5>Gráfico</h5>
+            <div class="chart-placeholder d-flex align-items-center justify-content-center bg-secondary" style="height: 150px;">
+                <span>Gráfico (Demo)</span>
+            </div>
+        `;
+        return chart;
+    }
+    
+    // Funciones para eliminar y duplicar componentes
+    window.deleteComponent = function(componentId) {
+        const component = document.getElementById(componentId);
+        if (component) {
+            component.remove();
+            propertiesPanel.innerHTML = '<p class="text-muted">Selecciona un componente para ver sus propiedades</p>';
+            
+            // Si no quedan componentes, mostrar mensaje de área vacía
+            if (workspace.children.length === 0) {
+                workspace.innerHTML = `
+                    <div class="empty-workspace">
+                        <i class="fas fa-puzzle-piece"></i>
+                        <h5>Área de trabajo vacía</h5>
+                        <p>Arrastra componentes aquí para empezar a construir tu aplicación</p>
+                    </div>
+                `;
+            }
+        }
+    };
+    
+    window.duplicateComponent = function(componentId) {
+        const component = document.getElementById(componentId);
+        if (component) {
+            const clone = component.cloneNode(true);
+            componentCounter++;
+            clone.id = `component-${componentCounter}`;
+            
+            workspace.appendChild(clone);
+            
+            // Hacer el clon seleccionable
+            clone.addEventListener('click', function() {
+                document.querySelectorAll('.workspace-component').forEach(comp => {
+                    comp.classList.remove('selected-component');
+                });
+                this.classList.add('selected-component');
+                
+                const componentType = this.getAttribute('data-component') || 
+                                      component.getAttribute('data-component') || 
+                                      'component';
+                                      
+                showProperties(componentType, this.id);
+            });
+        }
+    };
+    
+    // Botón de vista previa
+    previewBtn.addEventListener('click', function() {
+        alert('Funcionalidad de vista previa en desarrollo');
+    });
+    
+    // Botón de exportar
+    exportBtn.addEventListener('click', function() {
+        alert('Funcionalidad de exportación en desarrollo');
+    });
+});
+</script>
+{% endblock %}
