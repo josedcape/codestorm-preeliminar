@@ -737,14 +737,17 @@ def upload_file():
         return response, 500
 
 
-@file_explorer_bp.route('/api/explorer/delete', methods=['POST'])
+@file_explorer_bp.route('/api/explorer/delete', methods=['POST', 'DELETE'])
 def delete_file_or_directory():
     """Delete a file or directory."""
     try:
-        data = request.json
-        relative_path = data.get('path', '')
+        if request.method == 'DELETE':
+            path = request.args.get('path', '')
+        else:
+            data = request.json
+            path = data.get('path', '')
         
-        if not relative_path:
+        if not path:
             return jsonify({'error': 'No path provided'}), 400
             
         # Get the user workspace
@@ -752,23 +755,28 @@ def delete_file_or_directory():
         workspace_path = os.path.join('user_workspaces', workspace_id)
         
         # Build target path
-        target_path = os.path.join(workspace_path, relative_path.lstrip('./'))
+        target_path = os.path.join(workspace_path, path.lstrip('./'))
         
         # Verify path is within workspace
         if not os.path.abspath(target_path).startswith(os.path.abspath(workspace_path)):
             return jsonify({'error': 'Access denied: Path outside workspace'}), 403
             
         if os.path.exists(target_path):
-            if os.path.isdir(target_path):
-                shutil.rmtree(target_path)
-            else:
-                os.remove(target_path)
-            return jsonify({'success': True, 'message': f'Deleted {relative_path}'})
+            try:
+                if os.path.isdir(target_path):
+                    shutil.rmtree(target_path)
+                else:
+                    os.remove(target_path)
+                return jsonify({'success': True, 'message': f'Deleted {path}'})
+            except PermissionError:
+                return jsonify({'error': 'Permission denied'}), 403
+            except Exception as e:
+                return jsonify({'error': str(e)}), 500
         else:
             return jsonify({'error': 'Path not found'}), 404
             
     except Exception as e:
-        logger.error(f"Error deleting {relative_path}: {str(e)}")
+        logger.error(f"Error deleting {path}: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
 @file_explorer_bp.route('/api/explorer/upload_chunk', methods=['POST'])
