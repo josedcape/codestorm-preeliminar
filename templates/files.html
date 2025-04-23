@@ -631,9 +631,7 @@
                         </div>
                         <!-- Eliminada opción de extraer automáticamente -->
                         <input type="hidden" name="extract" value="false">
-                        <input type="hidden" id="upload-current-path" name="path" value="."
-                          oninvalid="this.setCustomValidity('El campo path es obligatorio')"
-                          required>
+                        <input type="hidden" id="upload-current-path" name="path" value=".">
                     </form>
                 </div>
                 <div class="modal-footer">
@@ -707,7 +705,7 @@
         <div class="container text-center">
             <span class="text-light">CODESTORM-Assistant © 2025 | Herramienta de Desarrollo Impulsada por IA</span>
         </div>
-    </footer
+    </footer>
 
     <!-- JavaScript -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
@@ -744,12 +742,6 @@
 
             // Cargar archivos iniciales
             loadFiles(currentPath);
-
-            // Una vez definido loadFiles, verificamos actualizaciones
-            setTimeout(function() {
-                // Verificar si hay solicitudes de actualización pendientes (después de definir loadFiles)
-                checkForRefreshRequests();
-            }, 500);
 
             // Event Listeners
             refreshBtn.addEventListener('click', () => loadFiles(currentPath));
@@ -875,62 +867,23 @@
             function loadFiles(path) {
                 currentPath = path;
 
-                // Agregar indicador de carga
-                const filesContainer = document.getElementById('files-container');
-                if (filesContainer) {
-                    filesContainer.innerHTML = `
-                        <div class="text-center p-5">
-                            <div class="spinner-border text-primary" role="status">
-                                <span class="visually-hidden">Cargando...</span>
-                            </div>
-                            <p class="mt-2">Cargando archivos...</p>
-                        </div>
-                    `;
-                }
-
                 // Actualizar la ruta en la miga de pan
                 updateBreadcrumb(path);
 
-                console.log(`[Explorer] Cargando archivos para ruta: ${path}`);
-
-                // Agregar timestamp para evitar caché
-                fetch(`/api/explorer/list?path=${encodeURIComponent(path)}&t=${Date.now()}`)
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error(`Error del servidor: ${response.status}`);
-                        }
-                        return response.json();
-                    })
+                fetch(`/api/files?directory=${encodeURIComponent(path)}`)
+                    .then(response => response.json())
                     .then(data => {
                         if (data.success) {
-                            console.log(`[Explorer] Archivos cargados: ${(data.items || data.files).length} elementos`);
-                            displayFiles(data.items || data.files);
+                            displayFiles(data.files);
                             // También actualizar el árbol de directorios
                             // loadDirectoryTree(path);
                         } else {
-                            console.error(`[Explorer] Error al cargar archivos:`, data.error);
                             showNotification('Error al cargar archivos: ' + data.error, 'danger');
-                            if (filesContainer) {
-                                filesContainer.innerHTML = `
-                                    <div class="alert alert-danger m-3">
-                                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
-                                        Error al cargar archivos: ${data.error}
-                                    </div>
-                                `;
-                            }
                         }
                     })
                     .catch(error => {
-                        console.error('[Explorer] Error al cargar archivos:', error);
-                        showNotification('Error al cargar archivos: ' + error.message, 'danger');
-                        if (filesContainer) {
-                            filesContainer.innerHTML = `
-                                <div class="alert alert-danger m-3">
-                                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
-                                    Error al cargar archivos: ${error.message}
-                                </div>
-                            `;
-                        }
+                        console.error('Error:', error);
+                        showNotification('Error al cargar archivos', 'danger');
                     });
             }
 
@@ -1135,7 +1088,7 @@
                 // Determinar el tipo de contenido
                 if (textExtensions.includes(extension)) {
                     // Previsualizar archivos de texto/código
-                    fetch(`/api/explorer/file?path=${encodeURIComponent(path)}`)
+                    fetch(`/api/files/read?file_path=${encodeURIComponent(path)}`)
                         .then(response => response.json())
                         .then(data => {
                             if (data.success) {
@@ -1493,11 +1446,11 @@
             function createFolder(path) {
                 // En los sistemas de archivos, crear una carpeta vacía a menudo se hace
                 // creando un archivo especial dentro de ella, como .gitkeep
-                fetch('/api/explorer/file', {
-                    method: 'PUT',
+                fetch('/api/files/create', {
+                    method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        path: path + '/.gitkeep',
+                        file_path: path + '/.gitkeep',
                         content: ''
                     })
                 })
@@ -1517,70 +1470,18 @@
             }
 
             function deleteItem(path) {
-                console.log(`[Explorer] Intentando eliminar: ${path}`);
-
-                // Deshabilitar temporalmente la interfaz durante la operación
-                const btnConfirmDelete = document.getElementById('btn-confirm-delete');
-                if (btnConfirmDelete) {
-                    btnConfirmDelete.disabled = true;
-                    btnConfirmDelete.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Eliminando...';
-                }
-
-                // Mostrar notificación de eliminación en progreso
-                const notifyId = showNotification('Eliminando elemento...', 'info', false);
-
-                // 1. Crear una variable para almacenar el elemento DOM que se está eliminando
-                // Esto permitirá ocultar el elemento inmediatamente para mejor UX
-                const elementToDelete = findFileElementByPath(path);
-                if (elementToDelete) {
-                    // Ocultar visualmente el elemento inmediatamente para mejor UX
-                    elementToDelete.style.opacity = '0.5';
-                    elementToDelete.style.pointerEvents = 'none';
-                }
-
-                fetch('/api/explorer/delete', {
+                fetch('/api/files/delete', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        path: path
+                        file_path: path
                     })
                 })
-                .then(response => {
-                    if (!response.ok) {
-                        console.error(`[Explorer] Error de servidor al eliminar ${path}:`, response.status);
-                        throw new Error('Error del servidor: ' + response.status);
-                    }
-                    return response.json();
-                })
+                .then(response => response.json())
                 .then(data => {
-                    // Restaurar botón si sigue existiendo
-                    if (btnConfirmDelete) {
-                        btnConfirmDelete.disabled = false;
-                        btnConfirmDelete.innerHTML = 'Eliminar';
-                    }
-
                     if (data.success) {
-                        console.log(`[Explorer] Eliminación exitosa de ${path}`);
-
-                        // Cerrar notificación previa y mostrar éxito
-                        closeNotification(notifyId);
                         showNotification('Elemento eliminado correctamente', 'success');
-
-                        // Si el elemento ya fue ocultado visualmente, podemos eliminarlo del DOM
-                        if (elementToDelete) {
-                            elementToDelete.remove();
-                        }
-
-                        // Actualizamos la lista completa
-                        setTimeout(() => {
-                            loadFiles(currentPath);
-                            console.log(`[Explorer] Recargando lista de archivos después de eliminación`);
-                        }, 500); // Pequeño retraso para evitar problemas
-
-                        // Cerrar el modal si está abierto
-                        if (deleteModal) {
-                            deleteModal.hide();
-                        }
+                        loadFiles(currentPath);
 
                         // Si el archivo eliminado era el que se estaba previsualizando, limpiar la previsualización
                         if (currentFileSelected === path) {
@@ -1595,141 +1496,13 @@
                             currentFileSelected = null;
                         }
                     } else {
-                        console.error(`[Explorer] Error al eliminar ${path}:`, data.error);
-                        closeNotification(notifyId);
                         showNotification('Error al eliminar: ' + data.error, 'danger');
-
-                        // Restaurar visual del elemento si no se pudo eliminar
-                        if (elementToDelete) {
-                            elementToDelete.style.opacity = '1';
-                            elementToDelete.style.pointerEvents = 'auto';
-                        }
                     }
                 })
                 .catch(error => {
-                    console.error(`[Explorer] Error en petición para eliminar ${path}:`, error);
-                    closeNotification(notifyId);
-                    showNotification('Error al eliminar: ' + error.message, 'danger');
-
-                    // Restaurar visual del elemento si no se pudo eliminar
-                    if (elementToDelete) {
-                        elementToDelete.style.opacity = '1';
-                        elementToDelete.style.pointerEvents = 'auto';
-                    }
-
-                    // Restaurar botón si sigue existiendo
-                    if (btnConfirmDelete) {
-                        btnConfirmDelete.disabled = false;
-                        btnConfirmDelete.innerHTML = 'Eliminar';
-                    }
+                    console.error('Error:', error);
+                    showNotification('Error al eliminar', 'danger');
                 });
-            }
-
-            /**
-             * Función auxiliar para encontrar un elemento por su ruta en el explorador de archivos
-             * @param {string} path - Ruta completa del archivo o carpeta
-             * @return {HTMLElement|null} El elemento del DOM o null si no se encuentra
-             */
-            function findFileElementByPath(path) {
-                console.log(`[Explorer] Buscando elemento para ruta: ${path}`);
-                // Extraer nombre del archivo o carpeta de la ruta completa
-                const pathParts = path.split('/');
-                const targetName = pathParts[pathParts.length - 1];
-
-                // Buscar en todos los elementos del explorador
-                const items = document.querySelectorAll('.file-explorer-item');
-
-                // Primer intento: Buscar coincidencia exacta por nombre de archivo
-                for (const item of items) {
-                    const fileNameElement = item.querySelector('.file-name');
-                    if (fileNameElement) {
-                        // Limpiar el texto (puede tener espacios o elementos extras)
-                        let fileName = fileNameElement.textContent.trim();
-                        // Si tiene un elemento .file-type-badge, quitar esa parte del texto
-                        const fileTypeBadge = fileNameElement.querySelector('.file-type-badge');
-                        if (fileTypeBadge) {
-                            fileName = fileName.replace(fileTypeBadge.textContent.trim(), '').trim();
-                        }
-
-                        // Si coincide el nombre y el elemento tiene un botón de eliminar, es probablemente el correcto
-                        if (fileName === targetName && item.querySelector('.delete-btn')) {
-                            console.log(`[Explorer] Elemento encontrado para ${targetName}`);
-                            return item;
-                        }
-                    }
-                }
-
-                // Segundo intento: Comparación menos estricta, solo verificar si el nombre está contenido
-                if (targetName) {
-                    for (const item of items) {
-                        const itemText = item.textContent.trim();
-                        if (itemText.includes(targetName) && item.querySelector('.delete-btn')) {
-                            console.log(`[Explorer] Elemento probable para ${targetName} (búsqueda parcial)`);
-                            return item;
-                        }
-                    }
-                }
-
-                console.log(`[Explorer] No se encontró elemento para ${targetName}`);
-                return null;
-            }
-
-            // Función para mostrar notificaciones con ID opcional
-            let notificationCounter = 0;
-            function showNotification(message, type = 'success', autoClose = true) {
-                const notificationId = 'notification-' + (++notificationCounter);
-
-                // Buscar el contenedor de notificaciones existente o usar 'notifications'
-                let notificationsContainer = document.getElementById('notifications-container');
-                if (!notificationsContainer) {
-                    notificationsContainer = document.getElementById('notifications');
-                    if (!notificationsContainer) {
-                        // Si no existe ningún contenedor, creamos uno
-                        notificationsContainer = document.createElement('div');
-                        notificationsContainer.id = 'notifications-container';
-                        notificationsContainer.className = 'notifications-container';
-                        notificationsContainer.style.cssText = `
-                            position: fixed;
-                            top: 20px;
-                            right: 20px;
-                            z-index: 9999;
-                            max-width: 350px;
-                        `;
-                        document.body.appendChild(notificationsContainer);
-                    }
-                }
-
-                const notification = document.createElement('div');
-                notification.className = `alert alert-${type} alert-dismissible fade show`;
-                notification.id = notificationId;
-                notification.innerHTML = `
-                    ${message}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                `;
-
-                notificationsContainer.appendChild(notification);
-
-                if (autoClose) {
-                    setTimeout(() => {
-                        notification.classList.remove('show');
-                        setTimeout(() => {
-                            notification.remove();
-                        }, 300);
-                    }, 5000);
-                }
-
-                return notificationId;
-            }
-
-            // Función para cerrar una notificación específica
-            function closeNotification(id) {
-                const notification = document.getElementById(id);
-                if (notification) {
-                    notification.classList.remove('show');
-                    setTimeout(() => {
-                        notification.remove();
-                    }, 300);
-                }
             }
 
             function showDeleteConfirmation(path, type, name) {
@@ -1751,8 +1524,7 @@
                 fetch('/api/github/clone', {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json'
+                        'Content-Type': 'application/json'
                     },
                     body: JSON.stringify(data)
                 })
@@ -1833,64 +1605,6 @@
                 });
             }
 
-            // Función para verificar si hay solicitudes de actualización del Constructor
-            function checkForRefreshRequests() {
-                try {
-                    // Verificar localStorage para solicitudes de actualización
-                    const refreshNeeded = localStorage.getItem('explorer_refresh_needed');
-
-                    if (refreshNeeded === 'true') {
-                        // Obtener información adicional
-                        const refreshPath = localStorage.getItem('explorer_refresh_path') || '.';
-                        const refreshWorkspace = localStorage.getItem('explorer_refresh_workspace') || 'default';
-                        const refreshTimestamp = localStorage.getItem('explorer_refresh_timestamp');
-
-                        console.log(`Se detectó solicitud de actualización: ${refreshPath}, workspace: ${refreshWorkspace}, timestamp: ${refreshTimestamp}`);
-
-                        // Limpiar después de procesar
-                        localStorage.removeItem('explorer_refresh_needed');
-                        localStorage.removeItem('explorer_refresh_path');
-                        localStorage.removeItem('explorer_refresh_workspace');
-                        localStorage.removeItem('explorer_refresh_timestamp');
-
-                        // Cargar los archivos del path especificado - asegurarse de que loadFiles ya está definida
-                        if (typeof loadFiles === 'function') {
-                            loadFiles(refreshPath);
-
-                            // Mostrar mensaje de confirmación
-                            if (typeof showNotification === 'function') {
-                                showNotification('Explorador de archivos actualizado con cambios recientes', 'success');
-                            }
-                        } else {
-                            console.warn('La función loadFiles no está disponible todavía');
-                            // Volver a intentar más tarde
-                            setTimeout(checkForRefreshRequests, 500);
-                        }
-                    }
-
-                    // Establecer un listener para mensajes de ventanas (solo una vez)
-                    if (!window._explorerMessageListenerAdded) {
-                        window.addEventListener('message', function(event) {
-                            try {
-                                if (event.data && event.data.action === 'refresh_explorer') {
-                                    console.log('Recibido mensaje para actualizar explorador:', event.data);
-                                    if (typeof loadFiles === 'function') {
-                                        loadFiles(event.data.path || '.');
-                                    } else {
-                                        console.warn('La función loadFiles no está disponible para mensaje');
-                                    }
-                                }
-                            } catch (msgError) {
-                                console.error('Error al procesar mensaje:', msgError);
-                            }
-                        });
-                        window._explorerMessageListenerAdded = true;
-                    }
-                } catch (err) {
-                    console.error('Error en checkForRefreshRequests:', err);
-                }
-            }
-
             function updateBreadcrumb(path) {
                 const parts = path === '.' ? [] : path.split('/');
                 let html = '<li class="breadcrumb-item"><a href="#" data-path="."><i class="bi bi-house-door"></i> /</a></li>';
@@ -1957,9 +1671,24 @@
                 return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
             }
 
-            // La implementación principal de la función de notificación está arriba 
-            // Esta es una implementación antigua, usaremos solo la versión mejorada
-            // function showNotification ya está definida anteriormente
+            function showNotification(message, type = 'info') {
+                const container = document.getElementById('notifications');
+
+                const notification = document.createElement('div');
+                notification.className = `alert alert-${type} alert-dismissible fade show`;
+                notification.innerHTML = `
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                `;
+
+                container.appendChild(notification);
+
+                // Auto-quitar después de 5 segundos
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                    setTimeout(() => notification.remove(), 300);
+                }, 5000);
+            }
 
             // Funciones para manejar archivos comprimidos
             function uploadFile() {
@@ -1975,10 +1704,6 @@
                 const fileName = file.name;
                 const fileSize = file.size;
 
-                // Debug - mostrar información en consola
-                console.log(`Subiendo archivo: ${fileName}, tamaño: ${fileSize} bytes`);
-                console.log(`Ruta actual: ${currentPath}`);
-
                 // Deshabilitar botón mientras se sube
                 const uploadBtn = document.getElementById('upload-file-submit-btn');
                 uploadBtn.disabled = true;
@@ -1988,7 +1713,6 @@
                 if (fileSize < 5 * 1024 * 1024) {
                     // Actualizar el valor del path en el formulario
                     uploadPathInput.value = currentPath;
-                    console.log(`Path establecido en formulario: ${uploadPathInput.value}`);
 
                     // Usar el formulario directamente en lugar de FormData
                     const form = document.getElementById('upload-file-form');
