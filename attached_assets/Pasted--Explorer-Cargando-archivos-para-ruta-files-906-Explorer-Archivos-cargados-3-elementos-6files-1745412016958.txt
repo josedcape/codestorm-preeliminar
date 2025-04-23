@@ -1,0 +1,39 @@
+[Explorer] Cargando archivos para ruta: .
+files:906 [Explorer] Archivos cargados: 3 elementos
+6files#:1 Uncaught (in promise) Error: A listener indicated an asynchronous response by returning true, but the message channel closed before a response was receivedUnderstand this error
+files:1520 [Explorer] Intentando eliminar: user_workspaces/default/./codestorm-Assistant
+files:1634 [Explorer] Buscando elemento para ruta: user_workspaces/default/./codestorm-Assistant
+files:1656 [Explorer] Elemento encontrado para codestorm-Assistant
+api/explorer/delete:1 
+            
+            
+           Failed to load resource: the server responded with a status of 404 (Not Found)Understand this error
+files:1550 [Explorer] Error de servidor al eliminar user_workspaces/default/./codestorm-Assistant: 404
+(anonymous) @ files:1550Understand this error
+files:1610 [Explorer] Error en petición para eliminar user_workspaces/default/./codestorm-Assistant: Error: Error del servidor: 404
+    at files:1551:31
+(anonymous) @ files:1610Understand this error
+files:1520 [Explorer] Intentando eliminar: user_workspaces/default/./CODESTORM
+files:1634 [Explorer] Buscando elemento para ruta: user_workspaces/default/./CODESTORM
+files:1656 [Explorer] Elemento encontrado para CODESTORM
+api/explorer/delete:1 
+            
+            
+           Failed to load resource: the server responded with a status of 404 (Not Found)Understand this error
+files:1550 [Explorer] Error de servidor al eliminar user_workspaces/default/./CODESTORM: 404
+(anonymous) @ files:1550Understand this error
+files:1610 [Explorer] Error en petición para eliminar user_workspaces/default/./CODESTORM: Error: Error del servidor: 404
+    at files:1551:31
+(anonymous) @ files:1610Understand this error
+files:1520 [Explorer] Intentando eliminar: user_workspaces/default/./CODESTORM
+files:1634 [Explorer] Buscando elemento para ruta: user_workspaces/default/./CODESTORM
+files:1656 [Explorer] Elemento encontrado para CODESTORM
+api/explorer/delete:1 
+            
+            
+           Failed to load resource: the server responded with a status of 404 (Not Found)Understand this error
+files:1550 [Explorer] Error de servidor al eliminar user_workspaces/default/./CODESTORM: 404
+(anonymous) @ files:1550Understand this error
+files:1610 [Explorer] Error en petición para eliminar user_workspaces/default/./CODESTORM: Error: Error del servidor: 404
+    at files:1551:31
+(anonymous) @ files:1610Understand this error
