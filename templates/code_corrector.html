@@ -10,7 +10,7 @@
     .code-correction-container {
         border-radius: 8px;
         overflow: hidden;
-        height: calc(100vh - 200px);
+        height: calc(100vh - 150px);
         display: flex;
         flex-direction: column;
     }
@@ -60,6 +60,36 @@
         align-items: center;
     }
     
+    .fullscreen-btn {
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: var(--text-secondary);
+        font-size: 1rem;
+        padding: 0.25rem;
+        transition: color 0.3s;
+        margin-left: 0.5rem;
+    }
+    
+    .fullscreen-btn:hover {
+        color: var(--accent-primary);
+    }
+    
+    .editor-fullscreen {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 1050;
+        background-color: var(--bg-primary);
+        overflow: auto;
+    }
+    
+    .editor-fullscreen .code-textarea {
+        height: calc(100vh - 120px);
+    }
+    
     .code-editor-body, .correction-result-body {
         padding: 1rem;
         overflow-y: auto;
@@ -68,7 +98,7 @@
     
     .code-textarea {
         width: 100%;
-        height: 300px;
+        height: 500px;
         background-color: var(--bg-tertiary);
         color: var(--text-primary);
         border: 1px solid var(--accent-primary);
@@ -76,6 +106,9 @@
         font-family: 'JetBrains Mono', monospace;
         padding: 0.75rem;
         resize: vertical;
+        overflow-y: auto;
+        white-space: pre;
+        tab-size: 4;
     }
     
     .instructions-textarea {
@@ -248,8 +281,18 @@
                         <textarea id="instructions" class="instructions-textarea" placeholder="Describe qué correcciones necesitas en el código. Por ejemplo: 'Corrige el manejo de errores y optimiza el rendimiento'"></textarea>
                     </div>
                     <div class="mb-3">
-                        <label for="code-input" class="form-label">Código a corregir:</label>
-                        <textarea id="code-input" class="code-textarea" placeholder="Ingresa aquí tu código para revisión..."></textarea>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <label for="code-input" class="form-label mb-0">Código a corregir:</label>
+                            <span class="text-muted code-stats">
+                                <span id="line-count">0</span> líneas | <span id="char-count">0</span> caracteres
+                            </span>
+                        </div>
+                        <div class="position-relative">
+                            <textarea id="code-input" class="code-textarea" placeholder="Ingresa aquí tu código para revisión..."></textarea>
+                            <button class="fullscreen-btn editor-fullscreen-btn" title="Editar en pantalla completa">
+                                <i class="fa-solid fa-expand"></i>
+                            </button>
+                        </div>
                     </div>
                     <div class="d-flex justify-content-end">
                         <button id="clear-button" class="btn btn-outline-secondary me-2">
@@ -295,13 +338,21 @@
                         </div>
                         
                         <div id="corrected-code-container" style="display: none;">
-                            <pre class="language-python"><code id="corrected-code"></code></pre>
+                            <div class="code-result-wrapper position-relative">
+                                <pre class="language-python" style="max-height: 500px; overflow: auto;"><code id="corrected-code"></code></pre>
+                                <button class="fullscreen-btn code-fullscreen-btn" title="Ver en pantalla completa">
+                                    <i class="fa-solid fa-expand"></i>
+                                </button>
+                            </div>
                             <div class="d-flex justify-content-end mt-3">
                                 <button id="copy-button" class="btn btn-sm btn-outline-secondary me-2">
                                     <i class="fa-regular fa-copy me-1"></i> Copiar
                                 </button>
                                 <button id="apply-button" class="btn btn-sm btn-primary me-2">
                                     <i class="fa-solid fa-check me-1"></i> Aplicar cambios
+                                </button>
+                                <button id="download-button" class="btn btn-sm btn-outline-primary me-2">
+                                    <i class="fa-solid fa-download me-1"></i> Descargar
                                 </button>
                                 <button id="send-to-assistant-button" class="btn btn-sm btn-accent">
                                     <i class="fa-solid fa-robot me-1"></i> Enviar al asistente
@@ -346,6 +397,7 @@
         const clearButton = document.getElementById('clear-button');
         const copyButton = document.getElementById('copy-button');
         const applyButton = document.getElementById('apply-button');
+        const downloadButton = document.getElementById('download-button');
         const languageDropdown = document.getElementById('languageDropdown');
         const loadingOverlay = document.getElementById('loading-overlay');
         const initialMessage = document.getElementById('initial-message');
@@ -355,6 +407,10 @@
         const codeView = document.getElementById('code-view');
         const changesList = document.getElementById('changes-list');
         const explanationContent = document.getElementById('explanation-content');
+        const lineCountElement = document.getElementById('line-count');
+        const charCountElement = document.getElementById('char-count');
+        const editorFullscreenBtn = document.querySelector('.editor-fullscreen-btn');
+        const codeFullscreenBtn = document.querySelector('.code-fullscreen-btn');
         
         // Cambiar entre vistas (código/cambios)
         document.querySelectorAll('.view-toggle-btn').forEach(button => {
@@ -480,6 +536,103 @@
                 const encodedMessage = encodeURIComponent(message);
                 window.location.href = `/chat?message=${encodedMessage}`;
             });
+        }
+        
+        // Botón para descargar código corregido
+        if (downloadButton) {
+            downloadButton.addEventListener('click', function() {
+                const code = correctedCode.textContent;
+                
+                if (!code) {
+                    alert('No hay código para descargar.');
+                    return;
+                }
+                
+                // Crear un blob con el código
+                const blob = new Blob([code], { type: 'text/plain' });
+                const url = URL.createObjectURL(blob);
+                
+                // Crear un elemento de enlace para la descarga
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `codigo_corregido.${getFileExtension(currentLanguage)}`;
+                document.body.appendChild(a);
+                a.click();
+                
+                // Limpiar
+                setTimeout(() => {
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                }, 0);
+            });
+        }
+        
+        // Funcionalidad de pantalla completa para el editor
+        if (editorFullscreenBtn) {
+            editorFullscreenBtn.addEventListener('click', function() {
+                const editorPane = document.querySelector('.code-editor-pane');
+                
+                if (editorPane.classList.contains('editor-fullscreen')) {
+                    editorPane.classList.remove('editor-fullscreen');
+                    this.innerHTML = '<i class="fa-solid fa-expand"></i>';
+                } else {
+                    editorPane.classList.add('editor-fullscreen');
+                    this.innerHTML = '<i class="fa-solid fa-compress"></i>';
+                }
+            });
+        }
+        
+        // Funcionalidad de pantalla completa para el código corregido
+        if (codeFullscreenBtn) {
+            codeFullscreenBtn.addEventListener('click', function() {
+                const resultPane = document.querySelector('.correction-result-pane');
+                
+                if (resultPane.classList.contains('editor-fullscreen')) {
+                    resultPane.classList.remove('editor-fullscreen');
+                    this.innerHTML = '<i class="fa-solid fa-expand"></i>';
+                } else {
+                    resultPane.classList.add('editor-fullscreen');
+                    this.innerHTML = '<i class="fa-solid fa-compress"></i>';
+                }
+            });
+        }
+        
+        // Función para obtener la extensión de archivo basada en el lenguaje
+        function getFileExtension(language) {
+            const extensions = {
+                'python': 'py',
+                'javascript': 'js',
+                'html': 'html',
+                'css': 'css',
+                'java': 'java',
+                'cpp': 'cpp'
+            };
+            
+            return extensions[language] || 'txt';
+        }
+        
+        // Actualizar contador de líneas y caracteres
+        if (codeInput) {
+            codeInput.addEventListener('input', updateCodeStats);
+            
+            function updateCodeStats() {
+                const code = codeInput.value;
+                const lines = code ? code.split('\n').length : 0;
+                const chars = code.length;
+                
+                lineCountElement.textContent = lines;
+                charCountElement.textContent = chars;
+                
+                // Alerta visual si el código es muy extenso
+                if (chars > 10000) {
+                    charCountElement.classList.add('text-warning');
+                } else {
+                    charCountElement.classList.remove('text-warning');
+                }
+            }
+            
+            // Inicializar contador
+            updateCodeStats();
         }
         
         // Función para renderizar los cambios en la vista de cambios

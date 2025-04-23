@@ -358,6 +358,10 @@ def process_code():
         if not code:
             return jsonify({'error': 'No se proporcionó código para procesar'}), 400
             
+        # Verificar tamaño del código
+        if len(code) > 100000:  # Aproximadamente 100KB
+            return jsonify({'error': 'El código es demasiado extenso. Por favor, divídelo en partes más pequeñas.'}), 413
+            
         # Detectar el lenguaje por la extensión del archivo
         language = 'unknown'
         if file_path:
