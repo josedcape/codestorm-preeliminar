@@ -595,7 +595,7 @@ def process_instructions():
 
         logging.debug(f"Generated command using {model_choice}: {terminal_command}")
 
-    return jsonify({'command': terminal_command})
+        return jsonify({'command': terminal_command})
     except Exception as e:
         logging.error(f"Error processing instructions: {str(e)}")
         return jsonify({'error': str(e)}), 500
