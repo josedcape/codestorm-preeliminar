@@ -737,6 +737,40 @@ def upload_file():
         return response, 500
 
 
+@file_explorer_bp.route('/api/explorer/delete', methods=['POST'])
+def delete_file_or_directory():
+    """Delete a file or directory."""
+    try:
+        data = request.json
+        relative_path = data.get('path', '')
+        
+        if not relative_path:
+            return jsonify({'error': 'No path provided'}), 400
+            
+        # Get the user workspace
+        workspace_id = request.args.get('workspace_id', 'default')
+        workspace_path = os.path.join('user_workspaces', workspace_id)
+        
+        # Build target path
+        target_path = os.path.join(workspace_path, relative_path.lstrip('./'))
+        
+        # Verify path is within workspace
+        if not os.path.abspath(target_path).startswith(os.path.abspath(workspace_path)):
+            return jsonify({'error': 'Access denied: Path outside workspace'}), 403
+            
+        if os.path.exists(target_path):
+            if os.path.isdir(target_path):
+                shutil.rmtree(target_path)
+            else:
+                os.remove(target_path)
+            return jsonify({'success': True, 'message': f'Deleted {relative_path}'})
+        else:
+            return jsonify({'error': 'Path not found'}), 404
+            
+    except Exception as e:
+        logger.error(f"Error deleting {relative_path}: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
 @file_explorer_bp.route('/api/explorer/upload_chunk', methods=['POST'])
 def upload_chunk():
     """
