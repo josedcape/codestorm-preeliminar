@@ -288,6 +288,11 @@ def code_corrector_slash():
     """Redirect to ensure both with and without trailing slash work."""
     return render_template('code_corrector.html')
 
+@app.route('/constructor')
+def constructor():
+    """Render the constructor page."""
+    return render_template('constructor.html')
+
 @app.route('/api/process_code', methods=['POST'])
 def process_code():
     """Process code for corrections and improvements."""
