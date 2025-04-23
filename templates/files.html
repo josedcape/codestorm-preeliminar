@@ -1467,11 +1467,11 @@
             }
 
             function createFile(path, content) {
-                fetch('/api/files/create', {
-                    method: 'POST',
+                fetch('/api/explorer/file', {
+                    method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        file_path: path,
+                        path: path,
                         content: content
                     })
                 })
@@ -1498,7 +1498,8 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         path: path + '/.gitkeep',
-                        content: ''
+                        content: '',
+                        workspace_id: 'default'
                     })
                 })
                 .then(response => response.json())
