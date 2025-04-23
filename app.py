@@ -771,8 +771,7 @@ def upload_file():
                     zip_ref.extractall(extract_dir)
                 return jsonify({
                     'success': True,
-                    'message': f'Archivo {filename} subido y extraído exitosamente',
-                    'extracted': True,
+                    'message': f'Archivo {filename} subido y extraído exitosamente','extracted': True,
                     'extract_path': str(extract_dir.relative_to(workspace_path))
                 })
             except Exception as zip_error:
