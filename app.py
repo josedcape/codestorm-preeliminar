@@ -146,6 +146,10 @@ if gemini_api_key:
 
 @app.route('/constructor')
 def constructor():
+    return render_template('constructor.html')
+
+@app.route('/api/constructor')
+def constructor():
     """Render the constructor page for building apps."""
     return render_template('constructor.html')
 
