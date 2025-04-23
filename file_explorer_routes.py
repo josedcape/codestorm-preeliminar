@@ -11,6 +11,7 @@ from flask import Blueprint, jsonify, request, send_file
 from werkzeug.utils import secure_filename
 import file_explorer
 import tempfile
+import shutil
 
 logger = logging.getLogger(__name__)
 
@@ -21,12 +22,12 @@ file_explorer_bp = Blueprint('file_explorer', __name__)
 def list_directory():
     """
     Lista archivos y directorios en una ruta especificada.
-    
+
     Parámetros de consulta:
     - path: Ruta relativa a listar (predeterminado: '.')
     - max_depth: Profundidad máxima de la exploración (predeterminado: 2)
     - workspace_id: ID del espacio de trabajo (predeterminado: 'default')
-    
+
     Retorna:
     - Lista de archivos y directorios
     """
@@ -34,21 +35,28 @@ def list_directory():
         relative_path = request.args.get('path', '.')
         max_depth = int(request.args.get('max_depth', 2))
         workspace_id = request.args.get('workspace_id', 'default')
-        
+
         # Construir ruta completa
         workspace_path = os.path.join('user_workspaces', workspace_id)
         target_path = os.path.join(workspace_path, relative_path)
-        
+
         # Asegurar que no se salga del directorio del usuario (prevenir directory traversal)
         if not os.path.abspath(target_path).startswith(os.path.abspath(workspace_path)):
             return jsonify({
                 'success': False,
                 'error': 'Acceso denegado: la ruta se sale del espacio de trabajo'
             }), 403
-        
+
+        # Verificar si el directorio existe
+        if not os.path.isdir(target_path):
+            return jsonify({
+                'success': False,
+                'error': f'El directorio "{target_path}" no existe.'
+            }), 404
+
         # Listar el contenido del directorio
         success, items, error = file_explorer.list_directory(target_path, 1, max_depth)
-        
+
         if success:
             return jsonify({
                 'success': True,
@@ -60,6 +68,12 @@ def list_directory():
                 'success': False,
                 'error': error
             }), 404
+    except ValueError as e:
+        logger.error(f"Error de valor al listar directorio: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': f'Error de valor al listar el directorio: {str(e)}'
+        }), 400 # Bad Request for incorrect input
     except Exception as e:
         logger.error(f"Error al listar directorio: {str(e)}")
         return jsonify({
@@ -72,38 +86,38 @@ def list_directory():
 def get_file():
     """
     Obtiene el contenido de un archivo específico.
-    
+
     Parámetros de consulta:
     - path: Ruta relativa al archivo
     - workspace_id: ID del espacio de trabajo (predeterminado: 'default')
-    
+
     Retorna:
     - Contenido del archivo y tipo
     """
     try:
         relative_path = request.args.get('path')
         workspace_id = request.args.get('workspace_id', 'default')
-        
+
         if not relative_path:
             return jsonify({
                 'success': False,
                 'error': 'Debe especificar una ruta de archivo'
             }), 400
-        
+
         # Construir ruta completa
         workspace_path = os.path.join('user_workspaces', workspace_id)
         file_path = os.path.join(workspace_path, relative_path)
-        
+
         # Asegurar que no se salga del directorio del usuario
         if not os.path.abspath(file_path).startswith(os.path.abspath(workspace_path)):
             return jsonify({
                 'success': False,
                 'error': 'Acceso denegado: la ruta se sale del espacio de trabajo'
             }), 403
-        
+
         # Obtener el contenido del archivo
         success, content, file_type = file_explorer.get_file_content(file_path)
-        
+
         if success:
             return jsonify({
                 'success': True,
@@ -128,12 +142,12 @@ def get_file():
 def update_file():
     """
     Actualiza el contenido de un archivo existente.
-    
+
     Espera:
     - path: Ruta relativa al archivo
     - content: Nuevo contenido para el archivo
     - workspace_id: ID del espacio de trabajo (predeterminado: 'default')
-    
+
     Retorna:
     - Confirmación de actualización
     """
@@ -142,31 +156,31 @@ def update_file():
         relative_path = data.get('path')
         content = data.get('content')
         workspace_id = data.get('workspace_id', 'default')
-        
+
         if not relative_path or content is None:
             return jsonify({
                 'success': False,
                 'error': 'Debe especificar una ruta de archivo y contenido'
             }), 400
-        
+
         # Construir ruta completa
         workspace_path = os.path.join('user_workspaces', workspace_id)
         file_path = os.path.join(workspace_path, relative_path)
-        
+
         # Asegurar que no se salga del directorio del usuario
         if not os.path.abspath(file_path).startswith(os.path.abspath(workspace_path)):
             return jsonify({
                 'success': False,
                 'error': 'Acceso denegado: la ruta se sale del espacio de trabajo'
             }), 403
-        
+
         # Actualizar el archivo
         success, message = file_explorer.update_file_content(file_path, content)
-        
+
         if success:
             # Registro de actividad (opcional)
             logger.info(f"Archivo actualizado: {file_path}")
-            
+
             return jsonify({
                 'success': True,
                 'path': relative_path,
@@ -189,12 +203,12 @@ def update_file():
 def create_file():
     """
     Crea un nuevo archivo con el contenido especificado.
-    
+
     Espera:
     - path: Ruta relativa al nuevo archivo
     - content: Contenido para el archivo
     - workspace_id: ID del espacio de trabajo (predeterminado: 'default')
-    
+
     Retorna:
     - Confirmación de creación
     """
@@ -203,31 +217,31 @@ def create_file():
         relative_path = data.get('path')
         content = data.get('content', '')
         workspace_id = data.get('workspace_id', 'default')
-        
+
         if not relative_path:
             return jsonify({
                 'success': False,
                 'error': 'Debe especificar una ruta de archivo'
             }), 400
-        
+
         # Construir ruta completa
         workspace_path = os.path.join('user_workspaces', workspace_id)
         file_path = os.path.join(workspace_path, relative_path)
-        
+
         # Asegurar que no se salga del directorio del usuario
         if not os.path.abspath(file_path).startswith(os.path.abspath(workspace_path)):
             return jsonify({
                 'success': False,
                 'error': 'Acceso denegado: la ruta se sale del espacio de trabajo'
             }), 403
-        
+
         # Crear el archivo
         success, message = file_explorer.create_file(file_path, content)
-        
+
         if success:
             # Registro de actividad (opcional)
             logger.info(f"Archivo creado: {file_path}")
-            
+
             return jsonify({
                 'success': True,
                 'path': relative_path,
@@ -250,13 +264,13 @@ def create_file():
 def search_files():
     """
     Busca archivos o directorios en el espacio de trabajo.
-    
+
     Parámetros de consulta:
     - query: Texto a buscar
     - type: Tipo de búsqueda ('name', 'content', 'extension')
     - path: Ruta base para la búsqueda (predeterminado: '.')
     - workspace_id: ID del espacio de trabajo (predeterminado: 'default')
-    
+
     Retorna:
     - Lista de archivos/directorios encontrados
     """
@@ -265,27 +279,27 @@ def search_files():
         search_type = request.args.get('type', 'name')
         relative_path = request.args.get('path', '.')
         workspace_id = request.args.get('workspace_id', 'default')
-        
+
         if not query:
             return jsonify({
                 'success': False,
                 'error': 'Debe especificar un texto de búsqueda'
             }), 400
-        
+
         # Construir ruta completa
         workspace_path = os.path.join('user_workspaces', workspace_id)
         search_path = os.path.join(workspace_path, relative_path)
-        
+
         # Asegurar que no se salga del directorio del usuario
         if not os.path.abspath(search_path).startswith(os.path.abspath(workspace_path)):
             return jsonify({
                 'success': False,
                 'error': 'Acceso denegado: la ruta se sale del espacio de trabajo'
             }), 403
-        
+
         # Realizar la búsqueda
         success, found_items, error = file_explorer.find_file(search_path, query, search_type)
-        
+
         if success:
             # Convertir rutas absolutas a relativas
             relative_items = []
@@ -294,7 +308,7 @@ def search_files():
                     relative_items.append(os.path.relpath(item, workspace_path))
                 else:
                     relative_items.append(item)
-            
+
             return jsonify({
                 'success': True,
                 'query': query,
@@ -320,12 +334,12 @@ def search_files():
 def analyze_project():
     """
     Analiza la estructura general de un proyecto.
-    
+
     Parámetros de consulta:
     - path: Ruta relativa al proyecto (predeterminado: '.')
     - workspace_id: ID del espacio de trabajo (predeterminado: 'default')
     - max_depth: Profundidad máxima de análisis (predeterminado: 3)
-    
+
     Retorna:
     - Información estructurada sobre el proyecto
     """
@@ -333,21 +347,21 @@ def analyze_project():
         relative_path = request.args.get('path', '.')
         workspace_id = request.args.get('workspace_id', 'default')
         max_depth = int(request.args.get('max_depth', 3))
-        
+
         # Construir ruta completa
         workspace_path = os.path.join('user_workspaces', workspace_id)
         project_path = os.path.join(workspace_path, relative_path)
-        
+
         # Asegurar que no se salga del directorio del usuario
         if not os.path.abspath(project_path).startswith(os.path.abspath(workspace_path)):
             return jsonify({
                 'success': False,
                 'error': 'Acceso denegado: la ruta se sale del espacio de trabajo'
             }), 403
-        
+
         # Analizar el proyecto
         analysis = file_explorer.analyze_project_structure(project_path, max_depth)
-        
+
         # Convertir rutas absolutas a relativas en el resultado
         if analysis.get('success', False) and 'important_files' in analysis:
             relative_files = []
@@ -357,7 +371,7 @@ def analyze_project():
                 else:
                     relative_files.append(item)
             analysis['important_files'] = relative_files
-        
+
         return jsonify(analysis)
     except Exception as e:
         logger.error(f"Error al analizar proyecto: {str(e)}")
@@ -371,13 +385,13 @@ def analyze_project():
 def compress_to_zip():
     """
     Comprime un archivo o directorio en formato ZIP.
-    
+
     Espera:
     - path: Ruta relativa al archivo o directorio a comprimir
     - output_path: (Opcional) Ruta relativa donde guardar el archivo ZIP
     - include_root: (Opcional) Si se debe incluir el directorio raíz en el ZIP (predeterminado: True)
     - workspace_id: ID del espacio de trabajo (predeterminado: 'default')
-    
+
     Retorna:
     - Confirmación de compresión y ruta del archivo ZIP generado
     """
@@ -387,17 +401,17 @@ def compress_to_zip():
         relative_output_path = data.get('output_path')
         include_root = data.get('include_root', True)
         workspace_id = data.get('workspace_id', 'default')
-        
+
         if not relative_path:
             return jsonify({
                 'success': False,
                 'error': 'Debe especificar una ruta a comprimir'
             }), 400
-        
+
         # Construir rutas completas
         workspace_path = os.path.join('user_workspaces', workspace_id)
         source_path = os.path.join(workspace_path, relative_path)
-        
+
         # Si se especificó una ruta de salida, construirla
         if relative_output_path:
             output_zip_path = os.path.join(workspace_path, relative_output_path)
@@ -407,7 +421,7 @@ def compress_to_zip():
                 output_zip_path = source_path.rstrip(os.path.sep) + '.zip'
             else:
                 output_zip_path = source_path + '.zip'
-            
+
         # Asegurar que no se salga del directorio del usuario
         if not os.path.abspath(source_path).startswith(os.path.abspath(workspace_path)):
             response = jsonify({
@@ -416,10 +430,10 @@ def compress_to_zip():
             })
             response.headers['Content-Type'] = 'application/json'
             return response, 403
-        
+
         # Comprimir en ZIP
         success, message = file_explorer.create_zip_archive(source_path, output_zip_path, include_root)
-        
+
         if success:
             # Obtener la ruta relativa del archivo ZIP generado
             if output_zip_path:
@@ -429,7 +443,7 @@ def compress_to_zip():
                     result_path = os.path.relpath(source_path + '.zip', workspace_path)
                 else:
                     result_path = os.path.relpath(source_path + '.zip', workspace_path)
-                    
+
             return jsonify({
                 'success': True,
                 'message': message,
@@ -452,12 +466,12 @@ def compress_to_zip():
 def extract_compressed():
     """
     Extrae un archivo comprimido (ZIP o RAR).
-    
+
     Espera:
     - path: Ruta relativa al archivo comprimido
     - extract_dir: (Opcional) Ruta relativa donde extraer el contenido
     - workspace_id: ID del espacio de trabajo (predeterminado: 'default')
-    
+
     Retorna:
     - Confirmación de extracción y lista de archivos extraídos
     """
@@ -466,22 +480,22 @@ def extract_compressed():
         relative_path = data.get('path')
         relative_extract_dir = data.get('extract_dir')
         workspace_id = data.get('workspace_id', 'default')
-        
+
         if not relative_path:
             return jsonify({
                 'success': False,
                 'error': 'Debe especificar una ruta de archivo comprimido'
             }), 400
-        
+
         # Construir rutas completas
         workspace_path = os.path.join('user_workspaces', workspace_id)
         file_path = os.path.join(workspace_path, relative_path)
-        
+
         # Si se especificó un directorio de extracción, construirlo
         extract_dir = None
         if relative_extract_dir:
             extract_dir = os.path.join(workspace_path, relative_extract_dir)
-            
+
         # Asegurar que no se salga del directorio del usuario
         if not os.path.abspath(file_path).startswith(os.path.abspath(workspace_path)):
             response = jsonify({
@@ -490,10 +504,10 @@ def extract_compressed():
             })
             response.headers['Content-Type'] = 'application/json'
             return response, 403
-        
+
         # Extraer archivo comprimido
         success, message, extracted_files = file_explorer.extract_compressed_file(file_path, extract_dir)
-        
+
         if success:
             # Obtener la ruta relativa del directorio de extracción
             if extract_dir:
@@ -502,7 +516,7 @@ def extract_compressed():
                 # Si no se especificó, se creó uno junto al archivo
                 file_name = os.path.splitext(os.path.basename(file_path))[0]
                 extract_rel_path = os.path.join(os.path.dirname(relative_path), file_name)
-                
+
             return jsonify({
                 'success': True,
                 'message': message,
@@ -526,60 +540,60 @@ def extract_compressed():
 def download_file_or_dir():
     """
     Descarga un archivo o directorio (comprimido en ZIP).
-    
+
     Parámetros de consulta:
     - path: Ruta relativa al archivo o directorio
     - workspace_id: ID del espacio de trabajo (predeterminado: 'default')
-    
+
     Retorna:
     - El archivo para descarga, o un archivo ZIP para directorios
     """
     try:
         relative_path = request.args.get('path')
         workspace_id = request.args.get('workspace_id', 'default')
-        
+
         if not relative_path:
             return jsonify({
                 'success': False,
                 'error': 'Debe especificar una ruta para descargar'
             }), 400
-        
+
         # Construir ruta completa
         workspace_path = os.path.join('user_workspaces', workspace_id)
         file_path = os.path.join(workspace_path, relative_path)
-        
+
         # Asegurar que no se salga del directorio del usuario
         if not os.path.abspath(file_path).startswith(os.path.abspath(workspace_path)):
             return jsonify({
                 'success': False,
                 'error': 'Acceso denegado: la ruta se sale del espacio de trabajo'
             }), 403
-        
+
         # Verificar si existe
         if not os.path.exists(file_path):
             return jsonify({
                 'success': False,
                 'error': f'La ruta {relative_path} no existe'
             }), 404
-        
+
         # Si es un archivo, simplemente descargarlo
         if os.path.isfile(file_path):
             return send_file(file_path, as_attachment=True, download_name=os.path.basename(file_path))
-        
+
         # Si es un directorio, comprimirlo primero
         if os.path.isdir(file_path):
             # Crear un archivo ZIP temporal
             with tempfile.NamedTemporaryFile(suffix='.zip', delete=False) as temp_file:
                 temp_zip_path = temp_file.name
-            
+
             # Comprimir el directorio
             success, message = file_explorer.create_zip_archive(file_path, temp_zip_path, True)
-            
+
             if success:
                 # Establecer nombre de descarga para el ZIP
                 dir_name = os.path.basename(file_path.rstrip(os.path.sep))
                 download_name = f"{dir_name}.zip"
-                
+
                 # Enviar el archivo y programar su eliminación después
                 return send_file(
                     temp_zip_path,
@@ -593,12 +607,12 @@ def download_file_or_dir():
                 # Limpiar si hubo error
                 if os.path.exists(temp_zip_path):
                     os.unlink(temp_zip_path)
-                    
+
                 return jsonify({
                     'success': False,
                     'error': f'Error al comprimir el directorio: {message}'
                 }), 500
-        
+
         # Ni archivo ni directorio (no debería llegar aquí)
         return jsonify({
             'success': False,
@@ -616,13 +630,13 @@ def download_file_or_dir():
 def upload_file():
     """
     Sube un archivo al espacio de trabajo.
-    
+
     Form data:
     - file: Archivo a subir
     - path: Ruta relativa donde guardar el archivo (predeterminado: '.')
     - workspace_id: ID del espacio de trabajo (predeterminado: 'default')
     - extract: Si es True y el archivo es ZIP o RAR, extraerlo automáticamente
-    
+
     Retorna:
     - Confirmación de carga y ruta del archivo
     """
@@ -635,7 +649,7 @@ def upload_file():
             })
             response.headers['Content-Type'] = 'application/json'
             return response, 400
-            
+
         uploaded_file = request.files['file']
         if uploaded_file.filename == '':
             response = jsonify({
@@ -644,15 +658,15 @@ def upload_file():
             })
             response.headers['Content-Type'] = 'application/json'
             return response, 400
-            
+
         relative_path = request.form.get('path', '.')
         workspace_id = request.form.get('workspace_id', 'default')
         extract = request.form.get('extract', 'false').lower() == 'true'
-        
+
         # Construir ruta completa
         workspace_path = os.path.join('user_workspaces', workspace_id)
         target_dir = os.path.join(workspace_path, relative_path)
-        
+
         # Asegurar que no se salga del directorio del usuario
         if not os.path.abspath(target_dir).startswith(os.path.abspath(workspace_path)):
             response = jsonify({
@@ -661,14 +675,14 @@ def upload_file():
             })
             response.headers['Content-Type'] = 'application/json'
             return response, 403
-            
+
         # Asegurar que el directorio exista
         os.makedirs(target_dir, exist_ok=True)
-        
+
         # Guardar el archivo usando un método más eficiente para archivos grandes
         filename = secure_filename(uploaded_file.filename)
         file_path = os.path.join(target_dir, filename)
-        
+
         # Guardar el archivo para mejor manejo de memoria
         try:
             # Usar el método save proporcionado por werkzeug, que maneja internamente los archivos grandes
@@ -682,19 +696,19 @@ def upload_file():
             })
             response.headers['Content-Type'] = 'application/json'
             return response, 500
-        
+
         # Si es archivo comprimido y se solicitó extracción (que ahora siempre es falso por defecto)
         file_ext = os.path.splitext(filename)[1].lower()
         if extract and file_ext in ['.zip']:
             # Extraer archivo
             try:
                 success, message, extracted_files = file_explorer.extract_compressed_file(file_path)
-                
+
                 if success:
                     # Obtener la ruta relativa del directorio de extracción
                     file_name = os.path.splitext(filename)[0]
                     extract_rel_path = os.path.join(relative_path, file_name)
-                    
+
                     response = jsonify({
                         'success': True,
                         'message': f'Archivo subido y extraído: {filename}',
@@ -717,7 +731,7 @@ def upload_file():
             except Exception as extract_error:
                 logger.error(f"Error al extraer archivo: {str(extract_error)}")
                 # Continuamos con el flujo normal, el archivo se subió pero no se pudo extraer
-        
+
         # Archivo normal (no comprimido o sin extracción)
         response = jsonify({
             'success': True,
@@ -746,21 +760,21 @@ def delete_file_or_directory():
         else:
             data = request.json
             path = data.get('path', '')
-        
+
         if not path:
             return jsonify({'error': 'No path provided'}), 400
-            
+
         # Get the user workspace
         workspace_id = request.args.get('workspace_id', 'default')
         workspace_path = os.path.join('user_workspaces', workspace_id)
-        
+
         # Build target path
         target_path = os.path.join(workspace_path, path.lstrip('./'))
-        
+
         # Verify path is within workspace
         if not os.path.abspath(target_path).startswith(os.path.abspath(workspace_path)):
             return jsonify({'error': 'Access denied: Path outside workspace'}), 403
-            
+
         if os.path.exists(target_path):
             try:
                 if os.path.isdir(target_path):
@@ -774,7 +788,7 @@ def delete_file_or_directory():
                 return jsonify({'error': str(e)}), 500
         else:
             return jsonify({'error': 'Path not found'}), 404
-            
+
     except Exception as e:
         logger.error(f"Error deleting {path}: {str(e)}")
         return jsonify({'error': str(e)}), 500
@@ -784,7 +798,7 @@ def upload_chunk():
     """
     Sube un fragmento de archivo al espacio de trabajo.
     Esta ruta está diseñada para subir archivos grandes en fragmentos.
-    
+
     Form data:
     - chunk: Fragmento de archivo a subir
     - filename: Nombre del archivo a crear
@@ -792,7 +806,7 @@ def upload_chunk():
     - total_chunks: Número total de fragmentos
     - path: Ruta relativa donde guardar el archivo (predeterminado: '.')
     - workspace_id: ID del espacio de trabajo (predeterminado: 'default')
-    
+
     Retorna:
     - Confirmación de carga del fragmento o del archivo completo
     """
@@ -803,53 +817,53 @@ def upload_chunk():
                 'success': False,
                 'error': 'No se ha enviado ningún fragmento de archivo'
             }), 400
-            
+
         chunk = request.files['chunk']
         if chunk.filename == '':
             return jsonify({
                 'success': False,
                 'error': 'Nombre de archivo vacío'
             }), 400
-            
+
         # Obtener parámetros
         filename = request.form.get('filename', '')
         chunk_index = int(request.form.get('index', 0))
         total_chunks = int(request.form.get('total_chunks', 1))
         relative_path = request.form.get('path', '.')
         workspace_id = request.form.get('workspace_id', 'default')
-        
+
         if not filename:
             return jsonify({
                 'success': False,
                 'error': 'El nombre del archivo es obligatorio'
             }), 400
-            
+
         # Construir ruta completa
         workspace_path = os.path.join('user_workspaces', workspace_id)
         target_dir = os.path.join(workspace_path, relative_path)
-        
+
         # Asegurar que no se salga del directorio del usuario
         if not os.path.abspath(target_dir).startswith(os.path.abspath(workspace_path)):
             return jsonify({
                 'success': False,
                 'error': 'Acceso denegado: la ruta se sale del espacio de trabajo'
             }), 403
-            
+
         # Asegurar que el directorio exista
         os.makedirs(target_dir, exist_ok=True)
-        
+
         # Carpeta temporal para almacenar fragmentos
         temp_dir = os.path.join(target_dir, '.temp_chunks', secure_filename(filename))
         os.makedirs(temp_dir, exist_ok=True)
-        
+
         # Guardar el fragmento
         chunk_path = os.path.join(temp_dir, f"chunk_{chunk_index}")
         chunk.save(chunk_path)
-        
+
         # Verificar si es el último fragmento
         chunks_dir = os.path.join(target_dir, '.temp_chunks', secure_filename(filename))
         chunks = os.listdir(chunks_dir)
-        
+
         # Si tenemos todos los fragmentos, unirlos
         if len(chunks) == total_chunks:
             # Construir el archivo final
@@ -859,14 +873,14 @@ def upload_chunk():
                     chunk_file_path = os.path.join(temp_dir, f"chunk_{i}")
                     with open(chunk_file_path, 'rb') as cf:
                         final_file.write(cf.read())
-            
+
             # Limpiar fragmentos temporales
             import shutil
             shutil.rmtree(temp_dir)
-            
+
             # Verificar si es un archivo ZIP y necesita extracción
             file_ext = os.path.splitext(filename)[1].lower()
-            
+
             return jsonify({
                 'success': True,
                 'message': f'Archivo "{filename}" creado correctamente desde {total_chunks} fragmentos',
@@ -883,7 +897,7 @@ def upload_chunk():
                 'chunks_received': len(chunks),
                 'total_chunks': total_chunks
             })
-            
+
     except Exception as e:
         logger.error(f"Error al subir fragmento: {str(e)}")
         return jsonify({
