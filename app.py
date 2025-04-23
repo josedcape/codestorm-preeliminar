@@ -789,6 +789,15 @@ def handle_chat():
         collaborative_mode = data.get('collaborative_mode', True)  # Modo colaborativo activado por defecto
         chat_mode = data.get('chat_mode', 'normal')  # Modo de chat: normal, creation, code_edit, etc.
 
+except Exception as e:
+        logging.error(f"Error using Gemini API: {str(e)}")
+        # En lugar de devolver error 500, usamos lógica de respaldo
+        if "crear" in user_input.lower() and "carpeta" in user_input.lower():
+            folder_name = user_input.lower().split("carpeta")[-1].strip()
+            terminal_command = f"mkdir -p {folder_name}"
+        else:
+            terminal_command = "echo 'Error with Gemini API'"
+
 @app.route('/api/documents/list', methods=['GET'])
 def list_documents():
     """API for listing documents."""
@@ -803,7 +812,7 @@ def list_documents():
             'files': files
         })
     except Exception as e:
-        logger.error(f"Error listing documents: {str(e)}")
+        logging.error(f"Error listing documents: {str(e)}")
         return jsonify({
             'success': False,
             'error': str(e)
