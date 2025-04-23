@@ -97,6 +97,7 @@ function showCopyFeedback(messageElement) {
     copyButton.classList.remove('btn-success');
     copyButton.classList.add('btn-outline-light');
   }, 1500);
+}
 
 // Mejorar el HTML para previsualización añadiendo meta tags y estilos necesarios
 function enhanceHtmlForPreview(htmlContent) {
