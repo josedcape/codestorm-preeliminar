@@ -55,9 +55,11 @@ from diagnostic_routes import register_diagnostic_routes
 # Initialize Flask app
 from flask import Flask
 from file_explorer_routes import register_file_explorer_routes
+from github_routes import register_github_routes
 
 app = Flask(__name__)
 register_file_explorer_routes(app)
+register_github_routes(app)  # Register GitHub routes
 CORS(app)  # Enable CORS for all routes
 
 # Register diagnostic routes
