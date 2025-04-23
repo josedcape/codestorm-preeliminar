@@ -53,7 +53,11 @@ from diagnostic_routes import register_diagnostic_routes
 # eventlet.monkey_patch(os=True, select=True, socket=True, thread=True, time=True)
 
 # Initialize Flask app
+from flask import Flask
+from file_explorer_routes import register_file_explorer_routes
+
 app = Flask(__name__)
+register_file_explorer_routes(app)
 CORS(app)  # Enable CORS for all routes
 
 # Register diagnostic routes
@@ -677,10 +681,10 @@ def list_files_api():
         for item in os.listdir(target_dir):
             item_path = os.path.join(target_dir, item)
             is_dir = os.path.isdir(item_path)
-            
+
             # Calcular ruta relativa al workspace
             rel_path = os.path.relpath(item_path, workspace_path)
-            
+
             file_info = {
                 'name': item,
                 'path': rel_path,
@@ -772,7 +776,7 @@ def upload_file():
                     'extract_path': str(extract_dir.relative_to(workspace_path))
                 })
             except Exception as zip_error:
-                logging.error(f"Error al extraer ZIP: {str(zip_error)}")
+                logging.error(f"Error al extraer ZIP: {str(ziperror)}")
                 return jsonify({
                     'success': True,
                     'message': f'Archivo {filename} subido pero hubo un error al extraerlo: {str(zip_error)}',
@@ -1135,6 +1139,25 @@ def read_file():
             'success': False,
             'error': str(e)
         }), 500
+
+def get_file_type(filename):
+    """Determine file type based on extension."""
+    _, ext = os.path.splitext(filename)
+    ext = ext.lower()
+    if ext in ['.py', '.pyw']:
+        return 'python'
+    elif ext in ['.js', '.ts', '.jsx', '.tsx']:
+        return 'javascript'
+    elif ext in ['.html', '.htm']:
+        return 'html'
+    elif ext in ['.css', '.scss', '.sass']:
+        return 'css'
+    elif ext in ['.json']:
+        return 'json'
+    elif ext in ['.md', '.markdown']:
+        return 'markdown'
+    else:
+        return 'text'
 
 # Function to start the server with the correct port
 if __name__ == '__main__':
