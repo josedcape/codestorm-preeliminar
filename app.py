@@ -143,16 +143,6 @@ if gemini_api_key:
         genai_configured = True
         logging.info(f"Google Gemini API configured successfully. Key: {gemini_api_key[:5]}...{gemini_api_key[-5:]}")
 
-
-@app.route('/constructor')
-def constructor():
-    return render_template('constructor.html')
-
-@app.route('/api/constructor')
-def constructor():
-    """Render the constructor page for building apps."""
-    return render_template('constructor.html')
-
         # Test Gemini client with a simple request
         try:
             model = genai.GenerativeModel('gemini-1.5-pro')
@@ -634,21 +624,21 @@ def generate_preview():
         # Sanitizar el HTML (implementación básica)
         # Eliminar scripts potencialmente peligrosos
         sanitized_html = html_content
-        
+
         # Añadir meta viewport si no existe para mejor visualización en dispositivos móviles
         if '<meta name="viewport"' not in sanitized_html and '<head>' in sanitized_html:
             sanitized_html = sanitized_html.replace(
                 '<head>',
                 '<head>\n    <meta name="viewport" content="width=device-width, initial-scale=1.0">'
             )
-            
+
         # Configurar dimensiones según el dispositivo
         dimensions = {
             'desktop': {'width': '100%', 'height': '100%'},
             'tablet': {'width': '768px', 'height': '1024px'},
             'mobile': {'width': '375px', 'height': '667px'}
         }
-        
+
         # Retornar el HTML y las dimensiones para la previsualización
         return jsonify({
             'success': True,
@@ -658,7 +648,7 @@ def generate_preview():
     except Exception as e:
         logging.error(f"Error generating preview: {str(e)}")
         return jsonify({'error': str(e)}), 500
-        
+
 # Rutas para el explorador de archivos
 @app.route('/api/files', methods=['GET'])
 def list_files_api():
@@ -667,15 +657,15 @@ def list_files_api():
         directory = request.args.get('directory', '.')
         user_id = session.get('user_id', 'default')
         workspace_path = get_user_workspace(user_id)
-        
+
         # Verificar que el directorio esté dentro del workspace
         target_dir = (workspace_path / directory).resolve()
         if not str(target_dir).startswith(str(workspace_path.resolve())):
             return jsonify({'error': 'Acceso denegado: No se puede acceder a directorios fuera del workspace'}), 403
-            
+
         if not target_dir.exists() or not target_dir.is_dir():
             return jsonify({'error': 'Directorio no encontrado'}), 404
-            
+
         # Listar archivos
         files = []
         for item in target_dir.iterdir():
@@ -686,7 +676,7 @@ def list_files_api():
                 'size': item.stat().st_size if item.is_file() else 0,
                 'last_modified': datetime.fromtimestamp(item.stat().st_mtime).isoformat()
             }
-            
+
             # Determinar tipo de archivo para iconos
             if item.is_file():
                 ext = item.suffix.lower() if item.suffix else ''
@@ -706,18 +696,18 @@ def list_files_api():
                     file_info['file_type'] = 'image'
                 else:
                     file_info['file_type'] = 'unknown'
-            
+
             files.append(file_info)
-            
+
         # Ordenar: directorios primero, luego archivos, ambos alfabéticamente
         files.sort(key=lambda x: (0 if x['type'] == 'directory' else 1, x['name'].lower()))
-        
+
         return jsonify({
             'files': files,
             'current_dir': directory,
             'parent_dir': os.path.dirname(directory) if directory != '.' else None
         })
-        
+
     except Exception as e:
         logging.error(f"Error listando archivos: {str(e)}")
         return jsonify({'error': str(e)}), 500
@@ -729,31 +719,31 @@ def upload_file():
     try:
         if 'file' not in request.files:
             return jsonify({'error': 'No se encontró el archivo en la solicitud'}), 400
-            
+
         file = request.files['file']
         if file.filename == '':
             return jsonify({'error': 'No se seleccionó ningún archivo'}), 400
-            
+
         path = request.form.get('path', '.')
         extract = request.form.get('extract', 'false').lower() == 'true'
-        
+
         # Obtener el workspace del usuario
         user_id = session.get('user_id', 'default')
         workspace_path = get_user_workspace(user_id)
-        
+
         # Verificar que la ruta esté dentro del workspace
         target_dir = (workspace_path / path).resolve()
         if not str(target_dir).startswith(str(workspace_path.resolve())):
             return jsonify({'error': 'Acceso denegado: No se puede acceder a directorios fuera del workspace'}), 403
-            
+
         if not target_dir.exists():
             target_dir.mkdir(parents=True, exist_ok=True)
-            
+
         # Guardar el archivo
         filename = file.filename
         file_path = target_dir / filename
         file.save(file_path)
-        
+
         # Extraer si es un archivo ZIP y se solicitó extracción
         is_zip = filename.lower().endswith('.zip')
         if is_zip and extract:
@@ -776,42 +766,42 @@ def upload_file():
                     'file_path': str(file_path.relative_to(workspace_path)),
                     'extracted': False
                 })
-        
+
         return jsonify({
             'success': True,
             'message': f'Archivo {filename} subido exitosamente',
             'file_path': str(file_path.relative_to(workspace_path)),
             'is_zip': is_zip
         })
-        
+
     except Exception as e:
         logging.error(f"Error subiendo archivo: {str(e)}")
         return jsonify({'error': str(e)}), 500
-        
+
 @app.route('/api/upload_preview_file', methods=['POST'])
 def upload_preview_file():
     """Procesar archivos HTML cargados para previsualización."""
     try:
         if 'file' not in request.files:
             return jsonify({'error': 'No file part'}), 400
-            
+
         file = request.files['file']
         if file.filename == '':
             return jsonify({'error': 'No selected file'}), 400
-            
+
         if not file.filename.lower().endswith(('.html', '.htm')):
             return jsonify({'error': 'Only HTML files are allowed'}), 400
-            
+
         # Leer el contenido del archivo
         html_content = file.read().decode('utf-8')
-        
+
         # Validar que sea HTML
         if not ('<html' in html_content.lower() or '<!doctype html' in html_content.lower()):
             return jsonify({'error': 'Invalid HTML file'}), 400
-            
+
         # Sanitizar el contenido HTML (implementación básica)
         sanitized_html = html_content
-        
+
         return jsonify({
             'success': True,
             'html': sanitized_html,
@@ -820,42 +810,42 @@ def upload_preview_file():
     except Exception as e:
         logging.error(f"Error uploading preview file: {str(e)}")
         return jsonify({'error': str(e)}), 500
-        
+
 @app.route('/api/validate_html', methods=['POST'])
 def validate_html():
     """Validar el código HTML para la previsualización."""
     try:
         data = request.json
         html_content = data.get('html', '')
-        
+
         if not html_content:
             return jsonify({'error': 'No HTML content provided'}), 400
-            
+
         # Implementación básica de validación
         errors = []
         warnings = []
-        
+
         # Verificar si tiene una estructura HTML básica
         if '<!DOCTYPE html>' not in html_content:
             warnings.append('Falta la declaración DOCTYPE')
-            
+
         if '<html' not in html_content:
             errors.append('Falta la etiqueta HTML')
-            
+
         if '<head>' not in html_content:
             warnings.append('Falta la sección HEAD')
-            
+
         if '<body>' not in html_content:
             warnings.append('Falta la etiqueta BODY')
-            
+
         # Verificar etiquetas mal cerradas (implementación muy básica)
         open_tags = re.findall(r'<([a-z0-9]+)[^>]*>', html_content, re.IGNORECASE)
         close_tags = re.findall(r'</([a-z0-9]+)>', html_content, re.IGNORECASE)
-        
+
         for tag in set(open_tags):
             if open_tags.count(tag) > close_tags.count(tag) and tag not in ['meta', 'link', 'img', 'br', 'hr', 'input']:
                 warnings.append(f'Posible etiqueta <{tag}> sin cerrar')
-                
+
         return jsonify({
             'success': True,
             'valid': len(errors) == 0,
