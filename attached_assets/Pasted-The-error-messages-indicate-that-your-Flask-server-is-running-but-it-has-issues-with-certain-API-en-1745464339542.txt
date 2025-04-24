@@ -1,0 +1,187 @@
+The error messages indicate that your Flask server is running, but it has issues with certain API endpoints. The main problems are:
+
+The /api/documents/list endpoint is returning a 500 Internal Server Error
+The socket connection is established ("Connection established with the server")
+The message is being sent to the server, but no response is coming back
+The fact that you're seeing "Connection established with the server" means the Socket.IO connection is working, which is good! The issue is that your server might not be properly handling the messages or the document API.
+
+Let's create a solution that:
+
+Properly handles the documents API error so it doesn't break the UI
+Sets up a fallback for when the real-time messaging isn't working
+The approach is:
+
+Add better error handling for the documents API
+Make sure the chat function works even if documents don't load
+Provide a fallback for message handling if Socket.IO doesn't respond
+Let's fix the document loading error by modifying your code to gracefully handle the 500 error. Here's how to update your JavaScript:
+
+javascript
+Copy Code
+// Replace the loadAvailableDocuments function:
+function loadAvailableDocuments() {
+    // Add a console message for debugging
+    console.log("Attempting to load documents...");
+    
+    // Add status indicator
+    const documentSelector = document.getElementById('document-selector');
+    const initialOption = documentSelector.querySelector('option');
+    if (initialOption) {
+        initialOption.textContent = "Cargando documentos...";
+    }
+    
+    fetch('/api/documents/list')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Server responded with ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log("Documents loaded successfully:", data);
+            
+            // Reset the default option
+            if (initialOption) {
+                initialOption.textContent = "Sin documento";
+            }
+            
+            if (data.success && data.documents) {
+                // Clear existing options except the first one
+                while (documentSelector.options.length > 1) {
+                    documentSelector.remove(1);
+                }
+                
+                // Add documents
+                data.documents.forEach(doc => {
+                    const option = document.createElement('option');
+                    option.value = doc.filename;
+                    option.textContent = doc.filename;
+                    documentSelector.appendChild(option);
+                });
+            }
+        })
+        .catch(error => {
+            console.error("Error loading documents:", error);
+            
+            // Gracefully handle the error in the UI
+            if (initialOption) {
+                initialOption.textContent = "Sin documento (Error al cargar)";
+            }
+            
+            // Disable document upload button
+            const uploadBtn = document.querySelector('[data-bs-target="#documentModal"]');
+            if (uploadBtn) {
+                uploadBtn.disabled = true;
+                uploadBtn.title = "Servicio de documentos no disponible";
+            }
+        });
+}
+
+// Add a timeout handler for messages not getting responses
+function setupMessageTimeoutHandler() {
+    // Store the time when a message was sent
+    window.lastMessageTime = null;
+    
+    // Check every 10 seconds if a message is stuck
+    setInterval(() => {
+        if (window.lastMessageTime && 
+            document.getElementById('loading-indicator') &&
+            (Date.now() - window.lastMessageTime > 15000)) {
+            
+            // More than 15 seconds passed with no response
+            hideLoadingIndicator();
+            addSystemMessage("❌ No se recibió respuesta del servidor después de 15 segundos. Por favor intenta nuevamente.");
+            
+            // Reset the timer
+            window.lastMessageTime = null;
+        }
+    }, 10000);
+}
+
+// Update the sendMessage function to set the timer
+function sendMessage() {
+    const input = document.getElementById('chat-input');
+    const message = input.value.trim();
+    
+    if (!message) return;
+    
+    // Clear input
+    input.value = '';
+    input.style.height = 'auto';
+    
+    // Add message to UI
+    addUserMessage(message);
+    
+    // Show loading indicator
+    showLoadingIndicator();
+    
+    // Set the message time for timeout tracking
+    window.lastMessageTime = Date.now();
+    
+    // Get current agent and model
+    const agentId = document.getElementById('agent-selector').value;
+    const modelId = document.getElementById('model-select').value;
+    const documentId = document.getElementById('document-selector').value;
+    
+    // Create message payload
+    const payload = {
+        content: message,
+        agent_id: agentId,
+        model_id: modelId,
+        document_id: documentId || null,
+        timestamp: new Date().toISOString()
+    };
+    
+    console.log('Sending message to server:', payload);
+    
+    // Try Socket.IO first
+    if (socket && socket.connected) {
+        socket.emit('user_message', payload);
+    } else {
+        console.warn('Socket not available, falling back to REST API');
+        
+        // Fallback to REST API
+        fetch('/api/chat/message', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Server responded with ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                addAgentMessage(data.response);
+            } else {
+                addSystemMessage("Error del servidor: " + (data.error || "Error desconocido"));
+            }
+            hideLoadingIndicator();
+            window.lastMessageTime = null;
+        })
+        .catch(error => {
+            console.error('Error sending message:', error);
+            addSystemMessage("Error de conexión: No se pudo procesar tu mensaje");
+            hideLoadingIndicator();
+            window.lastMessageTime = null;
+        });
+    }
+}
+
+// Call this when DOM is loaded
+function initPage() {
+    // Initialize the message timeout handler
+    setupMessageTimeoutHandler();
+    
+    // Everything else remains the same...
+}
+
+// Add this to your DOMContentLoaded event
+document.addEventListener('DOMContentLoaded', function() {
+    // ... existing code ...
+    
+    // Initialize the page with our new function
+    initPage();
+});
