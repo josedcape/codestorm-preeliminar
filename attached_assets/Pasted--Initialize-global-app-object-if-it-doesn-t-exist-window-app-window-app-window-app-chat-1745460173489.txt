@@ -1,0 +1,454 @@
+// Initialize global app object if it doesn't exist
+window.app = window.app || {};
+window.app.chat = window.app.chat || {};
+
+// Socket.IO instance
+let socket;
+
+// Initialize chat functionality
+function initializeChat() {
+    console.log("Initializing chat interface...");
+    
+    // Initialize socket connection
+    initializeSocketConnection();
+    
+    // Set up UI event listeners
+    setupEventListeners();
+    
+    // Add initial system message if not already present
+    if (document.querySelectorAll('.chat-message').length <= 1) {
+        addSystemMessage("Conexión establecida. Listo para responder a tus consultas.");
+    }
+}
+
+// Initialize Socket.IO connection
+function initializeSocketConnection() {
+    try {
+        // Connect to Socket.IO server
+        console.log("Estableciendo conexión con el servidor...");
+        
+        // Initialize socket (adjust URL if needed)
+        const serverUrl = window.location.protocol + '//' + window.location.host;
+        socket = io(serverUrl, {
+            path: '/socket.io',
+            transports: ['websocket', 'polling']
+        });
+        
+        // Socket event handlers
+        socket.on('connect', () => {
+            console.log('Conexión establecida con el servidor');
+            addSystemMessage("Conexión establecida con el servidor.");
+        });
+        
+        socket.on('disconnect', () => {
+            console.log('Desconexión del servidor');
+            addSystemMessage("⚠️ Desconexión del servidor. Intentando reconectar...");
+        });
+        
+        socket.on('connect_error', (error) => {
+            console.error('Error de conexión:', error);
+            addSystemMessage("❌ Error de conexión con el servidor. Verifica tu conexión a Internet.");
+        });
+        
+        socket.on('message', (data) => {
+            console.log('Mensaje recibido:', data);
+            handleReceivedMessage(data);
+        });
+        
+        socket.on('agent_response', (data) => {
+            console.log('Respuesta del agente recibida:', data);
+            addAgentMessage(data.content);
+            hideLoadingIndicator();
+        });
+        
+        // Diagnostic test to verify connection
+        setTimeout(() => {
+            console.log("Realizando prueba de conexión...");
+            socket.emit('ping', { time: new Date().toISOString() })
+                .catch(testError => {
+                    console.error("Error en la prueba de diagnóstico:", testError);
+                    addSystemMessage("❌ Error en la prueba de conexión. El servidor puede estar experimentando problemas.");
+                });
+        }, 1000);
+        
+    } catch (error) {
+        console.error("Error al inicializar Socket.IO:", error);
+        addSystemMessage("❌ Error al establecer la conexión. " + error.message);
+        
+        // Verificar si hay problemas específicos
+        if (error.message) {
+            if (error.message.includes('NetworkError') || error.message.includes('CORS')) {
+                console.warn('Posible problema de CORS o red detectado');
+                addSystemMessage('Nota: Posible problema de CORS o red. Verifica la configuración del servidor.');
+            }
+            
+            if (error.message.includes('socket.io')) {
+                console.warn('Problema con Socket.IO detectado');
+                addSystemMessage('Nota: Asegúrate de que Socket.IO esté instalado y configurado correctamente en el servidor.');
+            }
+        }
+    }
+}
+
+// Set up event listeners
+function setupEventListeners() {
+    const sendButton = document.getElementById('send-button');
+    const chatInput = document.getElementById('chat-input');
+    const agentSelector = document.getElementById('agent-selector');
+    const modelSelector = document.getElementById('model-select');
+    
+    // Send button click event
+    sendButton.addEventListener('click', () => {
+        sendMessage();
+    });
+    
+    // Enter key press in input field
+    chatInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            sendMessage();
+        }
+    });
+    
+    // Agent selection change
+    agentSelector.addEventListener('change', () => {
+        const agentId = agentSelector.value;
+        setActiveAgent(agentId);
+    });
+    
+    // Model selection change
+    modelSelector.addEventListener('change', () => {
+        const modelId = modelSelector.value;
+        addSystemMessage(`Modelo de IA cambiado a: ${modelId}`);
+    });
+}
+
+// Set active agent
+function setActiveAgent(agentId) {
+    const agents = window.SPECIALIZED_AGENTS || {};
+    const agent = agents[agentId];
+    
+    if (!agent) {
+        console.error(`Agente "${agentId}" no encontrado`);
+        return;
+    }
+    
+    // Update agent info in UI
+    document.getElementById('agent-name').textContent = agent.name;
+    document.getElementById('agent-description').textContent = agent.description;
+    
+    // Update agent icon
+    const iconElement = document.getElementById('agent-icon');
+    iconElement.className = '';
+    iconElement.classList.add('bi', agent.icon);
+    
+    // Send system message about agent change
+    addSystemMessage(`Agente cambiado a: ${agent.name}`);
+    
+    // Notify server about agent change
+    if (socket && socket.connected) {
+        socket.emit('change_agent', { agent_id: agentId });
+    }
+    
+    console.log(`Agente cambiado a: ${agent.name} (${agentId})`);
+}
+
+// Send message to server
+function sendMessage() {
+    const input = document.getElementById('chat-input');
+    const message = input.value.trim();
+    
+    if (!message) return;
+    
+    // Clear input
+    input.value = '';
+    input.style.height = 'auto';
+    
+    // Add message to UI
+    addUserMessage(message);
+    
+    // Show loading indicator
+    showLoadingIndicator();
+    
+    // Get current agent and model
+    const agentId = document.getElementById('agent-selector').value;
+    const modelId = document.getElementById('model-select').value;
+    const documentId = document.getElementById('document-selector').value;
+    
+    // Create message payload
+    const payload = {
+        content: message,
+        agent_id: agentId,
+        model_id: modelId,
+        document_id: documentId || null,
+        timestamp: new Date().toISOString()
+    };
+    
+    // Send to server if socket is available
+    if (socket && socket.connected) {
+        console.log('Enviando mensaje al servidor:', payload);
+        socket.emit('user_message', payload);
+    } else {
+        console.error('Socket no disponible o no conectado');
+        handleSocketError();
+        
+        // Fallback to AJAX if socket is not available
+        sendMessageFallback(payload);
+    }
+}
+
+// Fallback method for sending messages using AJAX
+function sendMessageFallback(payload) {
+    console.log('Usando método alternativo para enviar mensaje (AJAX)');
+    
+    fetch('/api/chat/message', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload)
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('Respuesta recibida (AJAX):', data);
+        if (data.success) {
+            addAgentMessage(data.response);
+        } else {
+            addSystemMessage("❌ Error: " + (data.error || "No se pudo procesar tu mensaje"));
+        }
+        hideLoadingIndicator();
+    })
+    .catch(error => {
+        console.error('Error en solicitud AJAX:', error);
+        addSystemMessage("❌ Error de conexión: No se pudo enviar el mensaje");
+        hideLoadingIndicator();
+    });
+}
+
+// Handle received message from server
+function handleReceivedMessage(data) {
+    if (data.type === 'agent') {
+        addAgentMessage(data.content);
+    } else if (data.type === 'system') {
+        addSystemMessage(data.content);
+    }
+    
+    hideLoadingIndicator();
+}
+
+// Add user message to chat
+function addUserMessage(message) {
+    const messagesContainer = document.getElementById('chat-messages');
+    const time = getCurrentTime();
+    
+    const messageDiv = document.createElement('div');
+    messageDiv.className = 'chat-message user-message';
+    
+    messageDiv.innerHTML = `
+        <div class="message-header">
+            <span class="message-sender">Tú</span>
+            <span class="message-time">${time}</span>
+        </div>
+        <div class="message-content">${formatMessage(message)}</div>
+    `;
+    
+    messagesContainer.appendChild(messageDiv);
+    scrollToBottom(messagesContainer);
+}
+
+// Add agent message to chat
+function addAgentMessage(message) {
+    const messagesContainer = document.getElementById('chat-messages');
+    const agentName = document.getElementById('agent-name').textContent;
+    const time = getCurrentTime();
+    
+    const messageDiv = document.createElement('div');
+    messageDiv.className = 'chat-message agent-message';
+    
+    // Process message content (handles code blocks, markdown, etc.)
+    const formattedContent = formatMessage(message);
+    
+    messageDiv.innerHTML = `
+        <div class="message-header">
+            <span class="message-sender">${agentName}</span>
+            <span class="message-time">${time}</span>
+        </div>
+        <div class="message-content">${formattedContent}</div>
+    `;
+    
+    messagesContainer.appendChild(messageDiv);
+    scrollToBottom(messagesContainer);
+    
+    // Initialize code highlighting and add copy buttons
+    processCodeBlocks(messageDiv);
+}
+
+// Add system message to chat
+function addSystemMessage(message) {
+    const messagesContainer = document.getElementById('chat-messages');
+    
+    const messageDiv = document.createElement('div');
+    messageDiv.className = 'chat-message system-message';
+    
+    messageDiv.innerHTML = `
+        <div class="message-content">${message}</div>
+    `;
+    
+    messagesContainer.appendChild(messageDiv);
+    scrollToBottom(messagesContainer);
+}
+
+// Format message text (convert code blocks, etc.)
+function formatMessage(text) {
+    if (!text) return '';
+    
+    // Escape HTML
+    text = escapeHtml(text);
+    
+    // Replace code blocks with formatted HTML
+    text = text.replace(/```([\w-]*)\n([\s\S]*?)```/g, function(match, language, code) {
+        return `
+            <div class="code-header">
+                <span class="code-language">${language || 'code'}</span>
+                <div class="code-buttons">
+                    <button class="code-button copy-code-btn" title="Copiar código">
+                        <i class="bi bi-clipboard"></i> Copiar
+                    </button>
+                </div>
+            </div>
+            <pre><code class="${language || ''}">${code}</code></pre>
+        `;
+    });
+    
+    // Replace inline code
+    text = text.replace(/`([^`]+)`/g, '<code class="inline-code">$1</code>');
+    
+    // Replace line breaks
+    text = text.replace(/\n/g, '<br>');
+    
+    return text;
+}
+
+// Process code blocks in message
+function processCodeBlocks(messageElement) {
+    // Initialize highlighting on all code blocks
+    const codeBlocks = messageElement.querySelectorAll('pre code');
+    codeBlocks.forEach(block => {
+        hljs.highlightElement(block);
+    });
+    
+    // Add copy functionality to code blocks
+    const copyButtons = messageElement.querySelectorAll('.copy-code-btn');
+    copyButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const codeBlock = this.closest('.message-content').querySelector('pre code');
+            copyToClipboard(codeBlock.textContent);
+            
+            // Change button text temporarily
+            const originalText = this.innerHTML;
+            this.innerHTML = '<i class="bi bi-check"></i> Copiado';
+            
+            setTimeout(() => {
+                this.innerHTML = originalText;
+            }, 2000);
+        });
+    });
+}
+
+// Copy text to clipboard
+function copyToClipboard(text) {
+    navigator.clipboard.writeText(text).then(
+        () => console.log('Texto copiado al portapapeles'),
+        err => console.error('Error al copiar texto: ', err)
+    );
+}
+
+// Show loading indicator
+function showLoadingIndicator() {
+    const messagesContainer = document.getElementById('chat-messages');
+    
+    // Remove existing loading indicator if any
+    const existingIndicator = document.getElementById('loading-indicator');
+    if (existingIndicator) {
+        existingIndicator.remove();
+    }
+    
+    // Create loading indicator
+    const loadingDiv = document.createElement('div');
+    loadingDiv.id = 'loading-indicator';
+    loadingDiv.className = 'loading-animation';
+    loadingDiv.innerHTML = `
+        <div class="loading-dot"></div>
+        <div class="loading-dot"></div>
+        <div class="loading-dot"></div>
+    `;
+    
+    messagesContainer.appendChild(loadingDiv);
+    scrollToBottom(messagesContainer);
+}
+
+// Hide loading indicator
+function hideLoadingIndicator() {
+    const loadingIndicator = document.getElementById('loading-indicator');
+    if (loadingIndicator) {
+        loadingIndicator.remove();
+    }
+}
+
+// Handle socket connection errors
+function handleSocketError() {
+    console.warn('Problemas con la conexión Socket.IO');
+    addSystemMessage("⚠️ Problemas de conexión. Utilizando método alternativo.");
+}
+
+// Process HTML code for preview
+function processHtmlCodeForPreview(message) {
+    // Extract HTML content from code blocks
+    const htmlRegex = /```html([\s\S]*?)```/g;
+    const htmlMatches = message.match(htmlRegex);
+    
+    if (htmlMatches && htmlMatches.length > 0) {
+        // Extract the HTML from the first match
+        const htmlCode = htmlMatches[0].replace(/```html/, '').replace(/```$/, '').trim();
+        return htmlCode;
+    }
+    
+    return null;
+}
+
+// Show preview of HTML
+function showHtmlPreview(htmlContent) {
+    const previewSection = document.getElementById('preview-section');
+    const previewIframe = document.getElementById('preview-iframe');
+    
+    if (!htmlContent) return;
+    
+    // Create a blob with the HTML content
+    const blob = new Blob([htmlContent], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+    
+    // Set the iframe source
+    previewIframe.src = url;
+    
+    // Show the preview section
+    previewSection.style.display = 'block';
+    
+    // Clean up the URL object when no longer needed
+    previewIframe.onload = function() {
+        URL.revokeObjectURL(url);
+    };
+}
+
+// Make functions globally available
+window.initializeChat = initializeChat;
+window.setActiveAgent = setActiveAgent;
+window.addSystemMessage = addSystemMessage;
+
+// Export for module usage
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = {
+        initializeChat,
+        setActiveAgent,
+        addSystemMessage
+    };
+}
