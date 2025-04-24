@@ -1464,3 +1464,37 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 {% endblock %}
+
+    console.log("Verificando la disponibilidad de la función initializeChat...");
+    if (typeof initializeChat === 'function') {
+        console.log("Función initializeChat disponible, inicializando chat...");
+        initializeChat();
+        setActiveAgent('developer');
+    } else {
+        console.error("ERROR: La función initializeChat no está disponible");
+        alert("Error al cargar el sistema de chat. Por favor recarga la página.");
+    }
+});
+
+// Funcionalidad para ajustar la altura del textarea
+const chatInput = document.getElementById('chat-input');
+chatInput.addEventListener('input', function() {
+    this.style.height = 'auto';
+    this.style.height = (this.scrollHeight < 150 ? this.scrollHeight : 150) + 'px';
+});
+
+// Funcionalidad para el botón de archivo
+const fileButton = document.getElementById('file-button');
+const fileInput = document.getElementById('file-input');
+
+fileButton.addEventListener('click', function() {
+    fileInput.click();
+});
+
+fileInput.addEventListener('change', function() {
+    if (this.files.length > 0) {
+        const fileNames = Array.from(this.files).map(file => file.name).join(', ');
+        chatInput.value += `\nArchivos seleccionados: ${fileNames}`;
+        chatInput.dispatchEvent(new Event('input'));
+    }
+});
