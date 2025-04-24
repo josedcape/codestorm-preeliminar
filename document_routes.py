@@ -127,7 +127,11 @@ def list_documents():
         user_id = request.args.get('user_id', 'default')
         user_document_dir = os.path.join(UPLOAD_FOLDER, user_id)
         
+        # Asegurar que el directorio de documentos existe
+        os.makedirs(user_document_dir, exist_ok=True)
+        
         if not os.path.exists(user_document_dir):
+            logger.warning(f"Directorio de documentos no encontrado: {user_document_dir}")
             return jsonify({
                 'success': True,
                 'documents': []
@@ -135,20 +139,32 @@ def list_documents():
             
         documents = []
         
-        for filename in os.listdir(user_document_dir):
-            file_path = os.path.join(user_document_dir, filename)
-            
-            if os.path.isfile(file_path) and allowed_file(filename):
-                # Obtener información básica del archivo
-                doc_info = {
-                    'filename': filename,
-                    'path': file_path,
-                    'size': os.path.getsize(file_path),
-                    'type': os.path.splitext(filename)[1].lower(),
-                    'last_modified': os.path.getmtime(file_path)
-                }
+        try:
+            for filename in os.listdir(user_document_dir):
+                file_path = os.path.join(user_document_dir, filename)
                 
-                documents.append(doc_info)
+                if os.path.isfile(file_path) and allowed_file(filename):
+                    # Obtener información básica del archivo
+                    try:
+                        doc_info = {
+                            'filename': filename,
+                            'path': file_path,
+                            'size': os.path.getsize(file_path),
+                            'type': os.path.splitext(filename)[1].lower(),
+                            'last_modified': os.path.getmtime(file_path)
+                        }
+                        documents.append(doc_info)
+                    except OSError as file_error:
+                        logger.warning(f"Error al procesar archivo {file_path}: {str(file_error)}")
+                        # Continuar con el siguiente archivo
+                        continue
+        except OSError as dir_error:
+            logger.error(f"Error al listar directorio {user_document_dir}: {str(dir_error)}")
+            # Devolver lista vacía en caso de error de directorio
+            return jsonify({
+                'success': True,
+                'documents': []
+            })
         
         # Ordenar por fecha de modificación (más reciente primero)
         documents.sort(key=lambda x: x['last_modified'], reverse=True)
@@ -159,9 +175,10 @@ def list_documents():
         })
     except Exception as e:
         logger.error(f"Error al listar documentos: {str(e)}")
+        # Devolver un error más amigable para el cliente
         return jsonify({
             'success': False,
-            'error': f'Error al listar documentos: {str(e)}'
+            'error': 'Error al listar documentos. Por favor, inténtelo de nuevo más tarde.'
         }), 500
 
 

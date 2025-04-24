@@ -459,7 +459,26 @@ function sendMessage(message) {
     console.log("Enviando mensaje:", data);
 
     // Enviar mensaje a través de Socket.IO
-    socket.emit('user_message', data);
+    socket.emit('user_message', data, (error) => {
+      if (error) {
+        console.error("Error sending message via Socket.IO:", error);
+        removeLoadingMessage();
+        addSystemMessage(`Error al enviar el mensaje: ${error}`);
+        // Restablecer el botón de envío en caso de error
+        if (sendButton) {
+          sendButton.disabled = false;
+          sendButton.classList.remove('btn-ripple');
+          if (typeof AnimationUtils !== 'undefined') {
+            AnimationUtils.hideSpinner(sendButton);
+          } else {
+            // Fallback si AnimationUtils no está disponible
+            if (sendButton.querySelector('.spinner')) {
+              sendButton.innerHTML = '<i class="bi bi-send"></i>';
+            }
+          }
+        }
+      }
+    });
 
     // Limpiar el campo de entrada
     document.getElementById('chat-input').value = '';
@@ -877,24 +896,7 @@ function sendMessage(message) {
 
       // Intentar realizar una prueba de conexión simple
       console.log("Realizando prueba de conexión para diagnóstico...");
-      addSystemMessage("🔄 Realizando prueba de conexión al servidor...");
-
-      fetch('/health')
-        .then(response => {
-          if (response.ok) {
-            console.log("Conexión básica exitosa, el problema puede estar en la API o en el procesamiento");
-            addSystemMessage("✅ La conexión básica funciona. El problema puede estar en la configuración de las APIs.");
-
-            // Prueba de claves API
-            return fetch('/api/test_apis', { method: 'GET' });
-          } else {
-            throw new Error(`Error en la prueba de conexión: ${response.status} - ${response.statusText}`);
-          }
-        })
-        .then(response => response.json())
-        .catch(testError => {
-          console.error("Error en la prueba de conexión:", testError);
-          addSystemMessage(`⚠️ Error en la prueba de conexión:([\w-]*)\n([\s\S]*?)```/g, function(match, language, code) {
+      addSystemMessage("🔄 Realizando([\w-]*)\n([\s\S]*?)```/g, function(match, language, code) {
         return `
             <div class="code-header">
                 <span class="code-language">${language || 'code'}</span>
