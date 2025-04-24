@@ -231,6 +231,12 @@ function initializeChat() {
 
   // Inicializar detección de comandos de creación de páginas
   initCreationCommandDetection();
+
+  // Initialize document features
+  initializeDocumentFeatures();
+
+  // Set up message timeout handler
+  setupMessageTimeoutHandler();
 }
 
 // Inicializar selectores para dispositivos móviles
@@ -889,14 +895,7 @@ function sendMessage(message) {
       }
 
       // Mensaje de error más detallado para facilitar la depuración
-      const errorMessage = `Error de conexión: ${error.message || 'Desconocido'}. 
-    Por favor, verifica tu conexión e intenta de nuevo.`;
-
-      addSystemMessage(errorMessage);
-
-      // Intentar realizar una prueba de conexión simple
-      console.log("Realizando prueba de conexión para diagnóstico...");
-      addSystemMessage("🔄 Realizando([\w-]*)\n([\s\S]*?)```/g, function(match, language, code) {
+      const errorMessage = `Error de conexión: ${error.message || '([^\s]+)\n([\s\S]*?)```/g, function(match, language, code) {
         return `
             <div class="code-header">
                 <span class="code-language">${language || 'code'}</span>
