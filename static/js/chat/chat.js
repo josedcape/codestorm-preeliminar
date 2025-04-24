@@ -892,11 +892,108 @@ function sendMessage(message) {
           }
         })
         .then(response => response.json())
-       .catch(testError => {
-         console.error("Error en la prueba de diagnóstico:", testError);
-         addSystemhtml([\s\S]*?)```/g;
-  const htmlMatches = response.match(htmlRegex);
+        .catch(testError => {
+          console.error("Error en la prueba de([\w-]*)\n([\s\S]*?)```/g, function(match, language, code) {
+        return `
+            <div class="code-header">
+                <span class="code-language">${language || 'code'}</span>
+                <div class="code-buttons">
+                    <button class="code-button copy-code-btn" title="Copiar código">
+                        <i class="bi bi-clipboard"></i> Copiar
+                    </button>
+                </div>
+            </div>
+            <pre><code class="${language || ''}">${code}</code></pre>
+        `;
+    });
 
-  if (htmlMatches && htmlMatches.length > 0) {
-    // Extraer el contenido HTML del primer bloque
-    const htmlContent = htmlMatches[0].replace(/```html/, '').replace(/
+    // Replace inline code
+    text = text.replace(/`([^`]+)`/g, '<code class="inline-code">$1</code>');
+
+    // Replace line breaks
+    text = text.replace(/\n/g, '<br>');
+
+    return text;
+}
+
+// Process code blocks in message
+function processCodeBlocks(messageElement) {
+    // Initialize highlighting on all code blocks
+    const codeBlocks = messageElement.querySelectorAll('pre code');
+    codeBlocks.forEach(block => {
+        hljs.highlightElement(block);
+    });
+
+    // Add copy functionality to code blocks
+    const copyButtons = messageElement.querySelectorAll('.copy-code-btn');
+    copyButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const codeBlock = this.closest('.message-content').querySelector('pre code');
+            copyToClipboard(codeBlock.textContent);
+
+            // Change button text temporarily
+            const originalText = this.innerHTML;
+            this.innerHTML = '<i class="bi bi-check"></i> Copiado';
+
+            setTimeout(() => {
+                this.innerHTML = originalText;
+            }, 2000);
+        });
+    });
+}
+
+// Copy text to clipboard
+function copyToClipboard(text) {
+    navigator.clipboard.writeText(text).then(
+        () => console.log('Texto copiado al portapapeles'),
+        err => console.error('Error al copiar texto: ', err)
+    );
+}
+
+// Show loading indicator
+function showLoadingIndicator() {
+    const messagesContainer = document.getElementById('chat-messages');
+
+    // Remove existing loading indicator if any
+    const existingIndicator = document.getElementById('loading-indicator');
+    if (existingIndicator) {
+        existingIndicator.remove();
+    }
+
+    // Create loading indicator
+    const loadingDiv = document.createElement('div');
+    loadingDiv.id = 'loading-indicator';
+    loadingDiv.className = 'loading-animation';
+    loadingDiv.innerHTML = `
+        <div class="loading-dot"></div>
+        <div class="loading-dot"></div>
+        <div class="loading-dot"></div>
+    `;
+
+    messagesContainer.appendChild(loadingDiv);
+    scrollToBottom(messagesContainer);
+}
+
+// Hide loading indicator
+function hideLoadingIndicator() {
+    const loadingIndicator = document.getElementById('loading-indicator');
+    if (loadingIndicator) {
+        loadingIndicator.remove();
+    }
+}
+
+// Handle socket connection errors
+function handleSocketError() {
+    console.warn('Problemas con la conexión Socket.IO');
+    addSystemMessage("⚠️ Problemas de conexión. Utilizando método alternativo.");
+}
+
+// Process HTML code for preview
+function processHtmlCodeForPreview(message) {
+    // Extract HTML content from code blocks
+    const htmlRegex = /```html([\s\S]*?)```/g;
+    const htmlMatches = message.match(htmlRegex);
+
+    if (htmlMatches && htmlMatches.length > 0) {
+        // Extract the HTML from the first match
+        const htmlCode = htmlMatches[0].replace(/```html/, '').replace(/
