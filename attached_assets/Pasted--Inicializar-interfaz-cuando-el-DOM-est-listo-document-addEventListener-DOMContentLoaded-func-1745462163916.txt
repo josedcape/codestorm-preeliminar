@@ -1,0 +1,92 @@
+// Inicializar interfaz cuando el DOM esté listo
+document.addEventListener('DOMContentLoaded', function() {
+    // Configuración de agentes especializados
+    window.SPECIALIZED_AGENTS = {
+        developer: {
+            id: 'developer',
+            name: 'Agente de Desarrollo',
+            icon: 'bi-code-slash',
+            description: 'Experto en optimización y edición de código en tiempo real',
+            capabilities: [
+                'Corrección y refactorización de código',
+                'Optimización de rendimiento',
+                'Integración de frameworks y librerías',
+                'Automatización de tareas',
+                'Generación de código limpio'
+            ]
+        },
+        architect: {
+            id: 'architect',
+            name: 'Arquitecto de Software',
+            icon: 'bi-diagram-3',
+            description: 'Diseñador de arquitecturas escalables y optimizadas',
+            capabilities: [
+                'Definición de estructura del proyecto',
+                'Selección de tecnologías y frameworks',
+                'Asesoría en elección de bases de datos',
+                'Implementación de microservicios',
+                'Planificación de UI/UX y patrones de diseño'
+            ]
+        },
+        advanced: {
+            id: 'advanced',
+            name: 'Especialista Avanzado',
+            icon: 'bi-braces',
+            description: 'Experto en soluciones complejas e integraciones',
+            capabilities: [
+                'Desarrollo de soluciones avanzadas',
+                'Integración con APIs externas',
+                'Optimización de rendimiento',
+                'Seguridad y encriptación',
+                'Despliegue y configuración de servidores'
+            ]
+        },
+        general: {
+            id: 'general',
+            name: 'Asistente General',
+            icon: 'bi-chat-dots',
+            description: 'Asistente versátil para consultas generales',
+            capabilities: [
+                'Respuesta a preguntas generales',
+                'Orientación básica de desarrollo',
+                'Ayuda con conceptos de programación',
+                'Consejos de buenas prácticas',
+                'Resolución de problemas comunes'
+            ]
+        }
+    };
+
+    consola . log ( "Verificando la disponibilidad de la función inicializeChat..." );
+         if ( tipo de inicializarChat === 'función' ) {
+             consola . log ( "Función inicializeChat disponible, inicializando chat..." );
+             inicializarChat ();
+             setActiveAgent ( 'desarrollador' );
+        } más {
+             consola . error ( "ERROR: La función inicializeChat no está disponible" );
+             alert ( "Error al cargar el sistema de chat. Por favor recarga la página." );
+        }
+    });
+   
+
+    // Funcionalidad para ajustar la altura del textarea
+    const chatInput = document.getElementById('chat-input');
+    chatInput.addEventListener('input', function() {
+        this.style.height = 'auto';
+        this.style.height = (this.scrollHeight < 150 ? this.scrollHeight : 150) + 'px';
+    });
+
+    // Funcionalidad para el botón de archivo
+    const fileButton = document.getElementById('file-button');
+    const fileInput = document.getElementById('file-input');
+
+    fileButton.addEventListener('click', function() {
+        fileInput.click();
+    });
+
+    fileInput.addEventListener('change', function() {
+        if (this.files.length > 0) {
+            const fileNames = Array.from(this.files).map(file => file.name).join(', ');
+            chatInput.value += `\nArchivos seleccionados: ${fileNames}`;
+            chatInput.dispatchEvent(new Event('input'));
+        }
+    });

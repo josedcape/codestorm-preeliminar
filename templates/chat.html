@@ -1367,16 +1367,17 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     };
 
-    console.log("Verificando la disponibilidad de la función inicializeChat...");
-    if (typeof initializeChat === 'function') {
-        console.log("Función inicializeChat disponible, inicializando chat...");
-        initializeChat();
-        setActiveAgent('developer');
-    } else {
-        console.error("ERROR: La función inicializeChat no está disponible");
-        alert("Error al cargar el sistema de chat. Por favor recarga la página.");
-    }
+    consola . log ( "Verificando la disponibilidad de la función inicializeChat..." );
+         if ( tipo de inicializarChat === 'función' ) {
+             consola . log ( "Función inicializeChat disponible, inicializando chat..." );
+             inicializarChat ();
+             setActiveAgent ( 'desarrollador' );
+        } más {
+             consola . error ( "ERROR: La función inicializeChat no está disponible" );
+             alert ( "Error al cargar el sistema de chat. Por favor recarga la página." );
+        }
     });
+   
 
     // Funcionalidad para ajustar la altura del textarea
     const chatInput = document.getElementById('chat-input');
