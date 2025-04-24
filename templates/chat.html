@@ -517,7 +517,7 @@ pre code {
                             <!-- System Welcome Message -->
                             <div class="chat-message system-message">
                                 <div class="message-content">
-                                    <p>Welcome to the CODESTORM specialized chat! You are talking to the <strong>Development Agent</strong>, an expert in real-time code optimization and editing.</p>
+                                    <p>¡Bienvenido al chat especializado de CODESTORM! Estás hablando con el <strong>Agente de Desarrollo</strong>, un experto en optimización y edición de código en tiempo real.</p>
                                 </div>
                             </div>
                             <!-- Dynamic messages will be added here -->
@@ -537,7 +537,7 @@ pre code {
                             </div>
 
                             <div class="chat-input-wrapper">
-                                <textarea id="chat-input" class="chat-input" placeholder="Type your message here... For example: 'Create a sales page for tech products'" rows="1"></textarea>
+                                <textarea id="chat-input" class="chat-input" placeholder="Escribe tu mensaje aquí... Por ejemplo: 'Crea una página de ventas para productos tecnológicos'" rows="1"></textarea>
                             </div>
 
                             <div class="chat-buttons">
@@ -693,11 +693,8 @@ function initializeSocketConnection() {
         // Diagnostic test to verify connection
         setTimeout(() => {
             console.log("Performing connection test...");
-            socket.emit('ping', { time: new Date().toISOString() })
-                .catch(testError => {
-                    console.error("Error in diagnostic test:", testError);
-                    addSystemMessage("❌ Error in connection test. The server may be experiencing issues.");
-                });
+            socket.emit('ping', { time: new Date().toISOString() });
+            // Socket.IO emit doesn't return a promise, so we can't use .catch
         }, 1000);
 
     } catch (error) {
@@ -1132,7 +1129,8 @@ function loadAvailableDocuments() {
     fetch('/api/documents/list')
         .then(response => {
             if (!response.ok) {
-                throw new Error('Error in server response: ' + response.status);
+                console.warn('Error in server response:', response.status);
+                return { success: false, error: response.statusText };
             }
             return response.json();
         })
@@ -1140,17 +1138,19 @@ function loadAvailableDocuments() {
             if (data.success) {
                 const documentSelector = document.getElementById('document-selector');
                 // Clear existing options except the first (No document)
-                while (documentSelector.options.length > 1) {
+                while (documentSelector && documentSelector.options.length > 1) {
                     documentSelector.remove(1);
                 }
 
                 // Add available documents
-                data.documents.forEach(doc => {
-                    const option = document.createElement('option');
-                    option.value = doc.filename;
-                    option.textContent = doc.filename;
-                    documentSelector.appendChild(option);
-                });
+                if (documentSelector && data.documents) {
+                    data.documents.forEach(doc => {
+                        const option = document.createElement('option');
+                        option.value = doc.filename;
+                        option.textContent = doc.filename;
+                        documentSelector.appendChild(option);
+                    });
+                }
             } else {
                 console.warn('Unexpected server response:', data);
             }
@@ -1315,54 +1315,54 @@ document.addEventListener('DOMContentLoaded', function() {
     window.SPECIALIZED_AGENTS = {
         developer: {
             id: 'developer',
-            name: 'Development Agent',
+            name: 'Agente de Desarrollo',
             icon: 'bi-code-slash',
-            description: 'Expert in real-time code optimization and editing',
+            description: 'Experto en optimización y edición de código en tiempo real',
             capabilities: [
-                'Code correction and refactoring',
-                'Performance optimization',
-                'Framework and library integration',
-                'Task automation',
-                'Clean code generation'
+                'Corrección y refactorización de código',
+                'Optimización de rendimiento',
+                'Integración de frameworks y librerías',
+                'Automatización de tareas',
+                'Generación de código limpio'
             ]
         },
         architect: {
             id: 'architect',
-            name: 'Software Architect',
+            name: 'Arquitecto de Software',
             icon: 'bi-diagram-3',
-            description: 'Designer of scalable and optimized architectures',
+            description: 'Diseñador de arquitecturas escalables y optimizadas',
             capabilities: [
-                'Project structure definition',
-                'Technology and framework selection',
-                'Database choice advisory',
-                'Microservices implementation',
-                'UI/UX and design pattern planning'
+                'Definición de estructura del proyecto',
+                'Selección de tecnologías y frameworks',
+                'Asesoría en elección de bases de datos',
+                'Implementación de microservicios',
+                'Planificación de UI/UX y patrones de diseño'
             ]
         },
         advanced: {
             id: 'advanced',
-            name: 'Advanced Specialist',
+            name: 'Especialista Avanzado',
             icon: 'bi-braces',
-            description: 'Expert in complex solutions and integrations',
+            description: 'Experto en soluciones complejas e integraciones',
             capabilities: [
-                'Advanced solution development',
-                'External API integration',
-                'Performance optimization',
-                'Security and encryption',
-                'Server deployment and configuration'
+                'Desarrollo de soluciones avanzadas',
+                'Integración con APIs externas',
+                'Optimización de rendimiento',
+                'Seguridad y encriptación',
+                'Despliegue y configuración de servidores'
             ]
         },
         general: {
             id: 'general',
-            name: 'General Assistant',
+            name: 'Asistente General',
             icon: 'bi-chat-dots',
-            description: 'Versatile assistant for general inquiries',
+            description: 'Asistente versátil para consultas generales',
             capabilities: [
-                'Answering general questions',
-                'Basic development guidance',
-                'Programming concept help',
-                'Best practice advice',
-                'Common problem resolution'
+                'Respuesta a preguntas generales',
+                'Orientación básica de desarrollo',
+                'Ayuda con conceptos de programación',
+                'Consejos de buenas prácticas',
+                'Resolución de problemas comunes'
             ]
         }
     };
