@@ -893,7 +893,8 @@ function sendMessage(message) {
         })
         .then(response => response.json())
         .catch(testError => {
-          console.error("Error en la prueba de([\w-]*)\n([\s\S]*?)```/g, function(match, language, code) {
+          console.error("Error en la prueba de conexión:", testError);
+          addSystemMessage(`⚠️ Error en la prueba de conexión:([\w-]*)\n([\s\S]*?)```/g, function(match, language, code) {
         return `
             <div class="code-header">
                 <span class="code-language">${language || 'code'}</span>
