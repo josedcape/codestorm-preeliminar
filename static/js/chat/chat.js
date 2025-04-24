@@ -894,8 +894,8 @@ function sendMessage(message) {
         .then(response => response.json())
        .catch(testError => {
          console.error("Error en la prueba de diagnóstico:", testError);
-html([\s\S]*?)```/g;
-  const htmlMatches = text.match(htmlRegex);
+         addSystemhtml([\s\S]*?)```/g;
+  const htmlMatches = response.match(htmlRegex);
 
   if (htmlMatches && htmlMatches.length > 0) {
     // Extraer el contenido HTML del primer bloque

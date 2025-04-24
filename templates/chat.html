@@ -602,13 +602,13 @@ pre code {
     div.textContent = text;
     return div.innerHTML;
   }
-  
+
   // Function to get current time for messages
   function getCurrentTime() {
     const now = new Date();
     return now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
   }
-  
+
   // Function to scroll chat container to bottom
   function scrollToBottom(element) {
     if (element) {
@@ -674,8 +674,22 @@ pre code {
             }
         };
 
-        // Inicializar chat
-        initializeChat();
+        // Inicializar chat - asegurarnos que el script de chat se ha cargado
+        window.app = window.app || {};
+        window.app.chat = window.app.chat || {};
+
+        // El script de chat debe haber cargado estas funciones
+        setTimeout(function() {
+            if (typeof initializeChat === 'function') {
+                window.app.chat.initialize = initializeChat;
+                window.app.chat.setActiveAgent = setActiveAgent;
+
+                window.app.chat.initialize();
+                setActiveAgent('developer'); // Establecer agente por defecto
+            } else {
+                console.error("Error: La función initializeChat no está definida");
+            }
+        }, 100); // Pequeño retraso para asegurar carga
 
         // Funcionalidad para ajustar la altura del textarea
         const chatInput = document.getElementById('chat-input');
@@ -860,7 +874,7 @@ pre code {
             return;
         }
 
-        const allowedTypes = ['.pdf', '.docx', '.doc', '.html', '.htm', '.md', '.txt', '.py', '.js', '.css', '.json', '.csv', '.xml', '.yml', '.yaml', '.pptx', '.epub'];
+        const allowedTypes = ['.pdf', '.docx', '.doc', '.html', '.htm', '.md', '.txt', '.py', '.js','.css', '.json', '.csv', '.xml', '.yml', '.yaml', '.pptx', '.epub'];
         const file = fileInput.files[0];
         const fileExt = '.' + file.name.split('.').pop().toLowerCase();
 
